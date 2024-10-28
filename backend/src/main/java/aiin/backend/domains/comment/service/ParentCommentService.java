@@ -25,6 +25,15 @@ public class ParentCommentService {
 	private final PostService postService;
 	private final ParentCommentRepository parentCommentRepository;
 
+	// 부모 댓글 권한 확인
+	private void validateParentCommentAuthority(Member member, Long commentId) {
+		Boolean exists = parentCommentRepository.existsByIdAndMember(commentId, member);
+
+		if (!exists) {
+			throw ApiException.from(UNAUTHORIZED_PARENT_COMMENT);
+		}
+	}
+
 	// 부모 댓글 저장
 	@Transactional(rollbackFor = ApiException.class)
 	public void saveParentComment(Member member, Long postId, SaveParentCommentRequest request) {
@@ -36,7 +45,7 @@ public class ParentCommentService {
 
 	// 부모 댓글 수정
 	@Transactional(rollbackFor = ApiException.class)
-	public void updateParentComment(Member member, Long commentId, UpdateParentCommentRequest request) {
+	public void validateAndUpdateParentComment(Member member, Long commentId, UpdateParentCommentRequest request) {
 		validateParentCommentAuthority(member, commentId);
 
 		ParentComment parentComment = parentCommentRepository.findById(commentId)
@@ -45,12 +54,10 @@ public class ParentCommentService {
 		parentComment.updateContent(request.getContent());
 	}
 
-	// 부모 댓글 권한 확인
-	private void validateParentCommentAuthority(Member member, Long commentId) {
-		Boolean exists = parentCommentRepository.existsByIdAndMember(commentId, member);
+	// 부모 댓글 삭제
+	public void validateAndDeleteParentComment(Member member, Long commentId) {
+		validateParentCommentAuthority(member, commentId);
 
-		if (!exists) {
-			throw ApiException.from(UNAUTHORIZED_PARENT_COMMENT);
-		}
+		parentCommentRepository.deleteById(commentId);
 	}
 }

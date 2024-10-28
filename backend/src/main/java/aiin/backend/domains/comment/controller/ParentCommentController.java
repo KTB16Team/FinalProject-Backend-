@@ -1,6 +1,7 @@
 package aiin.backend.domains.comment.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -41,7 +42,17 @@ public class ParentCommentController {
 		@RequestBody UpdateParentCommentRequest request
 	) {
 		Member member = memberLoader.getMember();
-		parentCommentService.updateParentComment(member, commentId, request);
+		parentCommentService.validateAndUpdateParentComment(member, commentId, request);
+
+		return ResponseEntity.ok(DataResponse.ok());
+	}
+
+	@DeleteMapping("comments/{commentId}")
+	public ResponseEntity<DataResponse<Void>> deleteParentComment(
+		@PathVariable Long commentId
+	) {
+		Member member = memberLoader.getMember();
+		parentCommentService.validateAndDeleteParentComment(member, commentId);
 
 		return ResponseEntity.ok(DataResponse.ok());
 	}
