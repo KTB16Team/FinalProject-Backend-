@@ -3,12 +3,14 @@ package aiin.backend.domains.comment.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import aiin.backend.common.dto.DataResponse;
 import aiin.backend.domains.comment.dto.request.SaveParentCommentRequest;
+import aiin.backend.domains.comment.dto.request.UpdateParentCommentRequest;
 import aiin.backend.domains.comment.service.ParentCommentService;
 import aiin.backend.domains.member.entity.Member;
 import aiin.backend.util.memberLoader.MemberLoader;
@@ -28,9 +30,19 @@ public class ParentCommentController {
 		@RequestBody SaveParentCommentRequest request
 	) {
 		Member member = memberLoader.getMember();
-		parentCommentService.saveParentComment(postId, member, request);
+		parentCommentService.saveParentComment(member, postId, request);
 
 		return ResponseEntity.ok(DataResponse.ok());
 	}
 
+	@PutMapping("comments/{commentId}")
+	public ResponseEntity<DataResponse<Void>> updateParentComment(
+		@PathVariable Long commentId,
+		@RequestBody UpdateParentCommentRequest request
+	) {
+		Member member = memberLoader.getMember();
+		parentCommentService.updateParentComment(member, commentId, request);
+
+		return ResponseEntity.ok(DataResponse.ok());
+	}
 }

@@ -1,10 +1,13 @@
 package aiin.backend.domains.comment.service;
 
+import static aiin.backend.common.exception.ErrorCode.*;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import aiin.backend.common.exception.ApiException;
 import aiin.backend.domains.comment.dto.request.SaveParentCommentRequest;
+import aiin.backend.domains.comment.dto.request.UpdateParentCommentRequest;
 import aiin.backend.domains.comment.entity.ParentComment;
 import aiin.backend.domains.comment.mapper.ParentCommentMapper;
 import aiin.backend.domains.comment.repository.ParentCommentRepository;
@@ -24,10 +27,30 @@ public class ParentCommentService {
 
 	// 부모 댓글 저장
 	@Transactional(rollbackFor = ApiException.class)
-	public void saveParentComment(Long postId, Member member, SaveParentCommentRequest request) {
+	public void saveParentComment(Member member, Long postId, SaveParentCommentRequest request) {
 		Post post = postService.findById(postId);
 		ParentComment parentComment = parentCommentMapper.from(request, member, post);
 
 		parentCommentRepository.save(parentComment);
+	}
+
+	// 부모 댓글 수정
+	@Transactional(rollbackFor = ApiException.class)
+	public void updateParentComment(Member member, Long commentId, UpdateParentCommentRequest request) {
+		validateParentCommentAuthority(member, commentId);
+
+		ParentComment parentComment = parentCommentRepository.findById(commentId)
+			.orElseThrow(() -> ApiException.from(PARENT_COMMENT_NOT_FOUND));
+
+		parentComment.updateContent(request.getContent());
+	}
+
+	// 부모 댓글 권한 확인
+	private void validateParentCommentAuthority(Member member, Long commentId) {
+		Boolean exists = parentCommentRepository.existsByIdAndMember(commentId, member);
+
+		if (!exists) {
+			throw ApiException.from(UNAUTHORIZED_PARENT_COMMENT);
+		}
 	}
 }

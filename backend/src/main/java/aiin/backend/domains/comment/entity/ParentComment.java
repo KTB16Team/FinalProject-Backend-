@@ -72,4 +72,8 @@ public class ParentComment extends BaseEntity {
 		this.isDeleted = true;
 		content = CommentConstants.DELETED_COMMENT.getValue();
 	}
+
+	public void updateContent(String content) {
+		this.content = content;
+	}
 }
