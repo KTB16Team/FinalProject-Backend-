@@ -37,9 +37,12 @@ public enum ErrorCode {
 	POST_NOT_FOUND(HttpStatus.NOT_FOUND, "해당하는 게시글을 찾을 수 없습니다.", "POST-001"),
 
 	//ParentComment
-	PARENT_COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당하는 부모 댓글을 찾을 수 없습니다.", "PC-001"),
-	UNAUTHORIZED_PARENT_COMMENT(HttpStatus.FORBIDDEN, "부모 댓글 작성자만 수정, 삭제가 가능합니다.", "PC-002"),
+	PARENT_COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당하는 부모 댓글을 찾을 수 없습니다.", "PARENT_COMMENT-001"),
+	UNAUTHORIZED_PARENT_COMMENT(HttpStatus.FORBIDDEN, "부모 댓글 작성자만 수정, 삭제가 가능합니다.", "PARENT-COMMENT-002"),
 
+	//ChildComment
+	CHILD_COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당하는 자식 댓글을 찾을 수 없습니다.", "CHILD_COMMENT-001"),
+	UNAUTHORIZED_CHILD_COMMENT(HttpStatus.FORBIDDEN, "자식 댓글 작성자만 수정, 삭제가 가능합니다.", "CHILD-COMMENT-002"),
 
 	;
 	private final HttpStatus httpStatus;

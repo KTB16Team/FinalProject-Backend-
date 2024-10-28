@@ -80,4 +80,8 @@ public class ChildComment extends BaseEntity {
 		this.isDeleted = true;
 		content = CommentConstants.DELETED_COMMENT.getValue();
 	}
+
+	public void updateChildComment(String content) {
+		this.content = content;
+	}
 }
