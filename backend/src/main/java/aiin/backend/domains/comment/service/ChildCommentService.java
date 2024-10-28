@@ -57,4 +57,13 @@ public class ChildCommentService {
 
 		childComment.updateChildComment(request.getContent());
 	}
+
+	//자식 댓글 삭제
+	@Transactional(rollbackFor = ApiException.class)
+	public void validateAndDeleteChildComment(Member member, Long childCommentId) {
+		validateChildCommentAuthority(member, childCommentId);
+
+		childCommentRepository.findById(childCommentId)
+			.ifPresent(ChildComment::deleteChildCommentSoftly);
+	}
 }
