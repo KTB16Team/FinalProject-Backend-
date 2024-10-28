@@ -60,4 +60,10 @@ public class ParentCommentService {
 
 		parentCommentRepository.deleteById(commentId);
 	}
+
+	// 부모 댓글 조회
+	public ParentComment findById(Long commentId) {
+		return parentCommentRepository.findById(commentId)
+			.orElseThrow(() -> ApiException.from(PARENT_COMMENT_NOT_FOUND));
+	}
 }
