@@ -6,8 +6,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import aiin.backend.member.entity.Member;
-import aiin.backend.member.service.MemberService;
+import aiin.backend.domains.member.entity.Member;
+import aiin.backend.domains.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor

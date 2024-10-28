@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import aiin.backend.common.exception.ApiException;
-import aiin.backend.member.entity.Member;
-import aiin.backend.member.repository.MemberRepository;
+import aiin.backend.domains.member.entity.Member;
+import aiin.backend.domains.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 
 @Component

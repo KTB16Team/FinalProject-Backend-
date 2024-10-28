@@ -2,7 +2,7 @@ package aiin.backend.common.entity;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import aiin.backend.member.entity.Member;
+import aiin.backend.domains.member.entity.Member;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
