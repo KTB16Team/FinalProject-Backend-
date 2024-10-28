@@ -55,10 +55,12 @@ public class ParentCommentService {
 	}
 
 	// 부모 댓글 삭제
+	@Transactional(rollbackFor = ApiException.class)
 	public void validateAndDeleteParentComment(Member member, Long commentId) {
 		validateParentCommentAuthority(member, commentId);
 
-		parentCommentRepository.deleteById(commentId);
+		parentCommentRepository.findById(commentId)
+			.ifPresent(ParentComment::deleteChildCommentSoftly);
 	}
 
 	// 부모 댓글 조회
