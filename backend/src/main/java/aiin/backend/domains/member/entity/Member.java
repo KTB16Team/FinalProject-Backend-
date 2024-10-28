@@ -11,7 +11,7 @@ import aiin.backend.domains.member.model.Gender;
 import aiin.backend.domains.member.model.MemberRole;
 import aiin.backend.domains.member.model.Provider;
 import aiin.backend.common.entity.BaseEntity;
-import aiin.backend.domains.comment.entity.Comment;
+import aiin.backend.domains.comment.entity.ParentComment;
 import aiin.backend.domains.post.entity.Post;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -79,7 +79,7 @@ public class Member extends BaseEntity {
 	private List<Post> posts = new ArrayList<>();
 
 	@OneToMany(mappedBy = "author")
-	private List<Comment> comments = new ArrayList<>();
+	private List<ParentComment> parentComments = new ArrayList<>();
 
 	@Builder
 	private Member(String username, String email, String password, MemberRole memberRole, Gender gender, Provider provider, String phoneNumber, LocalDate birthDate) {

@@ -1,5 +1,6 @@
 package aiin.backend.domains.post.entity;
 
+import static jakarta.persistence.CascadeType.*;
 import static lombok.AccessLevel.*;
 
 import java.util.List;
@@ -7,7 +8,7 @@ import java.util.List;
 import aiin.backend.common.entity.BaseEntity;
 import aiin.backend.domains.dispute.entity.Dispute;
 import aiin.backend.domains.member.entity.Member;
-import aiin.backend.domains.comment.entity.Comment;
+import aiin.backend.domains.comment.entity.ParentComment;
 import aiin.backend.domains.post.model.Category;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -36,10 +37,10 @@ public class Post extends BaseEntity {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id")
-	private Member author;
+	private Member member;
 
-	@OneToMany(mappedBy = "post")
-	private List<Comment> comments;
+	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY, orphanRemoval = true, cascade = ALL)
+	private List<ParentComment> parentComments;
 
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "dispute_id")
@@ -52,8 +53,8 @@ public class Post extends BaseEntity {
 	@Column(nullable = false)
 	private Category category;
 
-	public void setAuthor(Member author) {
-		this.author = author;
-		author.getPosts().add(this);
+	public void setAuthor(Member member) {
+		this.member = member;
+		member.getPosts().add(this);
 	}
 }
