@@ -31,8 +31,20 @@ public enum ErrorCode {
 	INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부에서 에러가 발생하였습니다.", "COMMON-002"),
 
 	//502
-	EMAIL_BAD_GATEWAY(HttpStatus.BAD_GATEWAY, "이메일 전송에 실패하였습니다.", "COMMON-003");
+	EMAIL_BAD_GATEWAY(HttpStatus.BAD_GATEWAY, "이메일 전송에 실패하였습니다.", "COMMON-003"),
 
+	//Post
+	POST_NOT_FOUND(HttpStatus.NOT_FOUND, "해당하는 게시글을 찾을 수 없습니다.", "POST-001"),
+
+	//ParentComment
+	PARENT_COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당하는 부모 댓글을 찾을 수 없습니다.", "PARENT_COMMENT-001"),
+	UNAUTHORIZED_PARENT_COMMENT(HttpStatus.FORBIDDEN, "부모 댓글 작성자만 수정, 삭제가 가능합니다.", "PARENT-COMMENT-002"),
+
+	//ChildComment
+	CHILD_COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당하는 자식 댓글을 찾을 수 없습니다.", "CHILD_COMMENT-001"),
+	UNAUTHORIZED_CHILD_COMMENT(HttpStatus.FORBIDDEN, "자식 댓글 작성자만 수정, 삭제가 가능합니다.", "CHILD-COMMENT-002"),
+
+	;
 	private final HttpStatus httpStatus;
 	private final String message;
 	private final String code;

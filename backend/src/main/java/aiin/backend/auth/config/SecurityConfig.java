@@ -5,7 +5,7 @@ import aiin.backend.auth.security.exceptionHandlingFilter.ExceptionHandlingFilte
 import aiin.backend.auth.security.jwtFilter.JwtAuthenticationFilter;
 import aiin.backend.auth.security.jwtFilter.JwtTokenProvider;
 import aiin.backend.auth.security.loginFilter.LoginFilter;
-import aiin.backend.member.service.MemberService;
+import aiin.backend.domains.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,7 +18,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
