@@ -37,3 +37,6 @@ security:
     /swagger-ui.html, 
     /api-docs/**, 
     /swagger-ui/**
+ai:
+  server:
+    url: http://localhost:8080
