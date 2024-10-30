@@ -11,15 +11,15 @@ import lombok.Getter;
 
 @Entity
 @Getter
-@Table(name = "dialogue_records")
+@Table(name = "text_records")
 public class TextRecord extends BaseEntity {
 	@Id @GeneratedValue
-	@Column(name = "dialogue_id")
+	@Column(name = "text_record_id")
 	private Long id;
 
 	@Column(nullable = false, length = 10000)
 	private String script;
 
-	@OneToOne(mappedBy = "dialogueRecord")
+	@OneToOne(mappedBy = "textRecord")
 	private PrivatePost privatePost;
 }

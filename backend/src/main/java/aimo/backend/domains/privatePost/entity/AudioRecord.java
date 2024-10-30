@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = PROTECTED)
 public class AudioRecord extends BaseEntity {
 	@Id @GeneratedValue
-	@Column(name = "audio_id")
+	@Column(name = "audio_record_id")
 	private Long id;
 
 	@Column(nullable = false, name = "audio_file_url")

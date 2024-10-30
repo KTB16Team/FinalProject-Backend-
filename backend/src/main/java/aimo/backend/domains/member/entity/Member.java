@@ -75,10 +75,10 @@ public class Member extends BaseEntity {
 	@OneToMany(mappedBy = "member")
 	private List<PrivatePost> privatePosts;
 
-	@OneToMany(mappedBy = "author")
+	@OneToMany(mappedBy = "member")
 	private List<Post> posts = new ArrayList<>();
 
-	@OneToMany(mappedBy = "author")
+	@OneToMany(mappedBy = "member")
 	private List<ParentComment> parentComments = new ArrayList<>();
 
 	@Builder

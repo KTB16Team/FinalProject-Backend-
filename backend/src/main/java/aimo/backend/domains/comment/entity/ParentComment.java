@@ -39,7 +39,7 @@ public class ParentComment extends BaseEntity {
 	@JoinColumn(name = "post_id")
 	private Post post;
 
-	@OneToMany(mappedBy = "parent", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "parentComment", fetch = FetchType.LAZY)
 	private List<ChildComment> childComments;
 
 	@Column(nullable = false)

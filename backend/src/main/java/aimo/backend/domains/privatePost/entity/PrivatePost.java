@@ -48,11 +48,11 @@ public class PrivatePost {
 	private String judgement;
 
 	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "origin_audio_id", referencedColumnName = "audio_id")
+	@JoinColumn(name = "audio_record_id", referencedColumnName = "audio_record_id")
 	private AudioRecord audioRecord;
 
 	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "orgin_dialogue_id", referencedColumnName = "dialogue_id", nullable = false)
+	@JoinColumn(name = "text_record_id", referencedColumnName = "text_record_id", nullable = false)
 	private TextRecord textRecord;
 
 	@Enumerated(EnumType.STRING)
