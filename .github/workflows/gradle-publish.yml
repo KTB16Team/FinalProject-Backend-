@@ -59,13 +59,14 @@ jobs:
           SPRING_DATASOURCE_USERNAME: admin
           SPRING_DATASOURCE_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
-      # EC2 연결 테스트 추가
+      # EC2 연결 테스트 추가 (debug 옵션 활성화)
       - name: Test EC2 SSH Connection
         uses: appleboy/ssh-action@v0.1.1
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
+          debug: true
           script: |
             echo "SSH 연결 테스트 성공"
 
@@ -76,6 +77,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
+          debug: true
           source: ${{ secrets.WORKING_DIRECTORY }}/build/libs/*.jar
           target: /home/ubuntu/
 
@@ -86,6 +88,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
+          debug: true
           script: |
             if pgrep -f "app.jar"; then pkill -f "app.jar"; fi
             nohup java -jar /home/ubuntu/app.jar --spring.profiles.active=dev > /dev/null 2>&1 &
