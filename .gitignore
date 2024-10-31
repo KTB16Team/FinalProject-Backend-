@@ -1,3 +1,6 @@
 
 .idea/compiler.xml
 backend/src/main/resources/application.yml
+backend/src/main/resources/application.yml
+.github/workflows/gradle-publish.yml
+/backend/src/main/resources

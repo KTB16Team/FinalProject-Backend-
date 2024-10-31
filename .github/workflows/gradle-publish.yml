@@ -90,5 +90,5 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           debug: true
           script: |
-            if pgrep -f "app.jar"; then pkill -f "app.jar"; fi
-            nohup java -jar /home/ubuntu/app.jar --spring.profiles.active=dev > /dev/null 2>&1 &
+            if pgrep -f "app.jar"; then pkill -f "backend-server.jar"; fi
+            nohup java -jar /home/ubuntu/build/libs/backend-server.jar --spring.profiles.active=dev > /dev/null 2>&1 &
