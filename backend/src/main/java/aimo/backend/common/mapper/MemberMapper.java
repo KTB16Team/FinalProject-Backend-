@@ -23,7 +23,6 @@ public class MemberMapper {
 			.memberRole(MemberRole.USER)
 			.gender(signUpRequest.gender())
 			.provider(Provider.AIMO)
-			.phoneNumber(signUpRequest.phoneNumber())
 			.birthDate(signUpRequest.birth())
 			.build();
 	}
