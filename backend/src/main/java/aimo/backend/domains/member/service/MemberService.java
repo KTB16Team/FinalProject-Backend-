@@ -73,6 +73,12 @@ public class MemberService {
         memberRepository.delete(member);
     }
 
+    public Member findById(Long memberId) {
+        return memberRepository
+            .findById(memberId)
+            .orElseThrow(() -> ApiException.from(ErrorCode.MEMBER_NOT_FOUND));
+    }
+
     protected boolean isDuplicateEmail(String email) {
         return memberRepository.findByEmail(email).isPresent();
     }

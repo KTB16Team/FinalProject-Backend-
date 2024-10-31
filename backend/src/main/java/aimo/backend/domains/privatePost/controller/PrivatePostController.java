@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,8 +24,12 @@ import aimo.backend.common.dto.DataResponse;
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.exception.ErrorCode;
 import aimo.backend.common.mapper.PrivatePostMapper;
+import aimo.backend.domains.auth.security.jwtFilter.JwtTokenProviderImpl;
+import aimo.backend.domains.member.entity.Member;
+import aimo.backend.domains.member.service.MemberService;
 import aimo.backend.domains.privatePost.dto.PrivatePostPreviewResponse;
 import aimo.backend.domains.privatePost.dto.PrivatePostResponse;
+import aimo.backend.domains.privatePost.dto.SummaryAndJudgementRequest;
 import aimo.backend.domains.privatePost.dto.TextRecordRequest;
 import aimo.backend.domains.privatePost.dto.UploadAudioSuccessRequest;
 import aimo.backend.domains.privatePost.entity.PrivatePost;
@@ -45,6 +50,8 @@ public class PrivatePostController {
 	private final PrivatePostService privatePostService;
 	private final TextRecordService textRecordService;
 	private final ChatRecordService chatRecordService;
+	private final MemberService memberService;
+	private final JwtTokenProviderImpl jwtTokenProviderImpl;
 
 	@GetMapping("/upload/audio/presigned")
 	public ResponseEntity<DataResponse<Void>> getPresignedUrlTo(@RequestParam("file") MultipartFile file)  {
@@ -65,10 +72,23 @@ public class PrivatePostController {
 
 	@PostMapping("/judgement")
 	public ResponseEntity<DataResponse<Void>> judgement(
+		@RequestHeader("Authorization") String accessToken,
 		@RequestBody TextRecordRequest textRecordRequest
 	) {
+		Long memberId = jwtTokenProviderImpl.extractMemberId(accessToken)
+		Member member = memberService.findById(memberId);
+
+		SummaryAndJudgementRequest summaryAndJudgementRequest =
+			new SummaryAndJudgementRequest(
+				textRecordRequest.title(),
+				textRecordRequest.script(),
+				member.getUsername(),
+				member.getGender(),
+				member.getBirthDate()
+			);
+
 		return privatePostService
-			.serveScriptToAi(textRecordRequest)
+			.serveScriptToAi(summaryAndJudgementRequest)
 			.blockOptional()
 			.map(response -> ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created()))
 			.orElseThrow(() -> ApiException.from(ErrorCode.AI_BAD_GATEWAY));
