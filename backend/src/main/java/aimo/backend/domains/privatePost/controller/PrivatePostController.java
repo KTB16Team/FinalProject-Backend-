@@ -75,7 +75,10 @@ public class PrivatePostController {
 		@RequestHeader("Authorization") String accessToken,
 		@RequestBody TextRecordRequest textRecordRequest
 	) {
-		Long memberId = jwtTokenProviderImpl.extractMemberId(accessToken)
+		Long memberId = jwtTokenProviderImpl
+			.extractMemberId(accessToken)
+			.orElseThrow(() -> ApiException.from(ErrorCode.INVALID_TOKEN));
+		
 		Member member = memberService.findById(memberId);
 
 		SummaryAndJudgementRequest summaryAndJudgementRequest =
