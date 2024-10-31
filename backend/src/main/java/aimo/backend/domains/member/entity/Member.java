@@ -66,9 +66,6 @@ public class Member extends BaseEntity {
 	@JoinColumn(name = "profile_image_id", referencedColumnName = "profile_id")
 	private ProfileImage profileImage;
 
-	@Column(nullable = false, name = "phone_number")
-	private String phoneNumber;
-
 	@Column(nullable = false, name = "birth_date")
 	private LocalDate birthDate;
 
@@ -82,12 +79,11 @@ public class Member extends BaseEntity {
 	private List<ParentComment> parentComments = new ArrayList<>();
 
 	@Builder
-	private Member(String username, String email, String password, MemberRole memberRole, Gender gender, Provider provider, String phoneNumber, LocalDate birthDate) {
+	private Member(String username, String email, String password, MemberRole memberRole, Gender gender, Provider provider, LocalDate birthDate) {
 		this.username = username;
 		this.email = email;
 		this.password = password;
 		this.role = memberRole;
-		this.phoneNumber = phoneNumber;
 		this.birthDate = birthDate;
 		this.gender = gender;
 		this.provider = provider;

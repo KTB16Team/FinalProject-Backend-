@@ -9,6 +9,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -17,19 +18,31 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = PROTECTED)
 public class AudioRecord extends BaseEntity {
+
 	@Id @GeneratedValue
 	@Column(name = "audio_record_id")
 	private Long id;
 
-	@Column(nullable = false, name = "audio_file_url")
+	@Column(nullable = false, name = "file_name")
+	private String filename;
+
+	@Column(nullable = false, name = "url")
 	private String url;
 
-	@Column(nullable = false, name = "audio_file_size")
-	private String size;
+	@Column(nullable = false, name = "size")
+	private Long size;
 
-	@Column(nullable = false, name = "audio_file_extension")
+	@Column(nullable = false, name = "extension")
 	private String extension;
 
 	@OneToOne(mappedBy = "audioRecord")
 	private PrivatePost privatePost;
+
+	@Builder
+	private AudioRecord(String filename, String extension, String url, Long size) {
+		this.filename = filename;
+		this.url = url;
+		this.size = size;
+		this.extension = extension;
+	}
 }
