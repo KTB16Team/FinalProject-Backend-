@@ -91,4 +91,4 @@ jobs:
           debug: true
           script: |
             if pgrep -f "app.jar"; then pkill -f "server.jar"; fi
-            nohup java -jar /home/ubuntu/build/libs/server.jar --spring.profiles.active=dev > /dev/null 2>&1 &
+            nohup java -jar /home/ubuntu/backend/build/libs/server.jar --spring.profiles.active=dev > /dev/null 2>&1 &
