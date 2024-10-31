@@ -61,7 +61,7 @@ jobs:
 
       # EC2 연결 테스트 추가 (debug 옵션 활성화)
       - name: Test EC2 SSH Connection
-        uses: appleboy/ssh-action@v0.1.1
+        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
@@ -72,7 +72,7 @@ jobs:
 
       # 빌드된 JAR 파일을 EC2로 복사
       - name: Copy JAR file to EC2
-        uses: appleboy/scp-action@v0.1.1
+        uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
@@ -83,7 +83,7 @@ jobs:
 
       # EC2에서 애플리케이션 실행 (RDS 연결)
       - name: Deploy to EC2
-        uses: appleboy/ssh-action@v0.1.1
+        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
