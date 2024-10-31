@@ -77,7 +77,7 @@ public class PrivatePostController {
 	) {
 		Long memberId = jwtTokenProviderImpl
 			.extractMemberId(accessToken)
-			.orElseThrow(() -> ApiException.from(ErrorCode.INVALID_TOKEN));
+			.orElseThrow(() -> ApiException.from(ErrorCode.INVALID_ACCESS_TOKEN));
 		
 		Member member = memberService.findById(memberId);
 
