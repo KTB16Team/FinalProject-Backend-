@@ -59,6 +59,16 @@ jobs:
           SPRING_DATASOURCE_USERNAME: admin
           SPRING_DATASOURCE_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
+      # EC2 연결 테스트 추가
+      - name: Test EC2 SSH Connection
+        uses: appleboy/ssh-action@v0.1.1
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            echo "SSH 연결 테스트 성공"
+
       # 빌드된 JAR 파일을 EC2로 복사
       - name: Copy JAR file to EC2
         uses: appleboy/scp-action@v0.1.1
