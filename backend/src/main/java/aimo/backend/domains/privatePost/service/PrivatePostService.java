@@ -1,6 +1,13 @@
 package aimo.backend.domains.privatePost.service;
 
+import java.util.stream.Collectors;
+
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,10 +16,12 @@ import org.springframework.web.reactive.function.client.WebClient;
 import aimo.backend.common.dto.DataResponse;
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.exception.ErrorCode;
-import aimo.backend.common.mapper.DisputeMapper;
+import aimo.backend.common.mapper.PrivatePostMapper;
 import aimo.backend.common.properties.AiServerProperties;
-import aimo.backend.domains.privatePost.dto.SummaryAndJudgementRequest;
+import aimo.backend.domains.privatePost.dto.PrivatePostPreviewResponse;
+import aimo.backend.domains.privatePost.dto.PrivatePostResponse;
 import aimo.backend.domains.privatePost.dto.SummaryAndJudgementResponse;
+import aimo.backend.domains.privatePost.dto.TextRecordRequest;
 import aimo.backend.domains.privatePost.entity.PrivatePost;
 import aimo.backend.domains.privatePost.repository.PrivatePostRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,12 +39,12 @@ public class PrivatePostService {
 
 	@Transactional(rollbackFor = ApiException.class)
 	public Mono<DataResponse<Void>> serveScriptToAi(
-		SummaryAndJudgementRequest summaryAndJudgementRequest
+		TextRecordRequest textRecordRequest
 	) {
 		return webClient
 				.post()
 				.uri(aiServerProperties.getDomainUrl() + aiServerProperties.getJudgementApi())
-				.bodyValue(summaryAndJudgementRequest)
+				.bodyValue(textRecordRequest)
 				.retrieve()
 				.onStatus(HttpStatusCode::is4xxClientError, clientResponse -> {
 					throw ApiException.from(ErrorCode.AI_BAD_GATEWAY);
@@ -44,14 +53,40 @@ public class PrivatePostService {
 					throw ApiException.from(ErrorCode.AI_SEVER_ERROR);
 				})
 				.bodyToMono(new ParameterizedTypeReference<DataResponse<SummaryAndJudgementResponse>>() {})
-				.flatMap(response -> saveDispute(response.getData()))
+				.flatMap(response -> save(response.getData()))
 				.then(Mono.just(DataResponse.created()));
 	}
 
 	@Transactional(rollbackFor = ApiException.class)
-	public Mono<PrivatePost> saveDispute(SummaryAndJudgementResponse summaryAndJudgementResponse) {
-		PrivatePost privatePost = DisputeMapper.toEntity(summaryAndJudgementResponse);
+	public Mono<PrivatePost> save(SummaryAndJudgementResponse summaryAndJudgementResponse) {
+		PrivatePost privatePost = PrivatePostMapper.toEntity(summaryAndJudgementResponse);
 		return Mono.fromCallable(() -> privatePostRepository.save(privatePost))
 			.subscribeOn(Schedulers.boundedElastic());
+	}
+
+	public PrivatePostResponse getPrivatePost(Long id) {
+		PrivatePost privatePost = privatePostRepository
+			.findById(id)
+			.orElseThrow(() -> ApiException.from(ErrorCode.PRIVATE_POST_NOT_FOUND));
+
+		return PrivatePostMapper.toResponse(privatePost);
+	}
+
+	public Page<PrivatePostPreviewResponse> getPrivatePostPreviews(
+		@PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
+		Pageable pageable
+	) {
+		Page<PrivatePost> privatePostPage = privatePostRepository
+			.findAll(pageable);
+
+		return new PageImpl<> (
+			privatePostPage
+			.getContent()
+			.stream()
+			.map(PrivatePostMapper::toPreviewResponse)
+			.collect(Collectors.toList()),
+			pageable,
+			privatePostPage.getTotalPages()
+			);
 	}
 }

@@ -2,6 +2,7 @@ package aimo.backend.domains.privatePost.entity;
 
 import static lombok.AccessLevel.*;
 
+import aimo.backend.common.entity.BaseEntity;
 import aimo.backend.domains.privatePost.model.OriginType;
 import aimo.backend.domains.member.entity.Member;
 import jakarta.persistence.Column;
@@ -23,7 +24,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Table(name = "disputes")
 @NoArgsConstructor(access = PROTECTED)
-public class PrivatePost {
+public class PrivatePost extends BaseEntity {
 	@Id @GeneratedValue
 	@Column(name = "private_post_id")
 	private Long id;
@@ -62,6 +63,9 @@ public class PrivatePost {
 	@Column(nullable = false)
 	private Double faultRate;
 
+	@Column(nullable = false)
+	private Boolean published;
+
 	@Builder
 	private PrivatePost(
 		String title,
@@ -73,7 +77,8 @@ public class PrivatePost {
 		AudioRecord audioRecord,
 		TextRecord textRecord,
 		OriginType originType,
-		Double faultRate)
+		Double faultRate,
+		Boolean published)
 	{
 		this.title = title;
 		this.member = member;
@@ -85,5 +90,6 @@ public class PrivatePost {
 		this.textRecord = textRecord;
 		this.originType = originType;
 		this.faultRate = faultRate;
+		this.published = published;
 	}
 }
