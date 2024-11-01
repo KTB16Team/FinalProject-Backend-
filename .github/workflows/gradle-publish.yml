@@ -7,7 +7,7 @@ on:
     branches: [ "develop" ]
 
 jobs:
-  backend-CI:
+  backend-CI-and-Deploy:
     runs-on: ubuntu-latest
 
     services:
@@ -70,14 +70,6 @@ jobs:
           source: ${{ secrets.WORKING_DIRECTORY }}/build/libs/*.jar
           target: /home/ubuntu/
 
-  backend-Deploy:
-    runs-on: ubuntu-latest
-    needs: backend-CI
-
-    steps:
-      # 소스 코드 체크아웃
-      - uses: actions/checkout@v4
-
       # EC2 연결 테스트 추가 (debug 옵션 활성화)
       - name: Test EC2 SSH Connection
         uses: appleboy/ssh-action@master
@@ -89,7 +81,7 @@ jobs:
           script: |
             echo "SSH 연결 테스트 성공"
 
-      # EC2에서 애플리케이션 실행 (RDS 연결)
+      # EC2에서 애플리케이션 실행 (screen 세션 사용)
       - name: Deploy to EC2
         uses: appleboy/ssh-action@master
         with:
@@ -98,7 +90,5 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           debug: true
           script: |
-            if pgrep -f "backend-server.jar"; then pkill -f "backend-server.jar"; fi
-            nohup java -jar /home/ubuntu/backend/build/libs/backend-server.jar --spring.profiles.active=dev > /dev/null 2>&1 &
-            disown
-          
+            if screen -list | grep -q "\bbe\b"; then screen -S be -X quit; fi
+            screen -dmS be java -jar /home/ubuntu/backend/build/libs/backend-server.jar --spring.profiles.active=dev
