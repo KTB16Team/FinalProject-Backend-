@@ -13,17 +13,13 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import aimo.backend.common.dto.DataResponse;
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.exception.ErrorCode;
 import aimo.backend.common.mapper.PrivatePostMapper;
 import aimo.backend.common.properties.AiServerProperties;
-import aimo.backend.domains.auth.security.jwtFilter.JwtTokenProviderImpl;
 import aimo.backend.domains.member.entity.Member;
-import aimo.backend.domains.member.service.MemberService;
 import aimo.backend.domains.privatePost.dto.PrivatePostPreviewResponse;
 import aimo.backend.domains.privatePost.dto.PrivatePostResponse;
 import aimo.backend.domains.privatePost.dto.SummaryAndJudgementRequest;
@@ -33,8 +29,6 @@ import aimo.backend.domains.privatePost.entity.PrivatePost;
 import aimo.backend.domains.privatePost.repository.PrivatePostRepository;
 import aimo.backend.util.memberLoader.MemberLoader;
 import lombok.RequiredArgsConstructor;
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 @Service
 @RequiredArgsConstructor

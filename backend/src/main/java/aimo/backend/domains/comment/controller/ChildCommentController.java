@@ -39,7 +39,7 @@ public class ChildCommentController {
 	@PutMapping("comments/child/{childCommentId}")
 	public ResponseEntity<DataResponse<Void>> updateParentComment(
 		@PathVariable Long childCommentId,
-		@RequestBody UpdateChildCommentRequest request
+		@RequestBody SaveChildCommentRequest request
 	) {
 		Member member = memberLoader.getMember();
 		childCommentService.validateAndUpdateChildComment(member, childCommentId, request);

@@ -10,27 +10,23 @@ import aimo.backend.domains.privatePost.model.OriginType;
 import jakarta.validation.constraints.NotNull;
 
 public record PrivatePostPreviewResponse(
-	@NotNull(message = "privatePostId is null")
-	@JsonProperty("private_post_id")
+	@NotNull(message = "ID가 비었습니다.")
 	Long privatePostId,
 
-	@NotNull(message = "title is null")
+	@NotNull(message = "제목이 비었습니다.")
 	String title,
 
-	@NotNull(message = "privatePostPreview is null")
-	@JsonProperty("private_post_preview")
+	@NotNull(message = "preview가 비었습니다.")
 	String privatePostPreview,
 
-	@NotNull(message = "privatePostPreviewType is null")
-	@JsonProperty("origin_type")
+	@NotNull(message = "원본 타입이 비었습니다.")
 	OriginType originType,
 
-	@NotNull(message = "createdAt is null")
-	@JsonProperty("created_at")
+	@NotNull(message = "생성일자가 비었습니다.")
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	LocalDateTime createdAt,
 
-	@NotNull(message = "published is null")
+	@NotNull(message = "발행이 비었습니다.")
 	Boolean published
 ) {
 }

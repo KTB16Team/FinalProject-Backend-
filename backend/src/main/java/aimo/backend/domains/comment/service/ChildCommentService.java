@@ -48,13 +48,13 @@ public class ChildCommentService {
 
 	//자식 댓글 수정
 	@Transactional(rollbackFor = ApiException.class)
-	public void validateAndUpdateChildComment(Member member, Long childCommentId, UpdateChildCommentRequest request) {
+	public void validateAndUpdateChildComment(Member member, Long childCommentId, SaveChildCommentRequest request) {
 		validateChildCommentAuthority(member, childCommentId);
 
 		ChildComment childComment = childCommentRepository.findById(childCommentId)
 			.orElseThrow(() -> ApiException.from(UNAUTHORIZED_CHILD_COMMENT));
 
-		childComment.updateChildComment(request.getContent());
+		childComment.updateChildComment(request.content());
 	}
 
 	//자식 댓글 삭제

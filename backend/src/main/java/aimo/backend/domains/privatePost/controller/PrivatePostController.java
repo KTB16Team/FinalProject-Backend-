@@ -77,7 +77,8 @@ public class PrivatePostController {
 
 		privatePostService.save(summaryAndJudgementResponse);
 
-		return ResponseEntity.status(HttpStatus.CREATED)
+		return ResponseEntity
+			.status(HttpStatus.CREATED)
 			.body(DataResponse.created());
 	}
 
@@ -86,7 +87,8 @@ public class PrivatePostController {
 		@RequestBody TextRecordRequest textRecordRequest
 	) {
 		textRecordService.save(textRecordRequest);
-		return ResponseEntity.status(HttpStatus.CREATED)
+		return ResponseEntity
+			.status(HttpStatus.CREATED)
 			.body(DataResponse.created());
 	}
 
@@ -95,7 +97,8 @@ public class PrivatePostController {
 		@RequestParam("chat_record") MultipartFile file
 	) throws IOException {
 		chatRecordService.save(file);
-		return ResponseEntity.status(HttpStatus.CREATED)
+		return ResponseEntity
+			.status(HttpStatus.CREATED)
 			.body(DataResponse.created());
 	}
 

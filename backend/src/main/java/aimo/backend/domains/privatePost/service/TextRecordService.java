@@ -19,7 +19,7 @@ public class TextRecordService {
 	private final TextRecordRepository textRecordRepository;
 
 	@Transactional(rollbackFor = Exception.class)
-	public ResponseEntity<DataResponse<Void>> save(TextRecordRequest textRecordRequest) {
+	public void save(TextRecordRequest textRecordRequest) {
 		TextRecord textRecord = TextRecord
 			.builder()
 			.title(textRecordRequest.title())
@@ -27,9 +27,5 @@ public class TextRecordService {
 			.build();
 
 		textRecordRepository.save(textRecord);
-
-		return ResponseEntity
-			.status(HttpStatus.CREATED)
-			.body(DataResponse.created());
 	}
 }

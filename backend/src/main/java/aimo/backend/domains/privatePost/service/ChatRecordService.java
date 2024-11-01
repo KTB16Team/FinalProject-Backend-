@@ -27,7 +27,7 @@ public class ChatRecordService {
 	private final ChatRecordRepository chatRecordRepository;
 
 	@Transactional(rollbackFor = ApiException.class)
-	public Long save(MultipartFile file) throws IOException {
+	public void save(MultipartFile file) throws IOException {
 		String originalFilename = file.getOriginalFilename();
 		if (originalFilename == null)
 			throw ApiException.from(ErrorCode.INVALID_FILE_NAME);
@@ -55,8 +55,6 @@ public class ChatRecordService {
 			.script(script)
 			.build();
 
-		return chatRecordRepository
-			.save(chatRecord)
-			.getId();
+		chatRecordRepository.save(chatRecord);
 	}
 }
