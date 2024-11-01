@@ -14,6 +14,7 @@ import lombok.Getter;
 @Getter
 @Table(name = "profile_images")
 public class ProfileImage extends BaseEntity {
+
 	@Id
 	@Column(name = "profile_id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

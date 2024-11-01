@@ -19,7 +19,7 @@ public class TextRecordService {
 	private final TextRecordRepository textRecordRepository;
 
 	@Transactional(rollbackFor = Exception.class)
-	public ResponseEntity<DataResponse<Void>> save(TextRecordRequest textRecordRequest){
+	public ResponseEntity<DataResponse<Void>> save(TextRecordRequest textRecordRequest) {
 		TextRecord textRecord = TextRecord
 			.builder()
 			.title(textRecordRequest.title())

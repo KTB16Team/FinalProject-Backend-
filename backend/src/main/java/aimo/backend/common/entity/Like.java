@@ -20,7 +20,8 @@ import lombok.NoArgsConstructor;
 @EntityListeners(AuditingEntityListener.class)
 public abstract class Like extends BaseEntity {
 
-	@Id @GeneratedValue
+	@Id
+	@GeneratedValue
 	@Column(nullable = false)
 	private Long like_id;
 

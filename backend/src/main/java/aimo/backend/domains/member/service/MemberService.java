@@ -24,66 +24,65 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class MemberService {
 
-    private final MemberRepository memberRepository;
-    private final RefreshTokenService refreshTokenService;
-    private final MemberMapper memberMapper;
-    private final JwtTokenProvider jwtTokenProvider;
-    private final PasswordEncoder passwordEncoder;
+	private final MemberRepository memberRepository;
+	private final RefreshTokenService refreshTokenService;
+	private final MemberMapper memberMapper;
+	private final JwtTokenProvider jwtTokenProvider;
+	private final PasswordEncoder passwordEncoder;
 
-    // 이메일로 멤버 조회
-    public Optional<Member> findByEmail(String email) {
-        return memberRepository.findByEmail(email);
-    }
+	// 이메일로 멤버 조회
+	public Optional<Member> findByEmail(String email) {
+		return memberRepository.findByEmail(email);
+	}
 
-    // 회원 가입
-    @Transactional
-    public void signUp(SignUpRequest signUpRequest) {
-        if(isDuplicateEmail(signUpRequest.email())){
-            throw ApiException.from(ErrorCode.EMAIL_DUPLICATE);
-        }
+	// 회원 가입
+	@Transactional
+	public void signUp(SignUpRequest signUpRequest) {
+		if (isDuplicateEmail(signUpRequest.email())) {
+			throw ApiException.from(ErrorCode.EMAIL_DUPLICATE);
+		}
 
-        Member member = memberMapper.signUpMemberEntity(signUpRequest);
-        memberRepository.save(member);
-    }
+		Member member = memberMapper.signUpMemberEntity(signUpRequest);
+		memberRepository.save(member);
+	}
 
+	//로그아웃
+	@Transactional
+	public void logoutMember(String accessToken, String refreshToken) {
+		// 회원의 refreshToken 만료 처리
+		RefreshToken expiredToken = new RefreshToken(accessToken, refreshToken);
+		refreshTokenService.save(expiredToken);
+		log.info("Logout successful {}", refreshTokenService.existsByAccessToken(accessToken));
+	}
 
-    //로그아웃
-    @Transactional
-    public void logoutMember(String accessToken, String refreshToken) {
-        // 회원의 refreshToken 만료 처리
-        RefreshToken expiredToken = new RefreshToken(accessToken, refreshToken);
-        refreshTokenService.save(expiredToken);
-        log.info("Logout successful {}", refreshTokenService.existsByAccessToken(accessToken));
-    }
+	@Transactional
+	public void deleteMember(String accessToken, DeleteRequest deleteRequest) {
+		Long memberId = jwtTokenProvider
+			.extractMemberId(accessToken)
+			.orElseThrow(() -> ApiException.from(ErrorCode.INVALID_ACCESS_TOKEN));
 
-    @Transactional
-    public void deleteMember(String accessToken, DeleteRequest deleteRequest) {
-        Long memberId = jwtTokenProvider
-            .extractMemberId(accessToken)
-            .orElseThrow(() -> ApiException.from(ErrorCode.INVALID_ACCESS_TOKEN));
+		Member member = memberRepository
+			.findById(memberId)
+			.orElseThrow(() -> ApiException.from(ErrorCode.MEMBER_NOT_FOUND));
 
-        Member member = memberRepository
-            .findById(memberId)
-            .orElseThrow(() -> ApiException.from(ErrorCode.MEMBER_NOT_FOUND));
+		if (!isValid(deleteRequest.password(), member.getPassword())) {
+			throw ApiException.from(ErrorCode.INVALID_PASSWORD);
+		}
 
-        if(!isValid(deleteRequest.password(), member.getPassword())){
-            throw ApiException.from(ErrorCode.INVALID_PASSWORD);
-        }
+		memberRepository.delete(member);
+	}
 
-        memberRepository.delete(member);
-    }
+	public Member findById(Long memberId) {
+		return memberRepository
+			.findById(memberId)
+			.orElseThrow(() -> ApiException.from(ErrorCode.MEMBER_NOT_FOUND));
+	}
 
-    public Member findById(Long memberId) {
-        return memberRepository
-            .findById(memberId)
-            .orElseThrow(() -> ApiException.from(ErrorCode.MEMBER_NOT_FOUND));
-    }
+	protected boolean isDuplicateEmail(String email) {
+		return memberRepository.findByEmail(email).isPresent();
+	}
 
-    protected boolean isDuplicateEmail(String email) {
-        return memberRepository.findByEmail(email).isPresent();
-    }
-
-    protected boolean isValid(String password, String encodedPassword) {
-        return passwordEncoder.matches(password, encodedPassword);
-    }
+	protected boolean isValid(String password, String encodedPassword) {
+		return passwordEncoder.matches(password, encodedPassword);
+	}
 }

@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @Table(
 	name = "post_likes",
 	uniqueConstraints = {
-		@UniqueConstraint(columnNames = { "post_id", "member_id" })
+		@UniqueConstraint(columnNames = {"post_id", "member_id"})
 	})
 @NoArgsConstructor(access = PROTECTED)
 public class PostLike extends Like {

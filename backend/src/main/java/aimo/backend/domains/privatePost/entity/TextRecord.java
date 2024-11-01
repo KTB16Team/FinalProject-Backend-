@@ -16,7 +16,8 @@ import lombok.NoArgsConstructor;
 @Table(name = "text_records")
 @NoArgsConstructor
 public class TextRecord extends BaseEntity {
-	@Id @GeneratedValue
+	@Id
+	@GeneratedValue
 	@Column(name = "text_record_id")
 	private Long id;
 

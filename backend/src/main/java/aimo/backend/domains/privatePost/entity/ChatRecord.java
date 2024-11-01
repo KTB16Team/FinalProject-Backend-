@@ -18,7 +18,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = PROTECTED)
 public class ChatRecord extends BaseEntity {
-	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "chat_record_id")
 	private Long id;
 

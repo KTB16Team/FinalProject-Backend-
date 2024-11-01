@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.domains.comment.dto.request.SaveChildCommentRequest;
-import aimo.backend.domains.comment.dto.request.UpdateChildCommentRequest;
 import aimo.backend.domains.comment.entity.ChildComment;
 import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.comment.mapper.ChildCommentMapper;

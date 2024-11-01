@@ -31,6 +31,7 @@ import aimo.backend.domains.privatePost.dto.SummaryAndJudgementResponse;
 import aimo.backend.domains.privatePost.dto.TextRecordRequest;
 import aimo.backend.domains.privatePost.entity.PrivatePost;
 import aimo.backend.domains.privatePost.repository.PrivatePostRepository;
+import aimo.backend.util.memberLoader.MemberLoader;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -43,34 +44,43 @@ public class PrivatePostService {
 	private final PrivatePostRepository privatePostRepository;
 	private final WebClient webClient;
 	private final AiServerProperties aiServerProperties;
-	private final JwtTokenProviderImpl jwtTokenProvider;
-	private final MemberService memberService;
+	private final MemberLoader memberLoader;
 
 	@Transactional(rollbackFor = ApiException.class)
-	public Mono<DataResponse<Void>> serveScriptToAi(
-		SummaryAndJudgementRequest summaryAndJudgementRequest
+	public SummaryAndJudgementResponse serveScriptToAi(
+		TextRecordRequest textRecordRequest
 	) {
+		Member member = memberLoader.getMember();
+
+		SummaryAndJudgementRequest summaryAndJudgementRequest =
+			new SummaryAndJudgementRequest(
+				textRecordRequest.title(),
+				textRecordRequest.script(),
+				member.getUsername(),
+				member.getGender(),
+				member.getBirthDate()
+			);
+
 		return webClient
-				.post()
-				.uri(aiServerProperties.getDomainUrl() + aiServerProperties.getJudgementApi())
-				.bodyValue(summaryAndJudgementRequest)
-				.retrieve()
-				.onStatus(HttpStatusCode::is4xxClientError, clientResponse -> {
-					throw ApiException.from(ErrorCode.AI_BAD_GATEWAY);
-				})
-				.onStatus(HttpStatusCode::is5xxServerError, clientResponse -> {
-					throw ApiException.from(ErrorCode.AI_SEVER_ERROR);
-				})
-				.bodyToMono(new ParameterizedTypeReference<DataResponse<SummaryAndJudgementResponse>>() {})
-				.flatMap(response -> save(response.getData()))
-				.then(Mono.just(DataResponse.created()));
+			.post()
+			.uri(aiServerProperties.getDomainUrl() + aiServerProperties.getJudgementApi())
+			.bodyValue(summaryAndJudgementRequest)
+			.retrieve()
+			.onStatus(HttpStatusCode::is4xxClientError, clientResponse -> {
+				throw ApiException.from(ErrorCode.AI_BAD_GATEWAY);
+			})
+			.onStatus(HttpStatusCode::is5xxServerError, clientResponse -> {
+				throw ApiException.from(ErrorCode.AI_SEVER_ERROR);
+			})
+			.bodyToMono(new ParameterizedTypeReference<SummaryAndJudgementResponse>() {
+			})
+			.block();
 	}
 
 	@Transactional(rollbackFor = ApiException.class)
-	public Mono<PrivatePost> save(SummaryAndJudgementResponse summaryAndJudgementResponse) {
+	public PrivatePost save(SummaryAndJudgementResponse summaryAndJudgementResponse) {
 		PrivatePost privatePost = PrivatePostMapper.toEntity(summaryAndJudgementResponse);
-		return Mono.fromCallable(() -> privatePostRepository.save(privatePost))
-			.subscribeOn(Schedulers.boundedElastic());
+		return privatePostRepository.save(privatePost);
 	}
 
 	public PrivatePostResponse getPrivatePost(Long id) {
@@ -88,14 +98,19 @@ public class PrivatePostService {
 		Page<PrivatePost> privatePostPage = privatePostRepository
 			.findAll(pageable);
 
-		return new PageImpl<> (
+		return new PageImpl<>(
 			privatePostPage
-			.getContent()
-			.stream()
-			.map(PrivatePostMapper::toPreviewResponse)
-			.collect(Collectors.toList()),
+				.getContent()
+				.stream()
+				.map(PrivatePostMapper::toPreviewResponse)
+				.collect(Collectors.toList()),
 			pageable,
 			privatePostPage.getTotalPages()
-			);
+		);
+	}
+
+	public PrivatePost findById(Long id) {
+		return privatePostRepository.findById(id)
+			.orElseThrow(() -> ApiException.from(PRIVATE_POST_NOT_FOUND));
 	}
 }

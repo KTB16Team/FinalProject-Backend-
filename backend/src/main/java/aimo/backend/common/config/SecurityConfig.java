@@ -7,6 +7,7 @@ import aimo.backend.domains.auth.security.jwtFilter.JwtTokenProvider;
 import aimo.backend.domains.auth.security.loginFilter.LoginFilter;
 import aimo.backend.domains.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -38,7 +39,6 @@ public class SecurityConfig {
 	private final SecurityProperties securityProperties;
 	private final PasswordEncoder passwordEncoder;
 	private final AntPathMatcher pathMatcher = new AntPathMatcher();
-
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {

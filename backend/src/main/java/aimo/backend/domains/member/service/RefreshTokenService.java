@@ -23,6 +23,7 @@ public class RefreshTokenService {
 	public void save(RefreshToken refreshToken) {
 		refreshTokenRepository.save(refreshToken);
 	}
+
 	public Optional<RefreshToken> findByToken(String token) {
 		return refreshTokenRepository.findById(token);
 	}
@@ -31,5 +32,7 @@ public class RefreshTokenService {
 		refreshTokenRepository.deleteByAccessToken(accessToken);
 	}
 
-	public boolean existsByAccessToken(String accessToken) { return refreshTokenRepository.existsByAccessToken(accessToken); }
+	public boolean existsByAccessToken(String accessToken) {
+		return refreshTokenRepository.existsByAccessToken(accessToken);
+	}
 }
