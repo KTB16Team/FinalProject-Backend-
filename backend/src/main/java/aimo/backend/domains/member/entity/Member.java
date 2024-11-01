@@ -79,7 +79,15 @@ public class Member extends BaseEntity {
 	private List<ParentComment> parentComments = new ArrayList<>();
 
 	@Builder
-	private Member(String username, String email, String password, MemberRole memberRole, Gender gender, Provider provider, LocalDate birthDate) {
+	private Member(
+		String username,
+		String email,
+		String password,
+		MemberRole memberRole,
+		Gender gender,
+		Provider provider,
+		LocalDate birthDate) {
+
 		this.username = username;
 		this.email = email;
 		this.password = password;

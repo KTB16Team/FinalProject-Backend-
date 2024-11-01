@@ -24,6 +24,12 @@ public class DataResponse<T> extends BaseResponse {
 	public static <T> DataResponse<Void> ok() {
 		return new DataResponse<>(HttpStatus.OK, null);
 	}
-	public static <T> DataResponse<Void> created() { return new DataResponse<>(HttpStatus.CREATED, null); }
-	public static <T> DataResponse<Void> noContent() { return new DataResponse<>(HttpStatus.NO_CONTENT, null); }
+
+	public static <T> DataResponse<Void> created() {
+		return new DataResponse<>(HttpStatus.CREATED, null);
+	}
+
+	public static <T> DataResponse<Void> noContent() {
+		return new DataResponse<>(HttpStatus.NO_CONTENT, null);
+	}
 }

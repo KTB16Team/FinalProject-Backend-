@@ -1,10 +1,9 @@
 package aimo.backend.domains.comment.dto.request;
 
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import jakarta.validation.constraints.Size;
 
-@Data
-@RequiredArgsConstructor
-public class UpdateChildCommentRequest {
-	private final String content;
+public record UpdateChildCommentRequest(
+	@Size(max = 1500, message = "댓글은 한글 기준 최대 500자까지 입력할 수 있습니다.")
+	String content
+) {
 }

@@ -3,6 +3,7 @@ package aimo.backend.domains.auth.security.jwtFilter;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.security.core.Authentication;
 
 import java.util.Optional;
@@ -35,9 +36,10 @@ public interface JwtTokenProvider {
 
 	void expireRefreshToken(Long memberId, String accessToken, String refreshToken);
 
-	void checkRefreshTokenAndReIssueAccessAndRefreshToken(HttpServletResponse response, String accessToken, String refreshToken);
+	void checkRefreshTokenAndReIssueAccessAndRefreshToken(HttpServletResponse response, String accessToken,
+		String refreshToken);
 
 	boolean isRefreshTokenValid(String refreshToken);
-	
+
 	boolean isLogout(String accessToken);
 }

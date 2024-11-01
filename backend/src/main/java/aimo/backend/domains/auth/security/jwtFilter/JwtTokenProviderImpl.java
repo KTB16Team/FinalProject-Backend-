@@ -20,6 +20,7 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -32,7 +33,6 @@ import java.security.Key;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-
 
 @Transactional(readOnly = true)
 @Service
@@ -104,7 +104,8 @@ public class JwtTokenProviderImpl implements JwtTokenProvider {
 		setAccessTokenHeader(response, accessToken);
 		setRefreshTokenHeader(response, refreshToken);
 
-		JwtDTO.AccessAndRefreshTokenResponse accessAndRefreshTokenResponse = JwtDTO.AccessAndRefreshTokenResponse.from(accessToken,
+		JwtDTO.AccessAndRefreshTokenResponse accessAndRefreshTokenResponse = JwtDTO.AccessAndRefreshTokenResponse.from(
+			accessToken,
 			refreshToken);
 
 		ResponseWriter.writeResponse(response, DataResponse.from(accessAndRefreshTokenResponse), HttpStatus.OK);
@@ -187,16 +188,16 @@ public class JwtTokenProviderImpl implements JwtTokenProvider {
 		return false;
 	}
 
-	public void checkRefreshTokenAndReIssueAccessAndRefreshToken(HttpServletResponse response, String accessToken, String refreshToken) {
+	public void checkRefreshTokenAndReIssueAccessAndRefreshToken(HttpServletResponse response, String accessToken,
+		String refreshToken) {
 		//refreshToken이 유효한지 확인
 
 		Long memberId = extractMemberId(refreshToken)
-				.orElseThrow(() -> ApiException.from(INVALID_REFRESH_TOKEN));
+			.orElseThrow(() -> ApiException.from(INVALID_REFRESH_TOKEN));
 
-		if(!isRefreshTokenValid(accessToken)){
+		if (!isRefreshTokenValid(accessToken)) {
 			throw ApiException.from(INVALID_REFRESH_TOKEN);
 		}
-
 
 		String newAccessToken = createAccessToken(memberId);
 		String newRefreshToken = createRefreshToken(memberId);
@@ -206,7 +207,7 @@ public class JwtTokenProviderImpl implements JwtTokenProvider {
 	}
 
 	@Override
-	public boolean isRefreshTokenValid(String accessToken){
+	public boolean isRefreshTokenValid(String accessToken) {
 
 		return !refreshTokenService.existsByAccessToken(accessToken);
 	}

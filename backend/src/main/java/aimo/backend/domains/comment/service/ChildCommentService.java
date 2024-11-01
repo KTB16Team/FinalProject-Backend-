@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.domains.comment.dto.request.SaveChildCommentRequest;
-import aimo.backend.domains.comment.dto.request.UpdateChildCommentRequest;
 import aimo.backend.domains.comment.entity.ChildComment;
 import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.comment.mapper.ChildCommentMapper;
@@ -49,13 +48,13 @@ public class ChildCommentService {
 
 	//자식 댓글 수정
 	@Transactional(rollbackFor = ApiException.class)
-	public void validateAndUpdateChildComment(Member member, Long childCommentId, UpdateChildCommentRequest request) {
+	public void validateAndUpdateChildComment(Member member, Long childCommentId, SaveChildCommentRequest request) {
 		validateChildCommentAuthority(member, childCommentId);
 
 		ChildComment childComment = childCommentRepository.findById(childCommentId)
 			.orElseThrow(() -> ApiException.from(UNAUTHORIZED_CHILD_COMMENT));
 
-		childComment.updateChildComment(request.getContent());
+		childComment.updateChildComment(request.content());
 	}
 
 	//자식 댓글 삭제

@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -55,7 +56,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		//4. access토큰이 존재하며, accesToken이 유효하지 않으면 에러 리턴
 		//5. 그 외 모든 경우는 에러 리턴
 
-		if (refreshToken != null && jwtTokenProvider.isTokenValid(refreshToken) && request.getRequestURI().matches("^\\/reissue$")) {
+		if (refreshToken != null && jwtTokenProvider.isTokenValid(refreshToken) && request.getRequestURI()
+			.matches("^\\/reissue$")) {
 			log.info("refresh토큰 인증 성공");
 			jwtTokenProvider.checkRefreshTokenAndReIssueAccessAndRefreshToken(response, accessToken, refreshToken);
 		} else if (refreshToken != null && !jwtTokenProvider.isTokenValid(refreshToken)) {

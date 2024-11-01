@@ -12,9 +12,10 @@ import lombok.RequiredArgsConstructor;
 @Component
 @RequiredArgsConstructor
 public class MemberMapper {
+
 	private final PasswordEncoder passwordEncoder;
 
-	public Member signUpMemberEntity(SignUpRequest signUpRequest){
+	public Member signUpMemberEntity(SignUpRequest signUpRequest) {
 		return Member
 			.builder()
 			.username(signUpRequest.username())

@@ -1,6 +1,5 @@
 package aimo.backend.util.memberLoader;
 
-
 import static aimo.backend.common.exception.ErrorCode.*;
 
 import org.springframework.security.core.context.SecurityContextHolder;

@@ -51,7 +51,7 @@ public class ParentCommentService {
 		ParentComment parentComment = parentCommentRepository.findById(commentId)
 			.orElseThrow(() -> ApiException.from(PARENT_COMMENT_NOT_FOUND));
 
-		parentComment.updateContent(request.getContent());
+		parentComment.updateContent(request.content());
 	}
 
 	// 부모 댓글 삭제

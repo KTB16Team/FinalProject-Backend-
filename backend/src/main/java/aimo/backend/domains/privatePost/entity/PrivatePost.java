@@ -25,7 +25,8 @@ import lombok.NoArgsConstructor;
 @Table(name = "disputes")
 @NoArgsConstructor(access = PROTECTED)
 public class PrivatePost extends BaseEntity {
-	@Id @GeneratedValue
+	@Id
+	@GeneratedValue
 	@Column(name = "private_post_id")
 	private Long id;
 
@@ -78,8 +79,7 @@ public class PrivatePost extends BaseEntity {
 		TextRecord textRecord,
 		OriginType originType,
 		Double faultRate,
-		Boolean published)
-	{
+		Boolean published) {
 		this.title = title;
 		this.member = member;
 		this.stancePlaintiff = stancePlaintiff;

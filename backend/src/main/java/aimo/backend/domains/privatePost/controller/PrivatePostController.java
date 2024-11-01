@@ -6,10 +6,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,26 +21,26 @@ import org.springframework.web.multipart.MultipartFile;
 import aimo.backend.common.dto.DataResponse;
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.exception.ErrorCode;
-import aimo.backend.common.mapper.PrivatePostMapper;
 import aimo.backend.domains.auth.security.jwtFilter.JwtTokenProviderImpl;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.member.service.MemberService;
 import aimo.backend.domains.privatePost.dto.PrivatePostPreviewResponse;
 import aimo.backend.domains.privatePost.dto.PrivatePostResponse;
 import aimo.backend.domains.privatePost.dto.SummaryAndJudgementRequest;
+import aimo.backend.domains.privatePost.dto.SummaryAndJudgementResponse;
 import aimo.backend.domains.privatePost.dto.TextRecordRequest;
-import aimo.backend.domains.privatePost.dto.UploadAudioSuccessRequest;
-import aimo.backend.domains.privatePost.entity.PrivatePost;
+import aimo.backend.domains.privatePost.dto.SaveAudioSuccessRequest;
 import aimo.backend.domains.privatePost.service.AudioRecordService;
 import aimo.backend.domains.privatePost.service.ChatRecordService;
 import aimo.backend.domains.privatePost.service.TextRecordService;
 import aimo.backend.domains.privatePost.service.PrivatePostService;
+import aimo.backend.util.memberLoader.MemberLoader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/private-post")
+@RequestMapping("/api/private-posts")
 @RequiredArgsConstructor
 public class PrivatePostController {
 
@@ -50,11 +48,10 @@ public class PrivatePostController {
 	private final PrivatePostService privatePostService;
 	private final TextRecordService textRecordService;
 	private final ChatRecordService chatRecordService;
-	private final MemberService memberService;
-	private final JwtTokenProviderImpl jwtTokenProviderImpl;
+	private final MemberLoader memberLoader;
 
 	@GetMapping("/upload/audio/presigned")
-	public ResponseEntity<DataResponse<Void>> getPresignedUrlTo(@RequestParam("file") MultipartFile file)  {
+	public ResponseEntity<DataResponse<Void>> getPresignedUrlTo(@RequestParam("file") MultipartFile file) {
 		return ResponseEntity
 			.status(HttpStatus.CREATED)
 			.body(DataResponse.created());
@@ -62,9 +59,9 @@ public class PrivatePostController {
 
 	@PostMapping("/upload/audio/success")
 	public ResponseEntity<DataResponse<Void>> saveAudioRecord(
-		@RequestBody UploadAudioSuccessRequest uploadAudioSuccessRequest
+		@RequestBody SaveAudioSuccessRequest saveAudioSuccessRequest
 	) {
-		audioRecordService.save(uploadAudioSuccessRequest);
+		audioRecordService.save(saveAudioSuccessRequest);
 		return ResponseEntity
 			.status(HttpStatus.CREATED)
 			.body(DataResponse.created());
@@ -72,29 +69,17 @@ public class PrivatePostController {
 
 	@PostMapping("/judgement")
 	public ResponseEntity<DataResponse<Void>> judgement(
-		@RequestHeader("Authorization") String accessToken,
 		@RequestBody TextRecordRequest textRecordRequest
 	) {
-		Long memberId = jwtTokenProviderImpl
-			.extractMemberId(accessToken)
-			.orElseThrow(() -> ApiException.from(ErrorCode.INVALID_ACCESS_TOKEN));
-		
-		Member member = memberService.findById(memberId);
 
-		SummaryAndJudgementRequest summaryAndJudgementRequest =
-			new SummaryAndJudgementRequest(
-				textRecordRequest.title(),
-				textRecordRequest.script(),
-				member.getUsername(),
-				member.getGender(),
-				member.getBirthDate()
-			);
+		SummaryAndJudgementResponse summaryAndJudgementResponse =
+			privatePostService.serveScriptToAi(textRecordRequest);
 
-		return privatePostService
-			.serveScriptToAi(summaryAndJudgementRequest)
-			.blockOptional()
-			.map(response -> ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created()))
-			.orElseThrow(() -> ApiException.from(ErrorCode.AI_BAD_GATEWAY));
+		privatePostService.save(summaryAndJudgementResponse);
+
+		return ResponseEntity
+			.status(HttpStatus.CREATED)
+			.body(DataResponse.created());
 	}
 
 	@PostMapping("/upload/text")

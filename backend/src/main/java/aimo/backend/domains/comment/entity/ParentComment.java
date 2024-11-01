@@ -24,7 +24,6 @@ public class ParentComment extends BaseEntity {
 	@Column(name = "parent_comment_id")
 	private Long id;
 
-
 	@Column(nullable = false)
 	private String memberName;
 
@@ -44,6 +43,10 @@ public class ParentComment extends BaseEntity {
 
 	@Column(nullable = false)
 	private Boolean isDeleted;
+
+	public Integer getCommentsCount() {
+		return childComments.size() + 1;
+	}
 
 	@Builder
 	private ParentComment(

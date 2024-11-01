@@ -35,7 +35,6 @@ public enum ErrorCode {
 	INVALID_EMAIL(HttpStatus.BAD_REQUEST, "이메일 형식이 잘못 되었습니다.", "MEMBER-009"),
 	EMAIL_NOT_MATCH(HttpStatus.BAD_REQUEST, "이메일이 일치하지 않습니다.", "MEMBER-010"),
 
-
 	//PrivatePost
 	PRIVATE_POST_NOT_FOUND(HttpStatus.NOT_FOUND, "해당하는 대화록을 찾을 수 없습니다.", "DISPUTE-001"),
 	PRIVATE_POST_CREATE_FAIL(HttpStatus.BAD_REQUEST, "대화록 생성에 실패하였습니다.", "DISPUTE-002"),

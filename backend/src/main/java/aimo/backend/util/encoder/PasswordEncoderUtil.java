@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class 	PasswordEncoderUtil {
+public class PasswordEncoderUtil {
 
 	private final PasswordEncoder passwordEncoder;
 

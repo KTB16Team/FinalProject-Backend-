@@ -11,6 +11,8 @@ import aimo.backend.domains.member.entity.RefreshToken;
 public interface RefreshTokenRepository extends CrudRepository<RefreshToken, String> {
 
 	Optional<RefreshToken> findByAccessToken(String accessToken);
+
 	boolean existsByAccessToken(String accessToken);
+
 	void deleteByAccessToken(String accessToken);
 }

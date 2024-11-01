@@ -10,6 +10,5 @@ public record SignUpRequest(
 	String password,
 	Gender gender,
 	String phoneNumber,
-	LocalDate birth)
-{
+	LocalDate birth) {
 }

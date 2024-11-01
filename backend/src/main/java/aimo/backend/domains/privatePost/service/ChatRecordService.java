@@ -27,20 +27,23 @@ public class ChatRecordService {
 	private final ChatRecordRepository chatRecordRepository;
 
 	@Transactional(rollbackFor = ApiException.class)
-	public Long save(MultipartFile file) throws IOException {
+	public void save(MultipartFile file) throws IOException {
 		String originalFilename = file.getOriginalFilename();
-		if(originalFilename == null) throw ApiException.from(ErrorCode.INVALID_FILE_NAME);
+		if (originalFilename == null)
+			throw ApiException.from(ErrorCode.INVALID_FILE_NAME);
 
 		List<String> parts = Arrays
 			.stream(originalFilename.split("\\."))
 			.toList();
 
-		if(parts.size() <= 1) throw ApiException.from(ErrorCode.INVALID_FILE_NAME);
+		if (parts.size() <= 1)
+			throw ApiException.from(ErrorCode.INVALID_FILE_NAME);
 
 		String filename = String.join(".", parts.subList(0, parts.size() - 1));
 		String extension = parts.get(parts.size() - 1);
 
-		if(!Objects.equals(extension, "txt")) throw ApiException.from(ErrorCode.INVALID_FILE_EXTENSION);
+		if (!Objects.equals(extension, "txt"))
+			throw ApiException.from(ErrorCode.INVALID_FILE_EXTENSION);
 
 		String script = StreamUtils
 			.copyToString(file.getInputStream(), StandardCharsets.UTF_8);
@@ -52,8 +55,6 @@ public class ChatRecordService {
 			.script(script)
 			.build();
 
-		return chatRecordRepository
-			.save(chatRecord)
-			.getId();
+		chatRecordRepository.save(chatRecord);
 	}
 }

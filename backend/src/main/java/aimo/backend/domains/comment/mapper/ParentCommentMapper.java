@@ -12,15 +12,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ParentCommentMapper {
 
-	public ParentComment from(
-		SaveParentCommentRequest request,
-		Member member,
-		Post post
-	) {
-		return ParentComment
-			.builder()
+	public ParentComment from(SaveParentCommentRequest request, Member member, Post post) {
+		return ParentComment.builder()
 			.memberName(member.getUsername())
-			.content(request.getContent())
+			.content(request.content())
 			.isDeleted(false)
 			.member(member)
 			.post(post)
