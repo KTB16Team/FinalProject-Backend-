@@ -41,22 +41,14 @@ public class PrivatePostService {
 	private final MemberLoader memberLoader;
 
 	@Transactional(rollbackFor = ApiException.class)
-	public SummaryAndJudgementResponse serveScriptToAi(
-		TextRecordRequest textRecordRequest
-	) {
+	public SummaryAndJudgementResponse serveScriptToAi(TextRecordRequest textRecordRequest) {
 		Member member = memberLoader.getMember();
 
-		SummaryAndJudgementRequest summaryAndJudgementRequest =
-			new SummaryAndJudgementRequest(
-				textRecordRequest.title(),
-				textRecordRequest.script(),
-				member.getUsername(),
-				member.getGender(),
-				member.getBirthDate()
-			);
+		SummaryAndJudgementRequest summaryAndJudgementRequest = new SummaryAndJudgementRequest(
+			textRecordRequest.title(), textRecordRequest.script(), member.getMemberName(), member.getGender(),
+			member.getBirthDate());
 
-		return webClient
-			.post()
+		return webClient.post()
 			.uri(aiServerProperties.getDomainUrl() + aiServerProperties.getJudgementApi())
 			.bodyValue(summaryAndJudgementRequest)
 			.retrieve()
@@ -74,37 +66,41 @@ public class PrivatePostService {
 	@Transactional(rollbackFor = ApiException.class)
 	public PrivatePost save(SummaryAndJudgementResponse summaryAndJudgementResponse) {
 		PrivatePost privatePost = PrivatePostMapper.toEntity(summaryAndJudgementResponse);
+
+		if(!isValid(memberLoader.getMember().getId(), privatePost)) {
+			throw ApiException.from(PRIVATE_POST_CREATE_UNAUTHORIZED);
+		}
+
 		return privatePostRepository.save(privatePost);
 	}
 
-	public PrivatePostResponse getPrivatePost(Long id) {
-		PrivatePost privatePost = privatePostRepository
-			.findById(id)
+	public PrivatePostResponse findPrivatePostBy(Long id) {
+		PrivatePost privatePost = privatePostRepository.findById(id)
 			.orElseThrow(() -> ApiException.from(ErrorCode.PRIVATE_POST_NOT_FOUND));
+
+		if(!isValid(memberLoader.getMember().getId(), privatePost)) {
+			throw ApiException.from(PRIVATE_POST_READ_UNAUTHORIZED);
+		}
 
 		return PrivatePostMapper.toResponse(privatePost);
 	}
 
-	public Page<PrivatePostPreviewResponse> getPrivatePostPreviews(
-		@PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
-		Pageable pageable
-	) {
-		Page<PrivatePost> privatePostPage = privatePostRepository
-			.findAll(pageable);
+	public Page<PrivatePostPreviewResponse> findPrivatePostPreviewsBy(
+		@PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+		Page<PrivatePost> privatePostPage = privatePostRepository.findAll(pageable);
+		Long memberId = memberLoader.getMember().getId();
 
-		return new PageImpl<>(
-			privatePostPage
-				.getContent()
-				.stream()
-				.map(PrivatePostMapper::toPreviewResponse)
-				.collect(Collectors.toList()),
-			pageable,
-			privatePostPage.getTotalPages()
-		);
+		return new PageImpl<>(privatePostPage.getContent()
+			.stream()
+			.map((p) -> {
+				if(!isValid(memberId, p)) throw ApiException.from(PRIVATE_POST_READ_UNAUTHORIZED);
+				return PrivatePostMapper.toPreviewResponse(p);
+			})
+			.collect(Collectors.toList()), pageable, privatePostPage.getTotalPages());
 	}
 
-	public PrivatePost findById(Long id) {
-		return privatePostRepository.findById(id)
-			.orElseThrow(() -> ApiException.from(PRIVATE_POST_NOT_FOUND));
+
+	private boolean isValid(Long memberId, PrivatePost privatePost) {
+		return privatePost.getMember().getId().equals(memberId);
 	}
 }

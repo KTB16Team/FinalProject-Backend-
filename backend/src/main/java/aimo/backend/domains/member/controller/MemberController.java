@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import aimo.backend.domains.member.dto.CreatePresignedUrlResponse;
 import aimo.backend.domains.member.dto.CreateProfileImageUrlRequest;
 import aimo.backend.domains.member.dto.DeleteRequest;
 import aimo.backend.domains.member.dto.LogOutRequest;
@@ -16,6 +15,7 @@ import aimo.backend.domains.member.dto.SignUpRequest;
 import aimo.backend.common.dto.DataResponse;
 import aimo.backend.domains.auth.security.jwtFilter.JwtTokenProvider;
 import aimo.backend.infrastructure.s3.S3Service;
+import aimo.backend.infrastructure.s3.dto.CreatePresignedUrlResponse;
 import aimo.backend.infrastructure.s3.dto.SaveFileMetaDataRequest;
 import aimo.backend.domains.member.service.MemberService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -69,7 +69,7 @@ public class MemberController {
 		@RequestBody CreateProfileImageUrlRequest request) {
 		return ResponseEntity
 			.status(HttpStatus.CREATED)
-			.body(DataResponse.created(s3Service.createProfilePreSignedUrl(request)));
+			.body(DataResponse.created(s3Service.createProfilePresignedUrl(request)));
 	}
 
 	@PostMapping("/members/profile/presigned/upload/success")

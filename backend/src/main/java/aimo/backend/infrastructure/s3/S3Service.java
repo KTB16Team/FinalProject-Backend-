@@ -13,10 +13,8 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 
 import aimo.backend.common.properties.S3Properties;
-import aimo.backend.domains.member.dto.CreatePresignedUrlResponse;
 import aimo.backend.domains.member.dto.CreateProfileImageUrlRequest;
-import aimo.backend.infrastructure.s3.dto.SaveFileMetaDataRequest;
-import aimo.backend.infrastructure.s3.dto.CreatePreSignedUrlRequest;
+import aimo.backend.infrastructure.s3.dto.CreatePresignedUrlRequest;
 import aimo.backend.infrastructure.s3.model.PresignedUrlPrefix;
 import lombok.RequiredArgsConstructor;
 
@@ -27,21 +25,23 @@ public class S3Service {
 	private final AmazonS3Client amazonS3Client;
 	private final S3Properties s3Properties;
 
-	public String createAudioPreSignedUrl(CreatePreSignedUrlRequest request) {
+	public String createAudioPreSignedUrl(CreatePresignedUrlRequest request) {
 		String path = createPath(PresignedUrlPrefix.AUDIO.getValue(), request.fileName());
-		return createGeneratePreSignedUrlRequest(path);
+		return createGeneratePresignedUrlRequest(path);
 	}
 
-	public CreatePresignedUrlResponse createProfilePreSignedUrl(CreateProfileImageUrlRequest request) {
+	public CreatePresignedUrlResponse createProfilePresignedUrl(CreateProfileImageUrlRequest request) {
 		String path = createPath(PresignedUrlPrefix.IMAGE.getValue(), request.memberName() + "." + request.extension());
-		String url = createGeneratePreSignedUrlRequest(path);
+		String url = createGeneratePresignedUrlRequest(path);
 		String filename = request.memberName() + "." + request.extension();
 		return new CreatePresignedUrlResponse(url, filename);
 	}
 
-	private String createGeneratePreSignedUrlRequest(String path) {
+	private String createGeneratePresignedUrlRequest(String path) {
 		GeneratePresignedUrlRequest generatePresignedUrlRequest = new GeneratePresignedUrlRequest(
-			s3Properties.getBucketName(), path).withMethod(HttpMethod.PUT).withExpiration(getPreSignedUrlExpiration());
+			s3Properties.getBucketName(), path)
+			.withMethod(HttpMethod.PUT)
+			.withExpiration(getPreSignedUrlExpiration());
 
 		generatePresignedUrlRequest.addRequestParameter(Headers.S3_CANNED_ACL,
 			CannedAccessControlList.PublicRead.toString());

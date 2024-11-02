@@ -1,4 +1,4 @@
-package aimo.backend.domains.member.dto;
+package aimo.backend.infrastructure.s3.dto;
 
 public record CreatePresignedUrlResponse(
 	String presignedUrl,
