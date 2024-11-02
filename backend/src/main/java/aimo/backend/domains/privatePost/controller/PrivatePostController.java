@@ -22,6 +22,8 @@ import aimo.backend.domains.privatePost.dto.ChatRecordRequest;
 import aimo.backend.domains.privatePost.dto.PrivatePostPreviewResponse;
 import aimo.backend.domains.privatePost.dto.PrivatePostResponse;
 import aimo.backend.domains.privatePost.dto.SaveAudioSuccessResponse;
+import aimo.backend.domains.privatePost.dto.SpeachToTextRequest;
+import aimo.backend.domains.privatePost.dto.SpeachToTextResponse;
 import aimo.backend.domains.privatePost.dto.SummaryAndJudgementResponse;
 import aimo.backend.domains.privatePost.dto.TextRecordRequest;
 import aimo.backend.domains.privatePost.dto.SaveAudioSuccessRequest;
@@ -72,6 +74,13 @@ public class PrivatePostController {
 		chatRecordService.save(chatRecordRequest);
 		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
+
+	@PostMapping("/speech-to-text")
+	public ResponseEntity<DataResponse<SpeachToTextResponse>> speechToText(
+		@Valid @RequestBody SpeachToTextRequest speachToTextRequest) {
+		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created(audioRecordService.speachToText(speachToTextRequest)));
+	}
+
 
 	@GetMapping("/upload/audio/presigned")
 	public ResponseEntity<DataResponse<CreatePresignedUrlResponse>> getPresignedUrlTo(
