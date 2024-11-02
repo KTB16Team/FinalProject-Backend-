@@ -1,5 +1,7 @@
 package aimo.backend.common.entity;
 
+import static jakarta.persistence.GenerationType.*;
+
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import aimo.backend.domains.member.entity.Member;
@@ -21,7 +23,7 @@ import lombok.NoArgsConstructor;
 public abstract class Like extends BaseEntity {
 
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy = IDENTITY)
 	@Column(nullable = false)
 	private Long like_id;
 

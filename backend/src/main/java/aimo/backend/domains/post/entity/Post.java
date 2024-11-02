@@ -1,16 +1,17 @@
 package aimo.backend.domains.post.entity;
 
 import static jakarta.persistence.CascadeType.*;
+import static jakarta.persistence.GenerationType.*;
 import static lombok.AccessLevel.*;
 
 import java.util.List;
 import java.util.Objects;
 
 import aimo.backend.common.entity.BaseEntity;
-import aimo.backend.domains.post.model.Side;
-import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.comment.entity.ParentComment;
+import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.post.model.Category;
+import aimo.backend.domains.post.model.Side;
 import aimo.backend.domains.privatePost.model.OriginType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -34,7 +35,7 @@ import lombok.NoArgsConstructor;
 public class Post extends BaseEntity {
 
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy = IDENTITY)
 	@Column(name = "post_id")
 	private Long id;
 
@@ -84,6 +85,14 @@ public class Post extends BaseEntity {
 		member.getPosts().add(this);
 	}
 
+	public Integer getPostLikesCount() {
+		return postLikes.size();
+	}
+
+	public Integer getPostViewsCount() {
+		return postViews.size();
+	}
+
 	public Integer getCommentsCount() {
 		return parentComments
 			.stream()
@@ -96,17 +105,22 @@ public class Post extends BaseEntity {
 		this.member = null;
 	}
 
-	public Long getPlaintiffVotesCount() {
-		return votes
-			.stream()
+	public Integer getPlaintiffVotesCount() {
+		return votes.stream()
 			.filter(vote -> vote.getSide() == Side.PLAINTIFF)
-			.count();
+			.mapToInt(vote -> 1)
+			.sum();
 	}
 
-	public Long getVotesCount() {
-		return votes
-			.stream()
-			.count();
+	public Integer getDefendantVotesCount() {
+		return votes.stream()
+			.filter(vote -> vote.getSide() == Side.DEFENDANT)
+			.mapToInt(vote -> 1)
+			.sum();
+	}
+
+	public Integer getVotesCount() {
+		return votes.size();
 	}
 
 	@Builder
