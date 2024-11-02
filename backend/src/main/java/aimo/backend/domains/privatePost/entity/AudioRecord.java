@@ -1,5 +1,6 @@
 package aimo.backend.domains.privatePost.entity;
 
+import static jakarta.persistence.GenerationType.*;
 import static lombok.AccessLevel.*;
 
 import aimo.backend.common.entity.BaseEntity;
@@ -20,7 +21,7 @@ import lombok.NoArgsConstructor;
 public class AudioRecord extends BaseEntity {
 
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy = IDENTITY)
 	@Column(name = "audio_record_id")
 	private Long id;
 

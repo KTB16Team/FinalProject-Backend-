@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.exception.ErrorCode;
 import lombok.Getter;
 
@@ -48,6 +49,14 @@ public class ErrorResponse extends BaseResponse {
 		String code = errorCode.getCode();
 
 		return new ErrorResponse(status, message, code, reasons);
+	}
+
+	public static ErrorResponse from(ApiException apiException) {
+		HttpStatus status = apiException.getHttpStatus();
+		String code = apiException.getCode();
+		String message = apiException.getMessage();
+
+		return new ErrorResponse(status, message, code, null);
 	}
 
 }

@@ -34,19 +34,20 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 		this.jwtTokenProvider = jwtTokenProvider;
 		this.memberService = memberService;
 
-		setFilterProcessesUrl("/api/members/login");
+		setFilterProcessesUrl("/api/v1/members/login");
 	}
 
 	@Override
-	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws
-		AuthenticationException {
-
+	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response
+	) throws AuthenticationException {
 		log.info("LoginFilter");
 
 		String email = obtainEmail(request);
 		String password = obtainPw(request);
 
-		UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(email, password,
+		UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+			email,
+			password,
 			null);
 
 		return getAuthenticationManager().authenticate(authToken);

@@ -38,9 +38,11 @@ public class MemberService {
 	// 회원 가입
 	@Transactional
 	public void signUp(SignUpRequest signUpRequest) {
-		if (isDuplicateEmail(signUpRequest.email())) {
-			throw ApiException.from(ErrorCode.EMAIL_DUPLICATE);
-		}
+		// 중복 이메일 검사
+		validateDuplicateEmail(signUpRequest.email());
+
+		// 중복 닉네임 검사
+		validateDuplicateUsername(signUpRequest.username());
 
 		Member member = memberMapper.signUpMemberEntity(signUpRequest);
 		memberRepository.save(member);
@@ -55,6 +57,7 @@ public class MemberService {
 		log.info("Logout successful {}", refreshTokenService.existsByAccessToken(accessToken));
 	}
 
+	// 회원 삭제
 	@Transactional
 	public void deleteMember(String accessToken, DeleteRequest deleteRequest) {
 		Long memberId = jwtTokenProvider
@@ -78,11 +81,22 @@ public class MemberService {
 			.orElseThrow(() -> ApiException.from(ErrorCode.MEMBER_NOT_FOUND));
 	}
 
-	protected boolean isDuplicateEmail(String email) {
-		return memberRepository.findByEmail(email).isPresent();
-	}
 
 	protected boolean isValid(String password, String encodedPassword) {
 		return passwordEncoder.matches(password, encodedPassword);
+	}
+
+	// 이메일 중복 검사
+	private void validateDuplicateEmail(String email) {
+		if (memberRepository.existsByEmail(email)) {
+			throw ApiException.from(ErrorCode.EMAIL_DUPLICATE);
+		}
+	}
+
+	// 닉네임 중복 검사
+	private void validateDuplicateUsername(String username) {
+		if (memberRepository.existsByUsername(username)) {
+			throw ApiException.from(ErrorCode.USERNAME_DUPLICATE);
+		}
 	}
 }
