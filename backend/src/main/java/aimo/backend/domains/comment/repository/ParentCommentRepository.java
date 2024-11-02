@@ -13,4 +13,6 @@ public interface ParentCommentRepository extends JpaRepository<ParentComment, Lo
 		(Long id, Member member);
 
 	List<ParentComment> findByMemberId(Long memberId);
+
+	List<ParentComment> findByPost_Id(Long postId);
 }

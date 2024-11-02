@@ -44,8 +44,15 @@ public class ParentComment extends BaseEntity {
 	@Column(nullable = false)
 	private Boolean isDeleted;
 
+	@OneToMany(mappedBy = "parentComment", fetch = FetchType.LAZY)
+	private List<ParentCommentLike> parentCommentLikes;
+
 	public Integer getCommentsCount() {
 		return childComments.size() + 1;
+	}
+
+	public Integer getLikesCount() {
+		return parentCommentLikes.size();
 	}
 
 	@Builder

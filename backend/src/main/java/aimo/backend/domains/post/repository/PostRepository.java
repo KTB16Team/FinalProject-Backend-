@@ -11,7 +11,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
 	Page<Post> findAllByMember_Id(Long memberId, Pageable pageable);
 
-	Page<Post> findPosts(Pageable pageable);
+	Page<Post> findAllByOrderByIdDesc(Pageable pageable);
 
 	@Query("SELECT p From Post p LEFT JOIN p.postViews pv GROUP BY p ORDER BY COUNT(pv) DESC")
 	Page<Post> findByViewsCount(Pageable pageable);

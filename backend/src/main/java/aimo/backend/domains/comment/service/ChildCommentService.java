@@ -67,9 +67,4 @@ public class ChildCommentService {
 		childCommentRepository.findById(childCommentId)
 			.ifPresent(ChildComment::deleteChildCommentSoftly);
 	}
-
-	// 멤버가 쓴 자식 댓글 조회
-	public List<ChildComment> findByMemberId(Long memberId) {
-		return childCommentRepository.findByMemberId(memberId);
-	}
 }
