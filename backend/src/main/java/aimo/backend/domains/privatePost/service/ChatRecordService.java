@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.exception.ErrorCode;
+import aimo.backend.domains.privatePost.dto.ChatRecordRequest;
 import aimo.backend.domains.privatePost.entity.ChatRecord;
 import aimo.backend.domains.privatePost.repository.ChatRecordRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,8 +28,8 @@ public class ChatRecordService {
 	private final ChatRecordRepository chatRecordRepository;
 
 	@Transactional(rollbackFor = ApiException.class)
-	public void save(MultipartFile file) throws IOException {
-		String originalFilename = file.getOriginalFilename();
+	public void save(ChatRecordRequest chatRecordRequest) throws IOException {
+		String originalFilename = chatRecordRequest.file().getOriginalFilename();
 		if (originalFilename == null)
 			throw ApiException.from(ErrorCode.INVALID_FILE_NAME);
 
@@ -46,7 +47,7 @@ public class ChatRecordService {
 			throw ApiException.from(ErrorCode.INVALID_FILE_EXTENSION);
 
 		String script = StreamUtils
-			.copyToString(file.getInputStream(), StandardCharsets.UTF_8);
+			.copyToString(chatRecordRequest.file().getInputStream(), StandardCharsets.UTF_8);
 
 		ChatRecord chatRecord = ChatRecord
 			.builder()

@@ -70,8 +70,11 @@ public enum ErrorCode {
 	AI_SEVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "AI 서버 내부에서 에러가 발생하였습니다.", "AI-002"),
 
 	// FILE
-	INVALID_FILE_NAME(HttpStatus.BAD_REQUEST, "파일 이름이 잘못 되었습니다.", "FILE-001"),
-	INVALID_FILE_EXTENSION(HttpStatus.BAD_REQUEST, "파일 확장자가 잘못 되었습니다.", "FILE-002"),
+	INVALID_PREFIX(HttpStatus.BAD_REQUEST, "잘못된 파일 경로입니다.", "FILE-000"),
+	PREFIX_NOT_FOUND(HttpStatus.NOT_FOUND, "해당하는 경로를 찾을 수 없습니다.", "FILE-001"),
+	PREFIX_IS_NULL(HttpStatus.BAD_REQUEST, "파일 경로가 비어있습니다.", "FILE-002"),
+	INVALID_FILE_NAME(HttpStatus.BAD_REQUEST, "파일 이름이 잘못 되었습니다.", "FILE-003"),
+	INVALID_FILE_EXTENSION(HttpStatus.BAD_REQUEST, "파일 확장자가 잘못 되었습니다.", "FILE-004"),
 
 	;
 	private final HttpStatus httpStatus;

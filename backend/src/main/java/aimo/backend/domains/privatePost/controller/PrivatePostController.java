@@ -24,6 +24,8 @@ import aimo.backend.common.exception.ErrorCode;
 import aimo.backend.domains.auth.security.jwtFilter.JwtTokenProviderImpl;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.member.service.MemberService;
+import aimo.backend.domains.privatePost.dto.AudioRecordPresignedRequest;
+import aimo.backend.domains.privatePost.dto.ChatRecordRequest;
 import aimo.backend.domains.privatePost.dto.PrivatePostPreviewResponse;
 import aimo.backend.domains.privatePost.dto.PrivatePostResponse;
 import aimo.backend.domains.privatePost.dto.SummaryAndJudgementRequest;
@@ -35,6 +37,7 @@ import aimo.backend.domains.privatePost.service.ChatRecordService;
 import aimo.backend.domains.privatePost.service.TextRecordService;
 import aimo.backend.domains.privatePost.service.PrivatePostService;
 import aimo.backend.util.memberLoader.MemberLoader;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -51,7 +54,9 @@ public class PrivatePostController {
 	private final MemberLoader memberLoader;
 
 	@GetMapping("/upload/audio/presigned")
-	public ResponseEntity<DataResponse<Void>> getPresignedUrlTo(@RequestParam("file") MultipartFile file) {
+	public ResponseEntity<DataResponse<Void>> getPresignedUrlTo(
+		@Valid @RequestBody AudioRecordPresignedRequest audioRecordPresignedRequest) {
+		String presignedUrl = audioRecordService.getPresignedUrl(audioRecordPresignedRequest.filename());
 		return ResponseEntity
 			.status(HttpStatus.CREATED)
 			.body(DataResponse.created());
@@ -59,7 +64,7 @@ public class PrivatePostController {
 
 	@PostMapping("/upload/audio/success")
 	public ResponseEntity<DataResponse<Void>> saveAudioRecord(
-		@RequestBody SaveAudioSuccessRequest saveAudioSuccessRequest
+		@Valid @RequestBody SaveAudioSuccessRequest saveAudioSuccessRequest
 	) {
 		audioRecordService.save(saveAudioSuccessRequest);
 		return ResponseEntity
@@ -69,7 +74,7 @@ public class PrivatePostController {
 
 	@PostMapping("/judgement")
 	public ResponseEntity<DataResponse<Void>> judgement(
-		@RequestBody TextRecordRequest textRecordRequest
+		@Valid @RequestBody TextRecordRequest textRecordRequest
 	) {
 
 		SummaryAndJudgementResponse summaryAndJudgementResponse =
@@ -84,7 +89,7 @@ public class PrivatePostController {
 
 	@PostMapping("/upload/text")
 	public ResponseEntity<DataResponse<Void>> uploadTextRecord(
-		@RequestBody TextRecordRequest textRecordRequest
+		@Valid @RequestBody TextRecordRequest textRecordRequest
 	) {
 		textRecordService.save(textRecordRequest);
 		return ResponseEntity
@@ -94,9 +99,10 @@ public class PrivatePostController {
 
 	@PostMapping("/upload/chat")
 	public ResponseEntity<DataResponse<Void>> uploadChatRecord(
-		@RequestParam("chat_record") MultipartFile file
+		@Valid @RequestParam("chat_record")ChatRecordRequest chatRecordRequest
 	) throws IOException {
-		chatRecordService.save(file);
+
+		chatRecordService.save(chatRecordRequest);
 		return ResponseEntity
 			.status(HttpStatus.CREATED)
 			.body(DataResponse.created());
@@ -104,7 +110,7 @@ public class PrivatePostController {
 
 	@GetMapping("/{privatePostId}")
 	public ResponseEntity<DataResponse<PrivatePostResponse>> getPrivatePost(
-		@PathVariable Long privatePostId
+		@Valid @PathVariable Long privatePostId
 	) {
 		return ResponseEntity
 			.status(HttpStatus.CREATED)
@@ -113,8 +119,8 @@ public class PrivatePostController {
 
 	@GetMapping("?page={page_number}&size={size}")
 	public ResponseEntity<DataResponse<Page<PrivatePostPreviewResponse>>> getPrivatePostPage(
-		@RequestParam(defaultValue = "0", name = "page_number") Long pageNumber,
-		@RequestParam(defaultValue = "10") Long size
+		@Valid @RequestParam(defaultValue = "0", name = "page_number") Long pageNumber,
+		@Valid @RequestParam(defaultValue = "10") Long size
 	) {
 		Pageable pageable = PageRequest
 			.of(pageNumber.intValue(),

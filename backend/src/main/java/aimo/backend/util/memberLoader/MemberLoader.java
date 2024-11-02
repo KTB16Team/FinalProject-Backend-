@@ -33,4 +33,12 @@ public class MemberLoader {
 			.getAuthentication()
 			.getPrincipal();
 	}
+
+	public String getMemberName() {
+		return getMember().getMemberName();
+	}
+
+	public Long getMemberId(){
+		return getMember().getId();
+	}
 }

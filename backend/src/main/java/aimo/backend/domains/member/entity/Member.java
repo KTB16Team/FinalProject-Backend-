@@ -42,7 +42,7 @@ public class Member extends BaseEntity {
 	private Long id;
 
 	@Column(nullable = false, unique = true)
-	private String username;
+	private String memberName;
 
 	@Column(nullable = false, unique = true)
 	private String email;
@@ -78,9 +78,13 @@ public class Member extends BaseEntity {
 	@OneToMany(mappedBy = "member")
 	private List<ParentComment> parentComments = new ArrayList<>();
 
+	public void updateProfileImage(ProfileImage profileImage) {
+		this.profileImage = profileImage;
+	}
+
 	@Builder
 	private Member(
-		String username,
+		String memberName,
 		String email,
 		String password,
 		MemberRole memberRole,
@@ -88,7 +92,7 @@ public class Member extends BaseEntity {
 		Provider provider,
 		LocalDate birthDate) {
 
-		this.username = username;
+		this.memberName = memberName;
 		this.email = email;
 		this.password = password;
 		this.role = memberRole;

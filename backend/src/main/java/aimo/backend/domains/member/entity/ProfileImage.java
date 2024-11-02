@@ -8,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import lombok.Builder;
 import lombok.Getter;
 
 @Entity
@@ -21,17 +22,26 @@ public class ProfileImage extends BaseEntity {
 	private Long id;
 
 	@Column(nullable = false)
-	private String image_file_url;
+	private String url;
 
 	@Column(nullable = false)
-	private Long image_file_size;
+	private Long size;
 
 	@Column(nullable = false)
-	private String image_file_name;
+	private String filename;
 
 	@Column(nullable = false)
-	private String image_file_extension;
+	private String extension;
 
 	@OneToOne(mappedBy = "profileImage")
 	private Member member;
+
+	@Builder
+	protected ProfileImage(String url, Long size, String filename, String extension, Member member) {
+		this.url = url;
+		this.size = size;
+		this.filename = filename;
+		this.extension = extension;
+		this.member = member;
+	}
 }

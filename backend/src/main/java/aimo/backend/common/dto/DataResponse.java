@@ -29,6 +29,10 @@ public class DataResponse<T> extends BaseResponse {
 		return new DataResponse<>(HttpStatus.CREATED, null);
 	}
 
+	public static <T> DataResponse<T> created(T data) {
+		return new DataResponse<>(HttpStatus.CREATED, data);
+	}
+
 	public static <T> DataResponse<Void> noContent() {
 		return new DataResponse<>(HttpStatus.NO_CONTENT, null);
 	}
