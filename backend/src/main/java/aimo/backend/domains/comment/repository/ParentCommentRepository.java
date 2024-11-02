@@ -1,5 +1,7 @@
 package aimo.backend.domains.comment.repository;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import aimo.backend.domains.comment.entity.ParentComment;
@@ -9,4 +11,6 @@ public interface ParentCommentRepository extends JpaRepository<ParentComment, Lo
 
 	Boolean existsByIdAndMember
 		(Long id, Member member);
+
+	List<ParentComment> findByMemberId(Long memberId);
 }

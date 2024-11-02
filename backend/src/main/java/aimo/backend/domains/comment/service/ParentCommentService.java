@@ -2,6 +2,8 @@ package aimo.backend.domains.comment.service;
 
 import static aimo.backend.common.exception.ErrorCode.*;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -68,4 +70,10 @@ public class ParentCommentService {
 		return parentCommentRepository.findById(commentId)
 			.orElseThrow(() -> ApiException.from(PARENT_COMMENT_NOT_FOUND));
 	}
+
+	// 멤버가 쓴 부모 댓글 조회
+	public List<ParentComment> findByMemberId(Long memberId) {
+		return parentCommentRepository.findByMemberId(memberId);
+	}
+
 }

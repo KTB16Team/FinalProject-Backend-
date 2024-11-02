@@ -5,22 +5,23 @@ import com.fasterxml.jackson.annotation.Nulls;
 
 import aimo.backend.domains.post.model.Category;
 import aimo.backend.domains.privatePost.model.OriginType;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record SavePostRequest(
-	@NotNull(message = "privatePostId is null")
+	@NotNull(message = "개인게시글 아이디가 null입니다.")
 	Long privatePostId,
-	@NotNull(message = "categoryId is null")
+	@NotBlank(message = "title이 null이거나 빈 문자열입니다.")
 	String title,
-	@NotNull(message = "summaryAi is null")
+	@NotBlank(message = "stancePlaintiff이 null이거나 빈 문자열입니다.")
 	String stancePlaintiff,
-	@NotNull(message = "stanceDefendant is null")
+	@NotBlank(message = "stanceDefendant이 null이거나 빈 문자열입니다.")
 	String stanceDefendant,
-	@NotNull(message = "summaryAi is null")
+	@NotBlank(message = "summaryAi이 null이거나 빈 문자열입니다.")
 	String summaryAi,
-	@NotNull(message = "judgement is null")
+	@NotBlank(message = "judgement이 null이거나 빈 문자열입니다.")
 	String judgement,
-	@NotNull(message = "originType is null")
+	@NotNull(message = "originType이 null입니다.")
 	OriginType originType,
 	@JsonSetter(nulls = Nulls.SKIP)
 	Category category

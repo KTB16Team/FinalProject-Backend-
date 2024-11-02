@@ -4,10 +4,10 @@ import static jakarta.persistence.CascadeType.*;
 import static lombok.AccessLevel.*;
 
 import java.util.List;
+import java.util.Objects;
 
 import aimo.backend.common.entity.BaseEntity;
 import aimo.backend.domains.post.model.Side;
-import aimo.backend.domains.privatePost.entity.PrivatePost;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.post.model.Category;
@@ -22,7 +22,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
@@ -80,7 +79,7 @@ public class Post extends BaseEntity {
 	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY, orphanRemoval = true, cascade = ALL)
 	private List<Vote> votes;
 
-	public void setAuthor(Member member) {
+	public void setMember(Member member) {
 		this.member = member;
 		member.getPosts().add(this);
 	}
@@ -131,5 +130,20 @@ public class Post extends BaseEntity {
 		this.stanceDefendant = stanceDefendant;
 		this.originType = originType;
 		this.category = category;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+		Post post = (Post)o;
+		return Objects.equals(id, post.id);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(id);
 	}
 }
