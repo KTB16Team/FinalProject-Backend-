@@ -16,6 +16,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -66,6 +67,12 @@ public class SecurityConfig {
 			.addFilterAfter(loginFilter(), LogoutFilter.class)
 			.addFilterBefore(jwtAuthenticationFilter(), LoginFilter.class)
 			.addFilterBefore(exceptionHandlingFilter(), JwtAuthenticationFilter.class);
+
+		// X-frame option 해제 (h2 인메모리 DB 사용시 활성화)
+		http
+			.headers(headers -> headers
+				.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
+			);
 
 		return http.build();
 	}

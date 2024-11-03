@@ -11,7 +11,10 @@ import aimo.backend.domains.member.entity.RefreshToken;
 import aimo.backend.common.mapper.MemberMapper;
 import aimo.backend.domains.member.repository.MemberRepository;
 import aimo.backend.domains.member.repository.ProfileImageRepository;
+import aimo.backend.domains.privatePost.dto.CreateResourceUrl;
+import aimo.backend.infrastructure.s3.S3Service;
 import aimo.backend.infrastructure.s3.dto.SaveFileMetaDataRequest;
+import aimo.backend.infrastructure.s3.model.PresignedUrlPrefix;
 import aimo.backend.util.memberLoader.MemberLoader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +37,7 @@ public class MemberService {
 	private final PasswordEncoder passwordEncoder;
 	private final MemberLoader memberLoader;
 	private final ProfileImageRepository profileImageRepository;
+	private final S3Service s3Service;
 
 	// 이메일로 멤버 조회
 	public Optional<Member> findByEmail(String email) {
@@ -74,16 +78,36 @@ public class MemberService {
 
 	@Transactional
 	public void saveProfileImageMetaData(SaveFileMetaDataRequest request) {
+		Member member = memberLoader.getMember();
+
+		if(member.getProfileImage() != null) {
+			deleteProfileImage();
+		}
+
+		CreateResourceUrl createResourceUrl = new CreateResourceUrl(
+			PresignedUrlPrefix.IMAGE.getValue(),
+			request.filename(),
+			request.extension());
+
 		ProfileImage profileImage = ProfileImage
 			.builder()
 			.member(memberLoader.getMember())
-			.filename(request.fileName())
+			.filename(request.filename())
 			.size(request.size())
 			.extension(request.extension())
-			.url(request.url())
+			.url(s3Service.getResourceUrl(createResourceUrl))
 			.build();
 
 		profileImageRepository.save(profileImage);
+		member.updateProfileImage(profileImage);
+	}
+
+	@Transactional
+	public void deleteProfileImage() {
+		Member member = memberLoader.getMember();
+		ProfileImage profileImage = member.getProfileImage();
+		profileImageRepository.delete(profileImage);
+		member.updateProfileImage(null);
 	}
 
 	public Member findById(Long memberId) {

@@ -5,10 +5,9 @@ import java.time.LocalDate;
 import aimo.backend.domains.member.model.Gender;
 
 public record SignUpRequest(
-	String username,
+	String memberName,
 	String email,
 	String password,
 	Gender gender,
-	String phoneNumber,
 	LocalDate birth) {
 }

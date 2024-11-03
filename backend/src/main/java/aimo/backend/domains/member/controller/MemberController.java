@@ -2,6 +2,7 @@ package aimo.backend.domains.member.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -19,12 +20,13 @@ import aimo.backend.infrastructure.s3.dto.CreatePresignedUrlResponse;
 import aimo.backend.infrastructure.s3.dto.SaveFileMetaDataRequest;
 import aimo.backend.domains.member.service.MemberService;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/members")
+@RequestMapping("/api/v1/members")
 @RequiredArgsConstructor
 public class MemberController {
 
@@ -64,7 +66,7 @@ public class MemberController {
 			.body(DataResponse.noContent());
 	}
 
-	@PostMapping("/members/profile/presigned")
+	@PostMapping("/profile/presigned")
 	public ResponseEntity<DataResponse<CreatePresignedUrlResponse>> createProfileImagePreSignedUrl(
 		@RequestBody CreateProfileImageUrlRequest request) {
 		return ResponseEntity
@@ -72,7 +74,7 @@ public class MemberController {
 			.body(DataResponse.created(s3Service.createProfilePresignedUrl(request)));
 	}
 
-	@PostMapping("/members/profile/presigned/upload/success")
+	@PostMapping("/profile/success")
 	public ResponseEntity<DataResponse<Void>> saveProfileImageMetaData(
 		@RequestBody SaveFileMetaDataRequest request) {
 		memberService.saveProfileImageMetaData(request);
@@ -80,5 +82,14 @@ public class MemberController {
 		return ResponseEntity
 			.status(HttpStatus.CREATED)
 			.body(DataResponse.created());
+	}
+
+	@DeleteMapping("/profile")
+	public ResponseEntity<DataResponse<Void>> deleteProfileImage() {
+		memberService.deleteProfileImage();
+
+		return ResponseEntity
+			.status(HttpStatus.NO_CONTENT)
+			.body(DataResponse.noContent());
 	}
 }

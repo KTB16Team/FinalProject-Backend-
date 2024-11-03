@@ -34,7 +34,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 		this.jwtTokenProvider = jwtTokenProvider;
 		this.memberService = memberService;
 
-		setFilterProcessesUrl("/api/members/login");
+		setFilterProcessesUrl("/api/v1/members/login");
 	}
 
 	@Override

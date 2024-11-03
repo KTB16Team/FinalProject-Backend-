@@ -1,5 +1,7 @@
 package aimo.backend.domains.member.entity;
 
+import static lombok.AccessLevel.*;
+
 import aimo.backend.common.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,10 +12,12 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @Table(name = "profile_images")
+@NoArgsConstructor(access = PROTECTED)
 public class ProfileImage extends BaseEntity {
 
 	@Id
