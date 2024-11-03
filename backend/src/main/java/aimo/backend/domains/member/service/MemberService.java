@@ -51,7 +51,7 @@ public class MemberService {
 		validateDuplicateEmail(signUpRequest.email());
 
 		// 중복 닉네임 검사
-		validateDuplicateUsername(signUpRequest.username());
+		validateDuplicateUsername(signUpRequest.memberName());
 
 		Member member = memberMapper.signUpMemberEntity(signUpRequest);
 		memberRepository.save(member);
@@ -133,7 +133,7 @@ public class MemberService {
 
 	// 닉네임 중복 검사
 	private void validateDuplicateUsername(String username) {
-		if (memberRepository.existsByUsername(username)) {
+		if (memberRepository.existsByMemberName(username)) {
 			throw ApiException.from(ErrorCode.USERNAME_DUPLICATE);
 		}
 	}

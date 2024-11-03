@@ -12,7 +12,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
 	void deleteMemberByEmail(String email);
 
-	boolean existsByUsername(String username);
+	boolean existsByMemberName(String memberName);
 
 	boolean existsByEmail(String email);
 }

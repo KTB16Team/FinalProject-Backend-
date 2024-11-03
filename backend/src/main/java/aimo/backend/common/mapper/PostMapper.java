@@ -81,7 +81,7 @@ public class PostMapper {
 		return new FindPostAndCommentsByIdResponse(
 			post.getMember() == member,
 			post.getTitle(),
-			post.getMember().getUsername(),
+			post.getMember().getMemberName(),
 			post.getSummaryAi(),
 			post.getPostLikesCount(),
 			post.getPostViewsCount(),

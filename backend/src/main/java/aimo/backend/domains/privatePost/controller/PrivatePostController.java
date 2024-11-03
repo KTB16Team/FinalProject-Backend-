@@ -21,6 +21,7 @@ import aimo.backend.common.dto.DataResponse;
 import aimo.backend.domains.privatePost.dto.ChatRecordRequest;
 import aimo.backend.domains.privatePost.dto.PrivatePostPreviewResponse;
 import aimo.backend.domains.privatePost.dto.PrivatePostResponse;
+import aimo.backend.domains.privatePost.dto.SaveAudioSuccessRequest;
 import aimo.backend.domains.privatePost.dto.SaveAudioSuccessResponse;
 import aimo.backend.domains.privatePost.dto.SpeachToTextRequest;
 import aimo.backend.domains.privatePost.dto.SpeachToTextResponse;
