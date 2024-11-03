@@ -1,11 +1,11 @@
 # Aimo-Backend
 Aimo의 백엔드 레포지토리입니다.
 
-### Flow Chart
-![image](https://github.com/user-attachments/assets/f042731e-2f12-4b4f-b682-601966799bcb)
-
 ### Story Board
 ![image](https://github.com/user-attachments/assets/ae7ed254-9c5d-4499-a1f1-bed8ac99b25f)
+
+### Flow Chart
+![image](https://github.com/user-attachments/assets/f042731e-2f12-4b4f-b682-601966799bcb)
 
 ### ERD
 ![QuickDBD-aimo (9)](https://github.com/user-attachments/assets/de754ec1-10f4-48f1-9445-cd7ebf31dfab)
