@@ -3,6 +3,8 @@ package aimo.backend.domains.comment.entity;
 import static jakarta.persistence.GenerationType.*;
 import static lombok.AccessLevel.*;
 
+import java.util.List;
+
 import aimo.backend.common.entity.BaseEntity;
 import aimo.backend.domains.comment.costants.CommentConstants;
 import aimo.backend.domains.member.entity.Member;
@@ -14,6 +16,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
@@ -51,6 +54,9 @@ public class ChildComment extends BaseEntity {
 	@JoinColumn(name = "post_id")
 	private Post post;
 
+	@OneToMany(mappedBy = "childComment", fetch = FetchType.LAZY)
+	private List<ChildCommentLike> childCommentLikes;
+
 	@Builder
 	private ChildComment(
 		String memberName,
@@ -66,6 +72,10 @@ public class ChildComment extends BaseEntity {
 		this.isDeleted = isDeleted;
 		this.member = member;
 		this.post = post;
+	}
+
+	public Integer getLikesCount() {
+		return childCommentLikes.size();
 	}
 
 	public void deleteChildCommentSoftly() {

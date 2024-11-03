@@ -1,5 +1,7 @@
 package aimo.backend.domains.privatePost.entity;
 
+import static jakarta.persistence.GenerationType.*;
+
 import aimo.backend.common.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,7 +19,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class TextRecord extends BaseEntity {
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy = IDENTITY)
 	@Column(name = "text_record_id")
 	private Long id;
 

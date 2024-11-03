@@ -1,12 +1,14 @@
 package aimo.backend.domains.member.controller;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import aimo.backend.domains.member.dto.CreateProfileImageUrlRequest;
@@ -18,9 +20,12 @@ import aimo.backend.domains.auth.security.jwtFilter.JwtTokenProvider;
 import aimo.backend.infrastructure.s3.S3Service;
 import aimo.backend.infrastructure.s3.dto.CreatePresignedUrlResponse;
 import aimo.backend.infrastructure.s3.dto.SaveFileMetaDataRequest;
+
 import aimo.backend.domains.member.service.MemberService;
+import aimo.backend.util.memberLoader.MemberLoader;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.Data;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -47,7 +52,7 @@ public class MemberController {
 	}
 
 	@PostMapping("/signup")
-	public ResponseEntity<DataResponse<Void>> signupMember(@RequestBody SignUpRequest signUpRequest) {
+	public ResponseEntity<DataResponse<Void>> signupMember(@RequestBody @Valid SignUpRequest signUpRequest) {
 		memberService.signUp(signUpRequest);
 
 		return ResponseEntity
@@ -91,5 +96,14 @@ public class MemberController {
 		return ResponseEntity
 			.status(HttpStatus.NO_CONTENT)
 			.body(DataResponse.noContent());
+	}
+
+	@PostMapping(value = "/login", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	public ResponseEntity<DataResponse<Void>> loginMember(
+		@RequestParam("email") String email,
+		@RequestParam("password") String password
+	) {
+		// 실제로 실행되지 않고 Swagger 문서용도로만 사용됩니다.
+		return ResponseEntity.ok(DataResponse.ok());
 	}
 }

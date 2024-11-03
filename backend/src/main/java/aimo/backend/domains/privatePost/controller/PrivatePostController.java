@@ -24,16 +24,19 @@ import aimo.backend.domains.privatePost.dto.PrivatePostResponse;
 import aimo.backend.domains.privatePost.dto.SaveAudioSuccessResponse;
 import aimo.backend.domains.privatePost.dto.SpeachToTextRequest;
 import aimo.backend.domains.privatePost.dto.SpeachToTextResponse;
+
 import aimo.backend.domains.privatePost.dto.SummaryAndJudgementResponse;
 import aimo.backend.domains.privatePost.dto.TextRecordRequest;
-import aimo.backend.domains.privatePost.dto.SaveAudioSuccessRequest;
 import aimo.backend.domains.privatePost.service.AudioRecordService;
 import aimo.backend.domains.privatePost.service.ChatRecordService;
-import aimo.backend.domains.privatePost.service.TextRecordService;
 import aimo.backend.domains.privatePost.service.PrivatePostService;
+
 import aimo.backend.infrastructure.s3.dto.CreatePresignedUrlRequest;
 import aimo.backend.infrastructure.s3.dto.CreatePresignedUrlResponse;
 import jakarta.validation.Valid;
+
+import aimo.backend.domains.privatePost.service.TextRecordService;
+import aimo.backend.util.memberLoader.MemberLoader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
