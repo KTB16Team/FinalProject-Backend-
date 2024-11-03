@@ -18,7 +18,7 @@ public class MemberMapper {
 	public Member signUpMemberEntity(SignUpRequest signUpRequest) {
 		return Member
 			.builder()
-			.username(signUpRequest.username())
+			.memberName(signUpRequest.memberName())
 			.password(passwordEncoder.encode(signUpRequest.password()))
 			.email(signUpRequest.email())
 			.memberRole(MemberRole.USER)

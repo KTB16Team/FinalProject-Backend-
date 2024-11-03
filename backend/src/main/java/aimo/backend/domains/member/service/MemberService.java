@@ -1,14 +1,21 @@
 package aimo.backend.domains.member.service;
 
-import aimo.backend.domains.auth.security.jwtFilter.JwtTokenProvider;
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.exception.ErrorCode;
 import aimo.backend.domains.member.dto.DeleteRequest;
+import aimo.backend.domains.member.dto.LogOutRequest;
 import aimo.backend.domains.member.dto.SignUpRequest;
 import aimo.backend.domains.member.entity.Member;
+import aimo.backend.domains.member.entity.ProfileImage;
 import aimo.backend.domains.member.entity.RefreshToken;
 import aimo.backend.common.mapper.MemberMapper;
 import aimo.backend.domains.member.repository.MemberRepository;
+import aimo.backend.domains.member.repository.ProfileImageRepository;
+import aimo.backend.domains.privatePost.dto.CreateResourceUrl;
+import aimo.backend.infrastructure.s3.S3Service;
+import aimo.backend.infrastructure.s3.dto.SaveFileMetaDataRequest;
+import aimo.backend.infrastructure.s3.model.PresignedUrlPrefix;
+import aimo.backend.util.memberLoader.MemberLoader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,8 +34,10 @@ public class MemberService {
 	private final MemberRepository memberRepository;
 	private final RefreshTokenService refreshTokenService;
 	private final MemberMapper memberMapper;
-	private final JwtTokenProvider jwtTokenProvider;
 	private final PasswordEncoder passwordEncoder;
+	private final MemberLoader memberLoader;
+	private final ProfileImageRepository profileImageRepository;
+	private final S3Service s3Service;
 
 	// 이메일로 멤버 조회
 	public Optional<Member> findByEmail(String email) {
@@ -50,8 +59,9 @@ public class MemberService {
 
 	//로그아웃
 	@Transactional
-	public void logoutMember(String accessToken, String refreshToken) {
+	public void logoutMember(LogOutRequest logOutRequest) {
 		// 회원의 refreshToken 만료 처리
+		String accessToken = logOutRequest.accessToken(), refreshToken = logOutRequest.refreshToken();
 		RefreshToken expiredToken = new RefreshToken(accessToken, refreshToken);
 		refreshTokenService.save(expiredToken);
 		log.info("Logout successful {}", refreshTokenService.existsByAccessToken(accessToken));
@@ -59,20 +69,48 @@ public class MemberService {
 
 	// 회원 삭제
 	@Transactional
-	public void deleteMember(String accessToken, DeleteRequest deleteRequest) {
-		Long memberId = jwtTokenProvider
-			.extractMemberId(accessToken)
-			.orElseThrow(() -> ApiException.from(ErrorCode.INVALID_ACCESS_TOKEN));
-
-		Member member = memberRepository
-			.findById(memberId)
-			.orElseThrow(() -> ApiException.from(ErrorCode.MEMBER_NOT_FOUND));
+	public void deleteMember(DeleteRequest deleteRequest) {
+		Member member = memberLoader.getMember();
 
 		if (!isValid(deleteRequest.password(), member.getPassword())) {
 			throw ApiException.from(ErrorCode.INVALID_PASSWORD);
 		}
 
 		memberRepository.delete(member);
+	}
+
+	@Transactional
+	public void saveProfileImageMetaData(SaveFileMetaDataRequest request) {
+		Member member = memberLoader.getMember();
+
+		if(member.getProfileImage() != null) {
+			deleteProfileImage();
+		}
+
+		CreateResourceUrl createResourceUrl = new CreateResourceUrl(
+			PresignedUrlPrefix.IMAGE.getValue(),
+			request.filename(),
+			request.extension());
+
+		ProfileImage profileImage = ProfileImage
+			.builder()
+			.member(memberLoader.getMember())
+			.filename(request.filename())
+			.size(request.size())
+			.extension(request.extension())
+			.url(s3Service.getResourceUrl(createResourceUrl))
+			.build();
+
+		profileImageRepository.save(profileImage);
+		member.updateProfileImage(profileImage);
+	}
+
+	@Transactional
+	public void deleteProfileImage() {
+		Member member = memberLoader.getMember();
+		ProfileImage profileImage = member.getProfileImage();
+		profileImageRepository.delete(profileImage);
+		member.updateProfileImage(null);
 	}
 
 	public Member findById(Long memberId) {

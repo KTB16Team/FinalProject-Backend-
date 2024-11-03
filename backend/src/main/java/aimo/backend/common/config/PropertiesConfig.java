@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import aimo.backend.common.properties.AiServerProperties;
 import aimo.backend.common.properties.CorsProperties;
 import aimo.backend.common.properties.JwtProperties;
+import aimo.backend.common.properties.S3Properties;
 import aimo.backend.common.properties.SecurityProperties;
 
 @Configuration
@@ -13,7 +14,8 @@ import aimo.backend.common.properties.SecurityProperties;
 	JwtProperties.class,
 	SecurityProperties.class,
 	CorsProperties.class,
-	AiServerProperties.class
+	AiServerProperties.class,
+	S3Properties.class
 })
 public class PropertiesConfig {
 }

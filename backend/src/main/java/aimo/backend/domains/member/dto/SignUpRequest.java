@@ -13,9 +13,8 @@ public record SignUpRequest(
 	String email,
 	@NotBlank(message = "password가 빈 문자열입니다.")
 	String password,
+  @NotNull(message = "gender가 비었습니다.")
 	Gender gender,
-	@NotBlank(message = "phoneNumber이 빈 문자열입니다.")
-	String phone_number,
+  @Past(message = "생년월일은 과거 날짜여야 합니다.")
 	LocalDate birth
-) {
-}
+) {}

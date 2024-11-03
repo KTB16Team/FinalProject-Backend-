@@ -15,6 +15,7 @@ import aimo.backend.domains.comment.dto.request.UpdateParentCommentRequest;
 import aimo.backend.domains.comment.service.ParentCommentService;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.util.memberLoader.MemberLoader;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -27,8 +28,8 @@ public class ParentCommentController {
 
 	@PostMapping("/{postId}/comments")
 	public ResponseEntity<DataResponse<Void>> saveParentComment(
-		@PathVariable Long postId,
-		@RequestBody SaveParentCommentRequest request
+		@Valid @PathVariable Long postId,
+		@Valid @RequestBody SaveParentCommentRequest request
 	) {
 		Member member = memberLoader.getMember();
 		parentCommentService.saveParentComment(member, postId, request);
@@ -38,8 +39,8 @@ public class ParentCommentController {
 
 	@PutMapping("comments/{commentId}")
 	public ResponseEntity<DataResponse<Void>> updateParentComment(
-		@PathVariable Long commentId,
-		@RequestBody UpdateParentCommentRequest request
+		@Valid @PathVariable Long commentId,
+		@Valid @RequestBody UpdateParentCommentRequest request
 	) {
 		Member member = memberLoader.getMember();
 		parentCommentService.validateAndUpdateParentComment(member, commentId, request);
@@ -49,7 +50,7 @@ public class ParentCommentController {
 
 	@DeleteMapping("comments/{commentId}")
 	public ResponseEntity<DataResponse<Void>> deleteParentComment(
-		@PathVariable Long commentId
+		@Valid @PathVariable Long commentId
 	) {
 		Member member = memberLoader.getMember();
 		parentCommentService.validateAndDeleteParentComment(member, commentId);

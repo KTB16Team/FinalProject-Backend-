@@ -15,17 +15,26 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import aimo.backend.common.dto.DataResponse;
+
+import aimo.backend.domains.privatePost.dto.ChatRecordRequest;
 import aimo.backend.domains.privatePost.dto.PrivatePostPreviewResponse;
 import aimo.backend.domains.privatePost.dto.PrivatePostResponse;
-import aimo.backend.domains.privatePost.dto.SaveAudioSuccessRequest;
+import aimo.backend.domains.privatePost.dto.SaveAudioSuccessResponse;
+import aimo.backend.domains.privatePost.dto.SpeachToTextRequest;
+import aimo.backend.domains.privatePost.dto.SpeachToTextResponse;
+
 import aimo.backend.domains.privatePost.dto.SummaryAndJudgementResponse;
 import aimo.backend.domains.privatePost.dto.TextRecordRequest;
 import aimo.backend.domains.privatePost.service.AudioRecordService;
 import aimo.backend.domains.privatePost.service.ChatRecordService;
 import aimo.backend.domains.privatePost.service.PrivatePostService;
+
+import aimo.backend.infrastructure.s3.dto.CreatePresignedUrlRequest;
+import aimo.backend.infrastructure.s3.dto.CreatePresignedUrlResponse;
+import jakarta.validation.Valid;
+
 import aimo.backend.domains.privatePost.service.TextRecordService;
 import aimo.backend.util.memberLoader.MemberLoader;
 import lombok.RequiredArgsConstructor;
@@ -41,81 +50,69 @@ public class PrivatePostController {
 	private final PrivatePostService privatePostService;
 	private final TextRecordService textRecordService;
 	private final ChatRecordService chatRecordService;
-	private final MemberLoader memberLoader;
 
-	@GetMapping("/upload/audio/presigned")
-	public ResponseEntity<DataResponse<Void>> getPresignedUrlTo(@RequestParam("file") MultipartFile file) {
-		return ResponseEntity
-			.status(HttpStatus.CREATED)
-			.body(DataResponse.created());
-	}
-
-	@PostMapping("/upload/audio/success")
-	public ResponseEntity<DataResponse<Void>> saveAudioRecord(
-		@RequestBody SaveAudioSuccessRequest saveAudioSuccessRequest
-	) {
-		audioRecordService.save(saveAudioSuccessRequest);
-		return ResponseEntity
-			.status(HttpStatus.CREATED)
-			.body(DataResponse.created());
-	}
-
+	// 판결
 	@PostMapping("/judgement")
-	public ResponseEntity<DataResponse<Void>> judgement(
-		@RequestBody TextRecordRequest textRecordRequest
-	) {
+	public ResponseEntity<DataResponse<Void>> judgement(@Valid @RequestBody TextRecordRequest textRecordRequest) {
 
-		SummaryAndJudgementResponse summaryAndJudgementResponse =
-			privatePostService.serveScriptToAi(textRecordRequest);
+		SummaryAndJudgementResponse summaryAndJudgementResponse = privatePostService.serveScriptToAi(textRecordRequest);
 
 		privatePostService.save(summaryAndJudgementResponse);
 
-		return ResponseEntity
-			.status(HttpStatus.CREATED)
-			.body(DataResponse.created());
+		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
 
+	// 대화록 업로드
 	@PostMapping("/upload/text")
 	public ResponseEntity<DataResponse<Void>> uploadTextRecord(
-		@RequestBody TextRecordRequest textRecordRequest
-	) {
+		@Valid @RequestBody TextRecordRequest textRecordRequest) {
 		textRecordService.save(textRecordRequest);
-		return ResponseEntity
-			.status(HttpStatus.CREATED)
-			.body(DataResponse.created());
+		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
 
 	@PostMapping("/upload/chat")
 	public ResponseEntity<DataResponse<Void>> uploadChatRecord(
-		@RequestParam("chat_record") MultipartFile file
-	) throws IOException {
-		chatRecordService.save(file);
-		return ResponseEntity
-			.status(HttpStatus.CREATED)
-			.body(DataResponse.created());
+		@Valid @RequestParam("chat_record") ChatRecordRequest chatRecordRequest) throws IOException {
+
+		chatRecordService.save(chatRecordRequest);
+		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
 
+	@PostMapping("/speech-to-text")
+	public ResponseEntity<DataResponse<SpeachToTextResponse>> speechToText(
+		@Valid @RequestBody SpeachToTextRequest speachToTextRequest) {
+		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created(audioRecordService.speachToText(speachToTextRequest)));
+	}
+
+
+	@GetMapping("/upload/audio/presigned")
+	public ResponseEntity<DataResponse<CreatePresignedUrlResponse>> getPresignedUrlTo(
+		@Valid @RequestBody CreatePresignedUrlRequest createPresignedUrlRequest) {
+		return ResponseEntity.status(HttpStatus.CREATED)
+			.body(DataResponse.created(audioRecordService.createPresignedUrl(createPresignedUrlRequest)));
+	}
+
+	@PostMapping("/upload/audio/success")
+	public ResponseEntity<DataResponse<SaveAudioSuccessResponse>> saveAudioRecord(
+		@Valid @RequestBody SaveAudioSuccessRequest saveAudioSuccessRequest) {
+		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created(audioRecordService.save(saveAudioSuccessRequest)));
+	}
+
+	// 개인글 조회
 	@GetMapping("/{privatePostId}")
-	public ResponseEntity<DataResponse<PrivatePostResponse>> getPrivatePost(
-		@PathVariable Long privatePostId
-	) {
-		return ResponseEntity
-			.status(HttpStatus.CREATED)
-			.body(DataResponse.from(privatePostService.getPrivatePost(privatePostId)));
+	public ResponseEntity<DataResponse<PrivatePostResponse>> findPrivatePost(
+		@Valid @PathVariable Long privatePostId) {
+		return ResponseEntity.status(HttpStatus.CREATED)
+			.body(DataResponse.from(privatePostService.findPrivatePostBy(privatePostId)));
 	}
 
 	@GetMapping("?page={page_number}&size={size}")
-	public ResponseEntity<DataResponse<Page<PrivatePostPreviewResponse>>> getPrivatePostPage(
-		@RequestParam(defaultValue = "0", name = "page_number") Long pageNumber,
-		@RequestParam(defaultValue = "10") Long size
-	) {
-		Pageable pageable = PageRequest
-			.of(pageNumber.intValue(),
-				size.intValue(),
-				Sort.by("createdAt").descending());
+	public ResponseEntity<DataResponse<Page<PrivatePostPreviewResponse>>> findPrivatePostPage(
+		@Valid @RequestParam(defaultValue = "0")  Long pageNumber,
+		@Valid @RequestParam(defaultValue = "10") Long size) {
+		Pageable pageable = PageRequest.of(pageNumber.intValue(), size.intValue(), Sort.by("createdAt").descending());
 
-		return ResponseEntity
-			.status(HttpStatus.CREATED)
-			.body(DataResponse.from(privatePostService.getPrivatePostPreviews(pageable)));
+		return ResponseEntity.status(HttpStatus.CREATED)
+			.body(DataResponse.from(privatePostService.findPrivatePostPreviewsBy(pageable)));
 	}
 }
