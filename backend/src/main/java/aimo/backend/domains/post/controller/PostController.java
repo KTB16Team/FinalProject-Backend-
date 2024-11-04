@@ -3,6 +3,7 @@ package aimo.backend.domains.post.controller;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -59,5 +60,12 @@ public class PostController {
 		FindPostAndCommentsByIdResponse response = postService.findPostAndCommentsDtoById(member, postId);
 
 		return ResponseEntity.ok(DataResponse.from(response));
+	}
+
+	@DeleteMapping("/{postId}")
+	public ResponseEntity<DataResponse<Void>> deletePost(@PathVariable Long postId) {
+		postService.deletePost(memberLoader.getMemberId(), postId);
+
+		return ResponseEntity.ok(DataResponse.noContent());
 	}
 }
