@@ -17,15 +17,15 @@ public class CustomUserDetailsService implements UserDetailsService {
 	private final MemberService memberService;
 
 	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		Member member = memberService.findByEmail(username)
+	public UserDetails loadUserByUsername(String nickname) throws UsernameNotFoundException {
+		Member member = memberService.findByEmail(nickname)
 			.orElseThrow(() -> new UsernameNotFoundException("해당하는 회원을 찾을 수 없습니다."));
 
 		String pw = member.getPassword();
 		String role = member.getRole().getValue();
 
 		return User.builder()
-			.username(username)
+			.username(nickname)
 			.password(pw)
 			.roles(role)
 			.build();

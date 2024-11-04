@@ -33,7 +33,7 @@ public class ParentCommentLikeService {
 				.member(member)
 				.build());
 		} else {
-			parentCommentLikeRepository.deleteByParentComment_Id(member.getId(), parentCommentId);
+			parentCommentLikeRepository.deleteByMember_IdAndParentComment_Id(member.getId(), parentCommentId);
 		}
 	}
 }

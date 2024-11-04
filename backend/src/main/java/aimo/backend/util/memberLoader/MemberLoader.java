@@ -34,8 +34,8 @@ public class MemberLoader {
 			.getPrincipal();
 	}
 
-	public String getMemberName() {
-		return getMember().getMemberName();
+	public String getnickname() {
+		return getMember().getNickname();
 	}
 
 	public Long getMemberId(){

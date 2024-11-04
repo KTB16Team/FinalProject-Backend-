@@ -16,6 +16,7 @@ import aimo.backend.common.properties.SecurityProperties;
 	CorsProperties.class,
 	AiServerProperties.class,
 	S3Properties.class
+	//SMTPProperties.class
 })
 public class PropertiesConfig {
 }

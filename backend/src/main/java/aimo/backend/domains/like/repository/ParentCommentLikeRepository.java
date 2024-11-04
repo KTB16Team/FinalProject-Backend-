@@ -6,7 +6,6 @@ import aimo.backend.domains.like.entity.ParentCommentLike;
 
 public interface ParentCommentLikeRepository extends JpaRepository<ParentCommentLike, Long> {
 
-	void deleteByParentComment_Id(Long id, Long parentCommentId);
-
+	void deleteByMember_IdAndParentComment_Id(Long likeId, Long parentCommentId);
 	Boolean existsByParentComment_IdAndMember_Id(Long parentCommentId, Long memberId);
 }

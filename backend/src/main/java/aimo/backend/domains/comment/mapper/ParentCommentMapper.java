@@ -14,7 +14,7 @@ public class ParentCommentMapper {
 
 	public ParentComment from(SaveParentCommentRequest request, Member member, Post post) {
 		return ParentComment.builder()
-			.memberName(member.getMemberName())
+			.nickname(member.getNickname())
 			.content(request.content())
 			.isDeleted(false)
 			.member(member)
