@@ -41,7 +41,7 @@ public class PostView extends BaseEntity {
 	private Member member;
 
 	@Builder
-	private PostView(Post post, Member member) {
+	public PostView(Post post, Member member) {
 		this.post = post;
 		this.member = member;
 	}

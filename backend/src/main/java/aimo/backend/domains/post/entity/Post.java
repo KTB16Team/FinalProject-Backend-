@@ -160,4 +160,8 @@ public class Post extends BaseEntity {
 	public int hashCode() {
 		return Objects.hashCode(id);
 	}
+
+	public void increaseViewsCount(PostView postView) {
+		this.postViews.add(postView);
+	}
 }
