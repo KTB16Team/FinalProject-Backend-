@@ -121,6 +121,7 @@ public class PostService {
 	}
 
 	// 글 삭제
+	@Transactional
 	public void deletePost(Long memberId, Long postId) {
 		validateDeletePost(memberId, postId);
 

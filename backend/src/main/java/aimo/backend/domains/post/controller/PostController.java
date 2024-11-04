@@ -18,7 +18,9 @@ import aimo.backend.domains.post.dto.requset.SavePostRequest;
 import aimo.backend.domains.post.dto.response.FindPostAndCommentsByIdResponse;
 import aimo.backend.domains.post.dto.response.FindPostsByPostTypeResponse;
 import aimo.backend.domains.post.model.PostType;
+import aimo.backend.domains.post.service.PostLikeService;
 import aimo.backend.domains.post.service.PostService;
+import aimo.backend.domains.post.service.PostViewService;
 import aimo.backend.util.memberLoader.MemberLoader;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -30,6 +32,8 @@ import lombok.RequiredArgsConstructor;
 public class PostController {
 
 	private final PostService postService;
+	private final PostViewService postViewService;
+	private final PostLikeService postLikeService;
 	private final MemberLoader memberLoader;
 
 	@PostMapping
@@ -68,5 +72,17 @@ public class PostController {
 		postService.deletePost(memberLoader.getMemberId(), postId);
 
 		return ResponseEntity.ok(DataResponse.noContent());
+	}
+
+	@PostMapping("/{postId}/likes")
+	public ResponseEntity<DataResponse<Void>> likePost(@PathVariable Long postId) {
+		postLikeService.like(memberLoader.getMember(), postId);
+
+		return ResponseEntity.ok(DataResponse.noContent());
+	}
+
+	@PostMapping("/{postId}/views")
+	public void increaseView(@PathVariable Long postId) {
+		postViewService.increaseView(memberLoader.getMember(), postId);
 	}
 }

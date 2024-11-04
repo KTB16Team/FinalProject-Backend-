@@ -3,6 +3,7 @@ package aimo.backend.domains.post.entity;
 import static lombok.AccessLevel.*;
 
 import aimo.backend.common.entity.Like;
+import aimo.backend.domains.member.entity.Member;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
@@ -25,4 +26,9 @@ public class PostLike extends Like {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "post_id")
 	private Post post;
+
+	public PostLike(Post post, Member member) {
+		super(member);
+		this.post = post;
+	}
 }
