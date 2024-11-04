@@ -6,6 +6,7 @@ import java.util.List;
 
 import aimo.backend.common.entity.BaseEntity;
 import aimo.backend.domains.comment.costants.CommentConstants;
+import aimo.backend.domains.like.entity.ParentCommentLike;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.post.entity.Post;
 import jakarta.persistence.*;

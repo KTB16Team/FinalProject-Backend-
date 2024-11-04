@@ -9,6 +9,7 @@ import java.util.Objects;
 
 import aimo.backend.common.entity.BaseEntity;
 import aimo.backend.domains.comment.entity.ParentComment;
+import aimo.backend.domains.like.entity.PostLike;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.post.model.Category;
 import aimo.backend.domains.post.model.Side;
@@ -159,5 +160,9 @@ public class Post extends BaseEntity {
 	@Override
 	public int hashCode() {
 		return Objects.hashCode(id);
+	}
+
+	public void increaseViewsCount(PostView postView) {
+		this.postViews.add(postView);
 	}
 }

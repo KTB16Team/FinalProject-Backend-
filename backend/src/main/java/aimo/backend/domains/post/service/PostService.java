@@ -17,7 +17,7 @@ import aimo.backend.common.mapper.PostMapper;
 import aimo.backend.domains.comment.entity.ChildComment;
 import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.member.entity.Member;
-import aimo.backend.domains.post.dto.SavePostRequest;
+import aimo.backend.domains.post.dto.requset.SavePostRequest;
 import aimo.backend.domains.post.dto.response.FindPostAndCommentsByIdResponse;
 import aimo.backend.domains.post.dto.response.FindPostsByPostTypeResponse;
 import aimo.backend.domains.post.entity.Post;
@@ -57,7 +57,12 @@ public class PostService {
 	}
 
 	// PostType으로 글 조회
-	public Page<FindPostsByPostTypeResponse> findPostDtosByPostType(Member member, PostType postType, Integer page, Integer size) {
+	public Page<FindPostsByPostTypeResponse> findPostDtosByPostType(
+		Member member,
+		PostType postType,
+		Integer page,
+		Integer size
+	) {
 		Page<Post> posts;
 		if (postType == PostType.MY) {
 			posts = findMyPosts(member.getId(), PageRequest.of(page, size));
@@ -115,4 +120,20 @@ public class PostService {
 		return new PageImpl<>(pagedPosts, pageable, posts.size());
 	}
 
+	// 글 삭제
+	@Transactional
+	public void deletePost(Long memberId, Long postId) {
+		validateDeletePost(memberId, postId);
+
+		postRepository.deleteById(postId);
+	}
+
+	// 글 삭제 권한 확인
+	public void validateDeletePost(Long memberId, Long postId) {
+		Boolean exists = postRepository.existsByIdAndMember_Id(postId, memberId);
+
+		if (!exists) {
+			throw ApiException.from(POST_DELETE_UNAUTHORIZED);
+		}
+	}
 }
