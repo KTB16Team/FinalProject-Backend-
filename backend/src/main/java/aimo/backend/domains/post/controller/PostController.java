@@ -13,12 +13,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import aimo.backend.common.dto.DataResponse;
+import aimo.backend.domains.like.service.PostLikeService;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.post.dto.requset.SavePostRequest;
 import aimo.backend.domains.post.dto.response.FindPostAndCommentsByIdResponse;
 import aimo.backend.domains.post.dto.response.FindPostsByPostTypeResponse;
 import aimo.backend.domains.post.model.PostType;
-import aimo.backend.domains.post.service.PostLikeService;
 import aimo.backend.domains.post.service.PostService;
 import aimo.backend.domains.post.service.PostViewService;
 import aimo.backend.util.memberLoader.MemberLoader;
@@ -70,13 +70,6 @@ public class PostController {
 	@DeleteMapping("/{postId}")
 	public ResponseEntity<DataResponse<Void>> deletePost(@PathVariable Long postId) {
 		postService.deletePost(memberLoader.getMemberId(), postId);
-
-		return ResponseEntity.ok(DataResponse.noContent());
-	}
-
-	@PostMapping("/{postId}/likes")
-	public ResponseEntity<DataResponse<Void>> likePost(@PathVariable Long postId) {
-		postLikeService.like(memberLoader.getMember(), postId);
 
 		return ResponseEntity.ok(DataResponse.noContent());
 	}

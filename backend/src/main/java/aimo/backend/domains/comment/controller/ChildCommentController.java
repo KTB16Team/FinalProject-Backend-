@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import aimo.backend.common.dto.DataResponse;
 import aimo.backend.domains.comment.dto.request.SaveChildCommentRequest;
+import aimo.backend.domains.like.service.ChildCommentLikeService;
 import aimo.backend.domains.comment.service.ChildCommentService;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.util.memberLoader.MemberLoader;
@@ -24,6 +25,7 @@ public class ChildCommentController {
 
 	private final ChildCommentService childCommentService;
 	private final MemberLoader memberLoader;
+	private final ChildCommentLikeService childCommentLikeService;
 
 	@PostMapping("/{postId}/comments/{parentCommentId}/child")
 	public ResponseEntity<DataResponse<Void>> saveChildComment(

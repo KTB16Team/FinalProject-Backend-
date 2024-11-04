@@ -1,9 +1,10 @@
-package aimo.backend.common.entity;
+package aimo.backend.domains.like.entity;
 
 import static jakarta.persistence.GenerationType.*;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import aimo.backend.common.entity.BaseEntity;
 import aimo.backend.domains.member.entity.Member;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
