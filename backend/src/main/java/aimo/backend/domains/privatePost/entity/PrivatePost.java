@@ -69,6 +69,14 @@ public class PrivatePost extends BaseEntity {
 	@Column(nullable = false)
 	private Boolean published;
 
+	public void publish() {
+		this.published = true;
+	}
+
+	public void unpublish() {
+		this.published = false;
+	}
+
 	@Builder
 	private PrivatePost(
 		String title,

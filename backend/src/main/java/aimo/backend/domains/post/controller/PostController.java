@@ -34,11 +34,10 @@ public class PostController {
 	private final PostService postService;
 	private final PostViewService postViewService;
 	private final PostLikeService postLikeService;
-	private final MemberLoader memberLoader;
 
 	@PostMapping
 	public ResponseEntity<DataResponse<Void>> savePost(@RequestBody @Valid SavePostRequest request) {
-		postService.save(request, memberLoader.getMember());
+		postService.save(request);
 
 		return ResponseEntity
 			.status(HttpStatus.CREATED)
@@ -51,8 +50,7 @@ public class PostController {
 		@RequestParam("page") @NotNull Integer page,
 		@RequestParam("size") @NotNull Integer size
 	) {
-		Page<FindPostsByPostTypeResponse> responses = postService.findPostDtosByPostType(memberLoader.getMember(),
-			postType, page, size);
+		Page<FindPostsByPostTypeResponse> responses = postService.findPostDtosByPostType(postType, page, size);
 
 		return ResponseEntity.ok(DataResponse.from(responses));
 	}
@@ -60,22 +58,21 @@ public class PostController {
 	@GetMapping("/{postId}")
 	public ResponseEntity<DataResponse<FindPostAndCommentsByIdResponse>> findPostAndComments(
 		@PathVariable Long postId) {
-		Member member = memberLoader.getMember();
 
-		FindPostAndCommentsByIdResponse response = postService.findPostAndCommentsDtoById(member, postId);
+		FindPostAndCommentsByIdResponse response = postService.findPostAndCommentsDtoById(postId);
 
 		return ResponseEntity.ok(DataResponse.from(response));
 	}
 
 	@DeleteMapping("/{postId}")
 	public ResponseEntity<DataResponse<Void>> deletePost(@PathVariable Long postId) {
-		postService.deletePost(memberLoader.getMemberId(), postId);
+		postService.deletePost(postId);
 
 		return ResponseEntity.ok(DataResponse.noContent());
 	}
 
 	@PostMapping("/{postId}/views")
 	public void increaseView(@PathVariable Long postId) {
-		postViewService.increaseView(memberLoader.getMember(), postId);
+		postViewService.increaseView(postId);
 	}
 }

@@ -3,10 +3,12 @@ package aimo.backend.common.exception;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.coyote.Response;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.messaging.MessagingException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -66,6 +68,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		log.warn("handleAllException", e);
 
 		ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
+		return makeErrorResponseEntity(errorCode);
+	}
+
+	@ExceptionHandler({MessagingException.class})
+	public ResponseEntity<Object> handleMessagingException(MessagingException e) {
+		log.warn("handleMessagingException", e);
+
+		ErrorCode errorCode = ErrorCode.EMAIL_BAD_GATEWAY;
 		return makeErrorResponseEntity(errorCode);
 	}
 
