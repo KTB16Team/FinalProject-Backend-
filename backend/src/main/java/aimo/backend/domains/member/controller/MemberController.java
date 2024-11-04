@@ -4,27 +4,30 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import aimo.backend.domains.member.dto.CreateProfileImageUrlRequest;
 import aimo.backend.domains.member.dto.DeleteRequest;
+import aimo.backend.domains.member.dto.FindMyInfoResponse;
 import aimo.backend.domains.member.dto.LogOutRequest;
 import aimo.backend.domains.member.dto.SignUpRequest;
 import aimo.backend.common.dto.DataResponse;
 import aimo.backend.domains.auth.security.jwtFilter.JwtTokenProvider;
+import aimo.backend.domains.member.dto.UpdateNicknameRequest;
+import aimo.backend.domains.member.dto.UpdatePasswordRequest;
 import aimo.backend.infrastructure.s3.S3Service;
 import aimo.backend.infrastructure.s3.dto.CreatePresignedUrlResponse;
 import aimo.backend.infrastructure.s3.dto.SaveFileMetaDataRequest;
 
 import aimo.backend.domains.member.service.MemberService;
-import aimo.backend.util.memberLoader.MemberLoader;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.Data;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,64 +49,76 @@ public class MemberController {
 		log.info("logout member access token: {} refresh token: {}", accessToken, refreshToken);
 		memberService.logoutMember(new LogOutRequest(accessToken, refreshToken));
 
-		return ResponseEntity
-			.status(HttpStatus.CREATED)
-			.body(DataResponse.created());
+		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
 
 	@PostMapping("/signup")
 	public ResponseEntity<DataResponse<Void>> signupMember(@RequestBody @Valid SignUpRequest signUpRequest) {
 		memberService.signUp(signUpRequest);
 
-		return ResponseEntity
-			.status(HttpStatus.CREATED)
-			.body(DataResponse.created());
+		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
 
-	@PostMapping("/delete")
-	public ResponseEntity<DataResponse<Void>> deleteMember(
-		@RequestHeader("Authorization") String accessToken,
-		@RequestBody DeleteRequest deleteRequest) {
+	@DeleteMapping
+	public ResponseEntity<DataResponse<Void>> deleteMember(@RequestBody DeleteRequest deleteRequest) {
 		memberService.deleteMember(deleteRequest);
 
-		return ResponseEntity
-			.status(HttpStatus.NO_CONTENT)
-			.body(DataResponse.noContent());
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(DataResponse.noContent());
 	}
 
 	@PostMapping("/profile/presigned")
 	public ResponseEntity<DataResponse<CreatePresignedUrlResponse>> createProfileImagePreSignedUrl(
 		@RequestBody CreateProfileImageUrlRequest request) {
-		return ResponseEntity
-			.status(HttpStatus.CREATED)
+		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(DataResponse.created(s3Service.createProfilePresignedUrl(request)));
 	}
 
 	@PostMapping("/profile/success")
-	public ResponseEntity<DataResponse<Void>> saveProfileImageMetaData(
-		@RequestBody SaveFileMetaDataRequest request) {
+	public ResponseEntity<DataResponse<Void>> saveProfileImageMetaData(@RequestBody SaveFileMetaDataRequest request) {
 		memberService.saveProfileImageMetaData(request);
 
-		return ResponseEntity
-			.status(HttpStatus.CREATED)
-			.body(DataResponse.created());
+		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
 
 	@DeleteMapping("/profile")
 	public ResponseEntity<DataResponse<Void>> deleteProfileImage() {
 		memberService.deleteProfileImage();
 
-		return ResponseEntity
-			.status(HttpStatus.NO_CONTENT)
-			.body(DataResponse.noContent());
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(DataResponse.noContent());
 	}
 
 	@PostMapping(value = "/login", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<DataResponse<Void>> loginMember(
-		@RequestParam("email") String email,
-		@RequestParam("password") String password
-	) {
+	public ResponseEntity<DataResponse<Void>> loginMember(@RequestParam("email") String email,
+		@RequestParam("password") String password) {
 		// 실제로 실행되지 않고 Swagger 문서용도로만 사용됩니다.
 		return ResponseEntity.ok(DataResponse.ok());
+	}
+
+	// 내 정보 조회 (프로필 이미지 포함)
+	@GetMapping
+	public ResponseEntity<DataResponse<FindMyInfoResponse>> findMyInfo() {
+		return ResponseEntity.status(HttpStatus.OK)
+			.body(DataResponse.from(memberService.findMyInfo()));
+	}
+
+	@PutMapping("/password")
+	public ResponseEntity<DataResponse<Void>> updatePassword(@Valid @RequestBody UpdatePasswordRequest updatePasswordRequest) {
+		memberService.updatePassword(updatePasswordRequest);
+
+		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
+	}
+
+	@GetMapping("/nickname/{nickname}/exists")
+	public ResponseEntity<DataResponse<Void>> checkNicknameExists(@PathVariable("nickname") String nickname) {
+		memberService.checkNicknameExists(nickname);
+
+		return ResponseEntity.status(HttpStatus.OK).body(DataResponse.ok());
+	}
+
+	@PutMapping("/nickname")
+	public ResponseEntity<DataResponse<Void>> updateNickname(@RequestBody UpdateNicknameRequest updateNicknameRequest) {
+		memberService.updateNickname(updateNicknameRequest);
+
+		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
 }

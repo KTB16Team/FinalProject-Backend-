@@ -3,8 +3,11 @@ package aimo.backend.domains.member.service;
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.exception.ErrorCode;
 import aimo.backend.domains.member.dto.DeleteRequest;
+import aimo.backend.domains.member.dto.FindMyInfoResponse;
 import aimo.backend.domains.member.dto.LogOutRequest;
 import aimo.backend.domains.member.dto.SignUpRequest;
+import aimo.backend.domains.member.dto.UpdateNicknameRequest;
+import aimo.backend.domains.member.dto.UpdatePasswordRequest;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.member.entity.ProfileImage;
 import aimo.backend.domains.member.entity.RefreshToken;
@@ -45,7 +48,7 @@ public class MemberService {
 	}
 
 	// 회원 가입
-	@Transactional
+	@Transactional(rollbackFor = ApiException.class)
 	public void signUp(SignUpRequest signUpRequest) {
 		// 중복 이메일 검사
 		validateDuplicateEmail(signUpRequest.email());
@@ -58,7 +61,7 @@ public class MemberService {
 	}
 
 	//로그아웃
-	@Transactional
+	@Transactional(rollbackFor = ApiException.class)
 	public void logoutMember(LogOutRequest logOutRequest) {
 		// 회원의 refreshToken 만료 처리
 		String accessToken = logOutRequest.accessToken(), refreshToken = logOutRequest.refreshToken();
@@ -68,7 +71,7 @@ public class MemberService {
 	}
 
 	// 회원 삭제
-	@Transactional
+	@Transactional(rollbackFor = ApiException.class)
 	public void deleteMember(DeleteRequest deleteRequest) {
 		Member member = memberLoader.getMember();
 
@@ -79,21 +82,18 @@ public class MemberService {
 		memberRepository.delete(member);
 	}
 
-	@Transactional
+	@Transactional(rollbackFor = ApiException.class)
 	public void saveProfileImageMetaData(SaveFileMetaDataRequest request) {
 		Member member = memberLoader.getMember();
 
-		if(member.getProfileImage() != null) {
+		if (member.getProfileImage() != null) {
 			deleteProfileImage();
 		}
 
-		CreateResourceUrl createResourceUrl = new CreateResourceUrl(
-			PresignedUrlPrefix.IMAGE.getValue(),
-			request.filename(),
-			request.extension());
+		CreateResourceUrl createResourceUrl = new CreateResourceUrl(PresignedUrlPrefix.IMAGE.getValue(),
+			request.filename(), request.extension());
 
-		ProfileImage profileImage = ProfileImage
-			.builder()
+		ProfileImage profileImage = ProfileImage.builder()
 			.member(memberLoader.getMember())
 			.filename(request.filename())
 			.size(request.size())
@@ -105,7 +105,7 @@ public class MemberService {
 		member.updateProfileImage(profileImage);
 	}
 
-	@Transactional
+	@Transactional(rollbackFor = ApiException.class)
 	public void deleteProfileImage() {
 		Member member = memberLoader.getMember();
 		ProfileImage profileImage = member.getProfileImage();
@@ -113,12 +113,37 @@ public class MemberService {
 		member.updateProfileImage(null);
 	}
 
-	public Member findById(Long memberId) {
-		return memberRepository
-			.findById(memberId)
-			.orElseThrow(() -> ApiException.from(ErrorCode.MEMBER_NOT_FOUND));
+	@Transactional(rollbackFor = ApiException.class)
+	public void updatePassword(UpdatePasswordRequest updatePasswordRequest) {
+		Member member = memberLoader.getMember();
+
+		if(!isValid(updatePasswordRequest.password(), member.getPassword())) {
+			throw ApiException.from(ErrorCode.INVALID_PASSWORD);
+		}
+
+		member.updatePassword(passwordEncoder.encode(updatePasswordRequest.newPassword()));
 	}
 
+	@Transactional(rollbackFor = ApiException.class)
+	public void updateNickname(UpdateNicknameRequest updateNicknameRequest) {
+		Member member = memberLoader.getMember();
+		validateDuplicateUsername(updateNicknameRequest.newNickname());
+		member.updateMemberName(updateNicknameRequest.newNickname());
+	}
+
+	public FindMyInfoResponse findMyInfo() {
+		return memberMapper.toFindMyInfoResponse(memberLoader.getMember());
+	}
+
+	public Member findById(Long memberId) {
+		return memberRepository.findById(memberId).orElseThrow(() -> ApiException.from(ErrorCode.MEMBER_NOT_FOUND));
+	}
+
+	public void checkNicknameExists(String nickname) {
+		if (memberRepository.existsByMemberName(nickname)) {
+			throw ApiException.from(ErrorCode.MEMBER_NAME_DUPLICATE);
+		}
+	}
 
 	protected boolean isValid(String password, String encodedPassword) {
 		return passwordEncoder.matches(password, encodedPassword);
@@ -134,7 +159,7 @@ public class MemberService {
 	// 닉네임 중복 검사
 	private void validateDuplicateUsername(String username) {
 		if (memberRepository.existsByMemberName(username)) {
-			throw ApiException.from(ErrorCode.USERNAME_DUPLICATE);
+			throw ApiException.from(ErrorCode.MEMBER_NAME_DUPLICATE);
 		}
 	}
 }

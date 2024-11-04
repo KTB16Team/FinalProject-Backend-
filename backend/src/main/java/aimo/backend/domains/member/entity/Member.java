@@ -82,6 +82,14 @@ public class Member extends BaseEntity {
 		this.profileImage = profileImage;
 	}
 
+	public void updatePassword(String password) {
+		this.password = password;
+	}
+
+	public void updateMemberName(String memberName) {
+		this.memberName = memberName;
+	}
+
 	@Builder
 	private Member(
 		String memberName,
