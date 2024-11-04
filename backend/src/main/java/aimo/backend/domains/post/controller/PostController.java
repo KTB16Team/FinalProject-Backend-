@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import aimo.backend.common.dto.DataResponse;
 import aimo.backend.domains.member.entity.Member;
-import aimo.backend.domains.post.dto.SavePostRequest;
+import aimo.backend.domains.post.dto.requset.SavePostRequest;
 import aimo.backend.domains.post.dto.response.FindPostAndCommentsByIdResponse;
 import aimo.backend.domains.post.dto.response.FindPostsByPostTypeResponse;
 import aimo.backend.domains.post.model.PostType;
@@ -54,7 +54,8 @@ public class PostController {
 	}
 
 	@GetMapping("/{postId}")
-	public ResponseEntity<DataResponse<FindPostAndCommentsByIdResponse>> findPostAndComments(@PathVariable Long postId) {
+	public ResponseEntity<DataResponse<FindPostAndCommentsByIdResponse>> findPostAndComments(
+		@PathVariable Long postId) {
 		Member member = memberLoader.getMember();
 
 		FindPostAndCommentsByIdResponse response = postService.findPostAndCommentsDtoById(member, postId);

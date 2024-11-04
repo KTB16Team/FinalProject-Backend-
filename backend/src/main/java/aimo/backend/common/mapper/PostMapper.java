@@ -4,8 +4,7 @@ import java.util.List;
 
 import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.member.entity.Member;
-import aimo.backend.domains.post.dto.PostPreviewResponse;
-import aimo.backend.domains.post.dto.SavePostRequest;
+import aimo.backend.domains.post.dto.requset.SavePostRequest;
 import aimo.backend.domains.post.dto.response.FindPostAndCommentsByIdResponse;
 import aimo.backend.domains.post.dto.response.FindPostAndCommentsByIdResponse.ParentCommentDto;
 import aimo.backend.domains.post.dto.response.FindPostsByPostTypeResponse;
@@ -28,18 +27,6 @@ public class PostMapper {
 			.originType(request.originType())
 			.category(request.category())
 			.build();
-	}
-
-	public static PostPreviewResponse toPreviewResponse(Post post) {
-		return new PostPreviewResponse(
-			post.getId(),
-			post.getTitle(),
-			getPreview(post.getSummaryAi()),
-			post.getPostLikes().size(),
-			post.getPostViews().size(),
-			post.getCommentsCount(),
-			post.getCreatedAt()
-		);
 	}
 
 	private static String getPreview(String summaryAi) {

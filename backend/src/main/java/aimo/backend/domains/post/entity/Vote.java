@@ -15,6 +15,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -43,4 +44,14 @@ public class Vote extends BaseEntity {
 
 	@Column(nullable = false)
 	private Side side;
+
+	public Vote(Post post, Member member, Side side) {
+		this.post = post;
+		this.member = member;
+		this.side = side;
+	}
+
+	public void changeSide(Side side) {
+		this.side = side;
+	}
 }
