@@ -67,18 +67,33 @@ public class PrivatePostService {
 	public PrivatePost save(SummaryAndJudgementResponse summaryAndJudgementResponse) {
 		PrivatePost privatePost = PrivatePostMapper.toEntity(summaryAndJudgementResponse);
 
-		if(!isValid(memberLoader.getMember().getId(), privatePost)) {
+		if (!isValid(memberLoader.getMember().getId(), privatePost)) {
 			throw ApiException.from(PRIVATE_POST_CREATE_UNAUTHORIZED);
 		}
 
 		return privatePostRepository.save(privatePost);
 	}
 
+	@Transactional(rollbackFor = ApiException.class)
+	public void deletePrivatePostBy(Long privatePostId) {
+		Member member = memberLoader.getMember();
+
+		PrivatePost privatePost = privatePostRepository.findById(privatePostId)
+			.orElseThrow(() -> ApiException.from(ErrorCode.PRIVATE_POST_NOT_FOUND));
+
+		if(!isValid(member.getId(), privatePost)) {
+			throw ApiException.from(PRIVATE_POST_DELETE_UNAUTHORIZED);
+		}
+
+		member.getPrivatePosts().remove(privatePost);
+		privatePostRepository.delete(privatePost);
+	}
+
 	public PrivatePostResponse findPrivatePostBy(Long id) {
 		PrivatePost privatePost = privatePostRepository.findById(id)
 			.orElseThrow(() -> ApiException.from(ErrorCode.PRIVATE_POST_NOT_FOUND));
 
-		if(!isValid(memberLoader.getMember().getId(), privatePost)) {
+		if (!isValid(memberLoader.getMember().getId(), privatePost)) {
 			throw ApiException.from(PRIVATE_POST_READ_UNAUTHORIZED);
 		}
 
@@ -93,12 +108,12 @@ public class PrivatePostService {
 		return new PageImpl<>(privatePostPage.getContent()
 			.stream()
 			.map((p) -> {
-				if(!isValid(memberId, p)) throw ApiException.from(PRIVATE_POST_READ_UNAUTHORIZED);
+				if (!isValid(memberId, p))
+					throw ApiException.from(PRIVATE_POST_READ_UNAUTHORIZED);
 				return PrivatePostMapper.toPreviewResponse(p);
 			})
 			.collect(Collectors.toList()), pageable, privatePostPage.getTotalPages());
 	}
-
 
 	private boolean isValid(Long memberId, PrivatePost privatePost) {
 		return privatePost.getMember().getId().equals(memberId);

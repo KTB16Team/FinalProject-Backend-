@@ -3,6 +3,7 @@ package aimo.backend.common.mapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import aimo.backend.domains.member.dto.FindMyInfoResponse;
 import aimo.backend.domains.member.dto.SignUpRequest;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.member.model.MemberRole;
@@ -26,5 +27,13 @@ public class MemberMapper {
 			.provider(Provider.AIMO)
 			.birthDate(signUpRequest.birth())
 			.build();
+	}
+
+	public FindMyInfoResponse toFindMyInfoResponse(Member member) {
+		return new FindMyInfoResponse(
+			member.getMemberName(),
+			member.getEmail(),
+			member.getProfileImage().getUrl()
+		);
 	}
 }
