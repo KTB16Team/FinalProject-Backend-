@@ -15,4 +15,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
 	@Query("SELECT p From Post p LEFT JOIN p.postViews pv GROUP BY p ORDER BY COUNT(pv) DESC")
 	Page<Post> findByViewsCount(Pageable pageable);
+
+	Boolean existsByIdAndMember_Id(Long postId, Long memberId);
 }

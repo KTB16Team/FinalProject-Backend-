@@ -1,4 +1,4 @@
-package aimo.backend.domains.post.dto;
+package aimo.backend.domains.post.dto.requset;
 
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
