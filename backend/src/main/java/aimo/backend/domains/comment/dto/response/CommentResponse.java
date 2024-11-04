@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 public record CommentResponse(
 	Long commentId,
-	String username,
+	String nickname,
 	String content,
 	Long likes,
 	List<ChildCommentResponse>childComments,

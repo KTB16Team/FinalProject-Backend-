@@ -14,7 +14,7 @@ import lombok.Data;
 public class FindPostAndCommentsByIdResponse {
 	private final Boolean is_mine;
 	private final String title;
-	private final String username;
+	private final String nickname;
 	private final String content;
 	private final Integer likes_count;
 	private final Integer views_count;
@@ -31,7 +31,7 @@ public class FindPostAndCommentsByIdResponse {
 		private final Boolean is_mine;
 		private final Long comment_id;
 		private final String content;
-		private final String username;
+		private final String nickname;
 		private final Integer likes_count;
 		private final LocalDateTime created_at;
 		private final List<ChildCommentDto> child_comments;
@@ -41,7 +41,7 @@ public class FindPostAndCommentsByIdResponse {
 				parentComment.getMember() == member,
 				parentComment.getId(),
 				parentComment.getContent(),
-				parentComment.getMemberName(),
+				parentComment.getNickname(),
 				parentComment.getLikesCount(),
 				parentComment.getCreatedAt(),
 				parentComment.getChildComments().stream()
@@ -49,7 +49,7 @@ public class FindPostAndCommentsByIdResponse {
 						parentComment.getMember() == member,
 						childComment.getId(),
 						childComment.getContent(),
-						childComment.getMemberName(),
+						childComment.getNickname(),
 						childComment.getLikesCount(),
 						childComment.getCreatedAt()
 					))
@@ -64,7 +64,7 @@ public class FindPostAndCommentsByIdResponse {
 		private final Boolean is_mine;
 		private final Long child_comment_id;
 		private final String content;
-		private final String username;
+		private final String nickname;
 		private final Integer likes_count;
 		private final LocalDateTime created_at;
 	}

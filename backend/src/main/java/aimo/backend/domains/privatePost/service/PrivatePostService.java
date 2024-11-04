@@ -45,7 +45,7 @@ public class PrivatePostService {
 		Member member = memberLoader.getMember();
 
 		SummaryAndJudgementRequest summaryAndJudgementRequest = new SummaryAndJudgementRequest(
-			textRecordRequest.title(), textRecordRequest.script(), member.getMemberName(), member.getGender(),
+			textRecordRequest.title(), textRecordRequest.script(), member.getNickname(), member.getGender(),
 			member.getBirthDate());
 
 		return webClient.post()

@@ -5,6 +5,7 @@ import aimo.backend.common.exception.ErrorCode;
 import aimo.backend.domains.member.dto.DeleteRequest;
 import aimo.backend.domains.member.dto.FindMyInfoResponse;
 import aimo.backend.domains.member.dto.LogOutRequest;
+import aimo.backend.domains.member.dto.SendTemproraryPasswordRequest;
 import aimo.backend.domains.member.dto.SignUpRequest;
 import aimo.backend.domains.member.dto.UpdateNicknameRequest;
 import aimo.backend.domains.member.dto.UpdatePasswordRequest;
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -54,7 +56,7 @@ public class MemberService {
 		validateDuplicateEmail(signUpRequest.email());
 
 		// 중복 닉네임 검사
-		validateDuplicateUsername(signUpRequest.memberName());
+		validateDuplicateNickname(signUpRequest.nickname());
 
 		Member member = memberMapper.signUpMemberEntity(signUpRequest);
 		memberRepository.save(member);
@@ -127,8 +129,8 @@ public class MemberService {
 	@Transactional(rollbackFor = ApiException.class)
 	public void updateNickname(UpdateNicknameRequest updateNicknameRequest) {
 		Member member = memberLoader.getMember();
-		validateDuplicateUsername(updateNicknameRequest.newNickname());
-		member.updateMemberName(updateNicknameRequest.newNickname());
+		validateDuplicateNickname(updateNicknameRequest.newNickname());
+		member.updateNickname(updateNicknameRequest.newNickname());
 	}
 
 	public FindMyInfoResponse findMyInfo() {
@@ -140,7 +142,7 @@ public class MemberService {
 	}
 
 	public void checkNicknameExists(String nickname) {
-		if (memberRepository.existsByMemberName(nickname)) {
+		if (memberRepository.existsByNickname(nickname)) {
 			throw ApiException.from(ErrorCode.MEMBER_NAME_DUPLICATE);
 		}
 	}
@@ -157,9 +159,18 @@ public class MemberService {
 	}
 
 	// 닉네임 중복 검사
-	private void validateDuplicateUsername(String username) {
-		if (memberRepository.existsByMemberName(username)) {
+	private void validateDuplicateNickname(String nickname) {
+		if (memberRepository.existsByNickname(nickname)) {
 			throw ApiException.from(ErrorCode.MEMBER_NAME_DUPLICATE);
 		}
+	}
+
+	@Transactional(rollbackFor = ApiException.class)
+	public void sendTemporaryPassword(SendTemproraryPasswordRequest sendTemproraryPasswordRequest) {
+		String temporaryPassword = UUID.randomUUID().toString().substring(0, 8);
+
+		Member member = memberRepository.findByEmail(sendTemproraryPasswordRequest.email())
+			.orElseThrow(() -> ApiException.from(ErrorCode.MEMBER_NOT_FOUND));
+		member.updatePassword(passwordEncoder.encode(temporaryPassword));
 	}
 }

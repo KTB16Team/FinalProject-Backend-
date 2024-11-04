@@ -10,7 +10,7 @@ import aimo.backend.domains.comment.dto.response.CommentResponse;
 
 public record SinglePostResponse(
 	String title,
-	String username,
+	String nickname,
 	String content,
 	@JsonProperty("votes_plaintiff")
 	Long votesPlaintiff,

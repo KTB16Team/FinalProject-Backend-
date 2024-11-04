@@ -34,7 +34,7 @@ public class ChildComment extends BaseEntity {
 	private Long id;
 
 	@Column(nullable = false)
-	private String memberName;
+	private String nickname;
 
 	@Column(nullable = false, length = 500)
 	private String content;
@@ -59,14 +59,14 @@ public class ChildComment extends BaseEntity {
 
 	@Builder
 	private ChildComment(
-		String memberName,
+		String nickname,
 		String content,
 		ParentComment parentComment,
 		Boolean isDeleted,
 		Member member,
 		Post post
 	) {
-		this.memberName = memberName;
+		this.nickname = nickname;
 		this.content = content;
 		this.parentComment = parentComment;
 		this.isDeleted = isDeleted;
@@ -80,13 +80,13 @@ public class ChildComment extends BaseEntity {
 
 	public void deleteChildCommentSoftly() {
 		this.member = null;
-		this.memberName = CommentConstants.DELETED_MEMBER.getValue();
+		this.nickname = CommentConstants.DELETED_MEMBER.getValue();
 		this.isDeleted = true;
 	}
 
 	public void deleteChildCommentSoftlyWithContent() {
 		this.member = null;
-		this.memberName = CommentConstants.DELETED_MEMBER.getValue();
+		this.nickname = CommentConstants.DELETED_MEMBER.getValue();
 		this.isDeleted = true;
 		content = CommentConstants.DELETED_COMMENT.getValue();
 	}

@@ -42,7 +42,7 @@ public class Member extends BaseEntity {
 	private Long id;
 
 	@Column(nullable = false, unique = true)
-	private String memberName;
+	private String nickname;
 
 	@Column(nullable = false, unique = true)
 	private String email;
@@ -86,13 +86,13 @@ public class Member extends BaseEntity {
 		this.password = password;
 	}
 
-	public void updateMemberName(String memberName) {
-		this.memberName = memberName;
+	public void updateNickname(String nickname) {
+		this.nickname = nickname;
 	}
 
 	@Builder
 	private Member(
-		String memberName,
+		String nickname,
 		String email,
 		String password,
 		MemberRole memberRole,
@@ -100,7 +100,7 @@ public class Member extends BaseEntity {
 		Provider provider,
 		LocalDate birthDate) {
 
-		this.memberName = memberName;
+		this.nickname = nickname;
 		this.email = email;
 		this.password = password;
 		this.role = memberRole;

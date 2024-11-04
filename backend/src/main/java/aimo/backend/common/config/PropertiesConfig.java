@@ -7,6 +7,7 @@ import aimo.backend.common.properties.AiServerProperties;
 import aimo.backend.common.properties.CorsProperties;
 import aimo.backend.common.properties.JwtProperties;
 import aimo.backend.common.properties.S3Properties;
+import aimo.backend.common.properties.SMTPProperties;
 import aimo.backend.common.properties.SecurityProperties;
 
 @Configuration
@@ -15,7 +16,8 @@ import aimo.backend.common.properties.SecurityProperties;
 	SecurityProperties.class,
 	CorsProperties.class,
 	AiServerProperties.class,
-	S3Properties.class
+	S3Properties.class,
+	SMTPProperties.class
 })
 public class PropertiesConfig {
 }
