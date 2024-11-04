@@ -63,6 +63,7 @@ public class Post extends BaseEntity {
 	private String stanceDefendant;
 
 	@Column(nullable = false)
+	@Enumerated(EnumType.STRING)
 	private OriginType originType;
 
 	@Column(nullable = false, length = 2500)

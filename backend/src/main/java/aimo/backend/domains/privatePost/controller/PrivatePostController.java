@@ -44,7 +44,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/private-posts")
+@RequestMapping("/api/v1/private-posts")
 @RequiredArgsConstructor
 public class PrivatePostController {
 
@@ -65,14 +65,14 @@ public class PrivatePostController {
 	}
 
 	// 대화록 업로드
-	@PostMapping("/upload/text")
+	@PostMapping("/text")
 	public ResponseEntity<DataResponse<Void>> uploadTextRecord(
 		@Valid @RequestBody TextRecordRequest textRecordRequest) {
 		textRecordService.save(textRecordRequest);
 		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
 
-	@PostMapping("/upload/chat")
+	@PostMapping("/chat")
 	public ResponseEntity<DataResponse<Void>> uploadChatRecord(
 		@Valid @RequestParam("chat_record") ChatRecordRequest chatRecordRequest) throws IOException {
 
@@ -87,14 +87,14 @@ public class PrivatePostController {
 	}
 
 
-	@GetMapping("/upload/audio/presigned")
+	@GetMapping("/audio/presigned")
 	public ResponseEntity<DataResponse<CreatePresignedUrlResponse>> getPresignedUrlTo(
 		@Valid @RequestBody CreatePresignedUrlRequest createPresignedUrlRequest) {
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(DataResponse.created(audioRecordService.createPresignedUrl(createPresignedUrlRequest)));
 	}
 
-	@PostMapping("/upload/audio/success")
+	@PostMapping("/audio/success")
 	public ResponseEntity<DataResponse<SaveAudioSuccessResponse>> saveAudioRecord(
 		@Valid @RequestBody SaveAudioSuccessRequest saveAudioSuccessRequest) {
 		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created(audioRecordService.save(saveAudioSuccessRequest)));
@@ -108,7 +108,7 @@ public class PrivatePostController {
 			.body(DataResponse.from(privatePostService.findPrivatePostBy(privatePostId)));
 	}
 
-	@GetMapping("?page={page_number}&size={size}")
+	@GetMapping
 	public ResponseEntity<DataResponse<Page<PrivatePostPreviewResponse>>> findPrivatePostPage(
 		@Valid @RequestParam(defaultValue = "0")  Long pageNumber,
 		@Valid @RequestParam(defaultValue = "10") Long size) {

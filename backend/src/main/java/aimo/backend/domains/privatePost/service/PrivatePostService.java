@@ -115,6 +115,28 @@ public class PrivatePostService {
 			.collect(Collectors.toList()), pageable, privatePostPage.getTotalPages());
 	}
 
+	public void publishPrivatePost(Long privatePostId) {
+		PrivatePost privatePost = privatePostRepository.findById(privatePostId)
+			.orElseThrow(() -> ApiException.from(PRIVATE_POST_NOT_FOUND));
+
+		if(privatePost.getPublished()) {
+			throw ApiException.from(PRIVATE_POST_ALREADY_PUBLISHED);
+		}
+
+		privatePost.publish();
+	}
+
+	public void unpublishPrivatePost(Long privatePostId){
+		PrivatePost privatePost = privatePostRepository.findById(privatePostId)
+			.orElseThrow(() -> ApiException.from(PRIVATE_POST_NOT_FOUND));
+
+		if(!privatePost.getPublished()) {
+			throw ApiException.from(PRIVATE_POST_ALREADY_UNPUBLISHED);
+		}
+
+		privatePost.unpublish();
+	}
+
 	private boolean isValid(Long memberId, PrivatePost privatePost) {
 		return privatePost.getMember().getId().equals(memberId);
 	}

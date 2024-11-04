@@ -5,7 +5,7 @@ import aimo.backend.common.exception.ErrorCode;
 import aimo.backend.domains.member.dto.DeleteRequest;
 import aimo.backend.domains.member.dto.FindMyInfoResponse;
 import aimo.backend.domains.member.dto.LogOutRequest;
-import aimo.backend.domains.member.dto.SendTemproraryPasswordRequest;
+import aimo.backend.domains.member.dto.SendTemporaryPasswordRequest;
 import aimo.backend.domains.member.dto.SignUpRequest;
 import aimo.backend.domains.member.dto.UpdateNicknameRequest;
 import aimo.backend.domains.member.dto.UpdatePasswordRequest;
@@ -19,7 +19,9 @@ import aimo.backend.domains.privatePost.dto.CreateResourceUrl;
 import aimo.backend.infrastructure.s3.S3Service;
 import aimo.backend.infrastructure.s3.dto.SaveFileMetaDataRequest;
 import aimo.backend.infrastructure.s3.model.PresignedUrlPrefix;
+import aimo.backend.infrastructure.smtp.MailService;
 import aimo.backend.util.memberLoader.MemberLoader;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,6 +29,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -43,6 +46,7 @@ public class MemberService {
 	private final MemberLoader memberLoader;
 	private final ProfileImageRepository profileImageRepository;
 	private final S3Service s3Service;
+	private final MailService mailService;
 
 	// 이메일로 멤버 조회
 	public Optional<Member> findByEmail(String email) {
@@ -166,11 +170,20 @@ public class MemberService {
 	}
 
 	@Transactional(rollbackFor = ApiException.class)
-	public void sendTemporaryPassword(SendTemproraryPasswordRequest sendTemproraryPasswordRequest) {
+	public void updateTemporaryPasswordAndSendMail(SendTemporaryPasswordRequest sendTemporaryPasswordRequest)
+		throws MessagingException {
 		String temporaryPassword = UUID.randomUUID().toString().substring(0, 8);
 
-		Member member = memberRepository.findByEmail(sendTemproraryPasswordRequest.email())
+		Member member = memberRepository.findByEmail(sendTemporaryPasswordRequest.email())
 			.orElseThrow(() -> ApiException.from(ErrorCode.MEMBER_NOT_FOUND));
+
+		if(!Objects.equals(member.getNickname(), sendTemporaryPasswordRequest.nickname())) {
+			throw ApiException.from(ErrorCode.EMAIL_NOT_MATCH);
+		}
+
 		member.updatePassword(passwordEncoder.encode(temporaryPassword));
+		mailService.sendMail(mailService.createMail(sendTemporaryPasswordRequest));
 	}
+
+
 }

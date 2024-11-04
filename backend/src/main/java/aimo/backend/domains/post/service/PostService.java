@@ -23,6 +23,10 @@ import aimo.backend.domains.post.dto.response.FindPostsByPostTypeResponse;
 import aimo.backend.domains.post.entity.Post;
 import aimo.backend.domains.post.model.PostType;
 import aimo.backend.domains.post.repository.PostRepository;
+import aimo.backend.domains.privatePost.dto.PrivatePostResponse;
+import aimo.backend.domains.privatePost.entity.PrivatePost;
+import aimo.backend.domains.privatePost.service.PrivatePostService;
+import aimo.backend.util.memberLoader.MemberLoader;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -30,12 +34,16 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class PostService {
 
+	private final PrivatePostService privatePostService;
 	private final PostRepository postRepository;
 	private final PostCommentService postCommentService;
+	private final MemberLoader memberLoader;
 
 	// 글 저장
 	@Transactional
-	public void save(SavePostRequest savePostRequest, Member member) {
+	public void save(SavePostRequest savePostRequest) {
+		Member member = memberLoader.getMember();
+		privatePostService.publishPrivatePost(savePostRequest.privatePostId());
 		postRepository.save(PostMapper.toEntity(savePostRequest, member));
 	}
 
@@ -46,9 +54,9 @@ public class PostService {
 	}
 
 	// 글 조회, dto로 응답
-	public FindPostAndCommentsByIdResponse findPostAndCommentsDtoById(Member member, Long postId) {
+	public FindPostAndCommentsByIdResponse findPostAndCommentsDtoById(Long postId) {
 		Post post = findById(postId);
-
+		Member member = memberLoader.getMember();
 		// 부모 댓글 조회
 		List<ParentComment> parentComments = postCommentService.findParentCommentsByPostId(postId);
 
@@ -58,12 +66,12 @@ public class PostService {
 
 	// PostType으로 글 조회
 	public Page<FindPostsByPostTypeResponse> findPostDtosByPostType(
-		Member member,
 		PostType postType,
 		Integer page,
 		Integer size
 	) {
 		Page<Post> posts;
+		Member member = memberLoader.getMember();
 		if (postType == PostType.MY) {
 			posts = findMyPosts(member.getId(), PageRequest.of(page, size));
 		} else if (postType == PostType.POPULAR) {
@@ -122,9 +130,16 @@ public class PostService {
 
 	// 글 삭제
 	@Transactional
-	public void deletePost(Long memberId, Long postId) {
+	public void deletePost(Long postId) {
+		Long memberId = memberLoader.getMember().getId();
 		validateDeletePost(memberId, postId);
 
+		Long privatePostId = postRepository
+			.findById(postId)
+			.orElseThrow(() -> ApiException.from(POST_NOT_FOUND))
+			.getPrivatePostId();
+
+		privatePostService.unpublishPrivatePost(privatePostId);
 		postRepository.deleteById(postId);
 	}
 

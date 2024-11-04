@@ -22,7 +22,7 @@ public enum ErrorCode {
 	INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 리프레시 토큰입니다.", "AUTH-002"),
 	REISSUE_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "액세스 토큰 재발급이 필요합니다.", "AUTH-003"),
 	EMAIL_AUTHENTICATION_FAIL(HttpStatus.BAD_REQUEST, "이메일 인증에 실패하였습니다.", "AUTH-004"),
-	UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "권한이 없습니다.", "AUTH-005"),
+	UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "인증에 실패하였습니다.", "AUTH-005"),
 
 	//Member
 	INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호가 잘못 되었습니다.", "MEMBER-001"),
@@ -44,6 +44,8 @@ public enum ErrorCode {
 	PRIVATE_POST_CREATE_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "대화록 생성 권한이 없습니다.", "PRIVATEPOST-007"),
 	PRIVATE_POST_UPDATE_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "대화록 수정 권한이 없습니다.", "PRIVATEPOST-007"),
 	PRIVATE_POST_READ_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "대화록 조회 권한이 없습니다.", "PRIVATEPOST-008"),
+	PRIVATE_POST_ALREADY_PUBLISHED(HttpStatus.BAD_REQUEST, "이미 공개된 대화록입니다.", "PRIVATEPOST-009"),
+	PRIVATE_POST_ALREADY_UNPUBLISHED(HttpStatus.BAD_REQUEST, "이미 비공개된 대화록입니다.", "PRIVATEPOST-010"),
 
 	//Post
 	POST_NOT_FOUND(HttpStatus.NOT_FOUND, "해당하는 게시글을 찾을 수 없습니다.", "POST-001"),

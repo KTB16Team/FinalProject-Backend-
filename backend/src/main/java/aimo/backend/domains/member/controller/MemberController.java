@@ -17,7 +17,7 @@ import aimo.backend.domains.member.dto.CreateProfileImageUrlRequest;
 import aimo.backend.domains.member.dto.DeleteRequest;
 import aimo.backend.domains.member.dto.FindMyInfoResponse;
 import aimo.backend.domains.member.dto.LogOutRequest;
-import aimo.backend.domains.member.dto.SendTemproraryPasswordRequest;
+import aimo.backend.domains.member.dto.SendTemporaryPasswordRequest;
 import aimo.backend.domains.member.dto.SignUpRequest;
 import aimo.backend.common.dto.DataResponse;
 import aimo.backend.domains.auth.security.jwtFilter.JwtTokenProvider;
@@ -28,6 +28,7 @@ import aimo.backend.infrastructure.s3.dto.CreatePresignedUrlResponse;
 import aimo.backend.infrastructure.s3.dto.SaveFileMetaDataRequest;
 
 import aimo.backend.domains.member.service.MemberService;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -113,8 +114,8 @@ public class MemberController {
 	// 비밀번호 재발급(임시 비밀번호를 이메일로 전송)
 	@PostMapping("/password/temp")
 	public ResponseEntity<DataResponse<Void>> sendTemporaryPassword(
-		@Valid @RequestBody SendTemproraryPasswordRequest sendTemproraryPasswordRequest) {
-		memberService.sendTemporaryPassword(sendTemproraryPasswordRequest);
+		@Valid @RequestBody SendTemporaryPasswordRequest sendTemporaryPasswordRequest) throws MessagingException {
+		memberService.updateTemporaryPasswordAndSendMail(sendTemporaryPasswordRequest);
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
