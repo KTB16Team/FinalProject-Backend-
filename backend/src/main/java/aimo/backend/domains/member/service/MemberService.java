@@ -29,7 +29,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -123,7 +122,7 @@ public class MemberService {
 	public void updatePassword(UpdatePasswordRequest updatePasswordRequest) {
 		Member member = memberLoader.getMember();
 
-		if(!isValid(updatePasswordRequest.password(), member.getPassword())) {
+		if (!isValid(updatePasswordRequest.password(), member.getPassword())) {
 			throw ApiException.from(ErrorCode.INVALID_PASSWORD);
 		}
 
@@ -145,10 +144,8 @@ public class MemberService {
 		return memberRepository.findById(memberId).orElseThrow(() -> ApiException.from(ErrorCode.MEMBER_NOT_FOUND));
 	}
 
-	public void checkNicknameExists(String nickname) {
-		if (memberRepository.existsByNickname(nickname)) {
-			throw ApiException.from(ErrorCode.MEMBER_NAME_DUPLICATE);
-		}
+	public boolean checkNicknameExists(String nickname) {
+		return memberRepository.existsByNickname(nickname);
 	}
 
 	protected boolean isValid(String password, String encodedPassword) {
@@ -170,20 +167,14 @@ public class MemberService {
 	}
 
 	@Transactional(rollbackFor = ApiException.class)
-	public void updateTemporaryPasswordAndSendMail(SendTemporaryPasswordRequest sendTemporaryPasswordRequest)
-		throws MessagingException {
+	public void updateTemporaryPasswordAndSendMail(SendTemporaryPasswordRequest sendTemporaryPasswordRequest) throws
+		MessagingException {
 		String temporaryPassword = UUID.randomUUID().toString().substring(0, 8);
 
 		Member member = memberRepository.findByEmail(sendTemporaryPasswordRequest.email())
 			.orElseThrow(() -> ApiException.from(ErrorCode.MEMBER_NOT_FOUND));
 
-		if(!Objects.equals(member.getNickname(), sendTemporaryPasswordRequest.nickname())) {
-			throw ApiException.from(ErrorCode.EMAIL_NOT_MATCH);
-		}
-
 		member.updatePassword(passwordEncoder.encode(temporaryPassword));
 		mailService.sendMail(mailService.createMail(sendTemporaryPasswordRequest));
 	}
-
-
 }

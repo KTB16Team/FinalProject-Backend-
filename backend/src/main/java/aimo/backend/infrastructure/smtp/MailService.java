@@ -36,8 +36,7 @@ public class MailService {
 		return new SendTemporaryPasswordResponse(
 			sendTemporaryPasswordRequest.email(),
 			Notice.TITLE.getValue(),
-			Notice.INTRODUCE.getValue() + sendTemporaryPasswordRequest.nickname() +
-				Notice.TEMPORARY_PASSWORD.getValue() + createTempPassword() + Notice.END_MESSAGE.getValue() + Notice.FROM.getValue(),
+			Notice.INTRODUCE.getValue() + Notice.TEMPORARY_PASSWORD.getValue() + createTempPassword() + Notice.END_MESSAGE.getValue() + Notice.FROM.getValue(),
 			Notice.SERVICE_ADDRESS.getValue());
 	}
 
@@ -48,7 +47,7 @@ public class MailService {
 	public void sendMail(SendTemporaryPasswordResponse sendTemporaryPasswordResponse) throws MessagingException {
 		// 메일 전송 로직
 		MimeMessage message = javaMailSender.createMimeMessage();
-		MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8"); // true는 멀티파트 및 HTML 허용 설정
+		MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
 		helper.setTo(sendTemporaryPasswordResponse.to());
 		helper.setSubject(sendTemporaryPasswordResponse.title());

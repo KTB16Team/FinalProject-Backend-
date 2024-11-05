@@ -33,7 +33,7 @@ public class MemberMapper {
 		return new FindMyInfoResponse(
 			member.getNickname(),
 			member.getEmail(),
-			member.getProfileImage().getUrl()
+			member.getProfileImage() == null ? null : member.getProfileImage().getUrl()
 		);
 	}
 }

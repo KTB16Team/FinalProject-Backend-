@@ -2,6 +2,7 @@ package aimo.backend.domains.privatePost.service;
 
 import static aimo.backend.common.exception.ErrorCode.*;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.core.ParameterizedTypeReference;
@@ -100,19 +101,9 @@ public class PrivatePostService {
 		return PrivatePostMapper.toResponse(privatePost);
 	}
 
-	public Page<PrivatePostPreviewResponse> findPrivatePostPreviewsBy(
-		@PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-		Page<PrivatePost> privatePostPage = privatePostRepository.findAll(pageable);
-		Long memberId = memberLoader.getMember().getId();
-
-		return new PageImpl<>(privatePostPage.getContent()
-			.stream()
-			.map((p) -> {
-				if (!isValid(memberId, p))
-					throw ApiException.from(PRIVATE_POST_READ_UNAUTHORIZED);
-				return PrivatePostMapper.toPreviewResponse(p);
-			})
-			.collect(Collectors.toList()), pageable, privatePostPage.getTotalPages());
+	public Page<PrivatePostPreviewResponse> findPrivatePostPreviewsBy(Pageable pageable) {
+		return privatePostRepository.findByMemberId(memberLoader.getMemberId(), pageable)
+			.map(PrivatePostMapper::toPreviewResponse);
 	}
 
 	public void publishPrivatePost(Long privatePostId) {
