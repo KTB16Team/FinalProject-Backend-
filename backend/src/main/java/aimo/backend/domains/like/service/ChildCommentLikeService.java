@@ -3,6 +3,7 @@ package aimo.backend.domains.like.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import aimo.backend.common.exception.ApiException;
 import aimo.backend.domains.comment.entity.ChildComment;
 import aimo.backend.domains.comment.service.ChildCommentService;
 import aimo.backend.domains.like.entity.ChildCommentLike;
@@ -19,6 +20,7 @@ public class ChildCommentLikeService {
 	private final ChildCommentLikeRepository childCommentLikeRepository;
 	private final ChildCommentService childCommentService;
 
+	@Transactional(rollbackFor = ApiException.class)
 	public void likeChildComment(Member member, Long childCommentId, LikeType likeType) {
 		ChildComment childComment = childCommentService.findById(childCommentId);
 

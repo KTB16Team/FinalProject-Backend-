@@ -17,7 +17,7 @@ import aimo.backend.util.memberLoader.MemberLoader;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/")
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class LikeController {
 
@@ -26,7 +26,7 @@ public class LikeController {
 	private final ChildCommentLikeService childCommentLikeService;
 	private final ParentCommentLikeService parentCommentLikeService;
 
-	@PostMapping("/{postId}/likes")
+	@PostMapping("/posts/{postId}/likes")
 	public ResponseEntity<DataResponse<Void>> likePost(
 		@PathVariable Long postId,
 		@RequestParam("likeType") LikeType likeType
@@ -37,7 +37,7 @@ public class LikeController {
 		return ResponseEntity.ok(DataResponse.noContent());
 	}
 
-	@PostMapping("/comments/child/{childCommentId}/like")
+	@PostMapping("/comments/child/{childCommentId}/likes")
 	public ResponseEntity<DataResponse<Void>> likeChildComment(
 		@PathVariable Long childCommentId,
 		@RequestParam("likeType") LikeType likeType
@@ -48,7 +48,7 @@ public class LikeController {
 		return ResponseEntity.ok(DataResponse.ok());
 	}
 
-	@PostMapping("/comments/{parentCommentId}/like")
+	@PostMapping("/comments/{parentCommentId}/likes")
 	public ResponseEntity<DataResponse<Void>> likeParentComment(
 		@PathVariable Long parentCommentId,
 		@RequestParam("likeType") LikeType likeType

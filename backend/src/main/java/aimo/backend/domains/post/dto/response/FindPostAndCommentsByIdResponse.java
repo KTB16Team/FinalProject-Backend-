@@ -12,29 +12,29 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class FindPostAndCommentsByIdResponse {
-	private final Boolean is_mine;
+	private final Boolean isMine;
 	private final String title;
 	private final String nickname;
 	private final String content;
-	private final Integer likes_count;
-	private final Integer views_count;
-	private final Integer comments_count;
-	private final Integer votes_count;
-	private final Integer votes_plaintiff;
-	private final Integer votes_defendant;
-	private final LocalDateTime created_at;
+	private final Integer likesCount;
+	private final Integer viewsCount;
+	private final Integer commentsCount;
+	private final Integer votesCount;
+	private final Integer votesPlaintiff;
+	private final Integer votesDefendant;
+	private final LocalDateTime createdAt;
 	private final List<ParentCommentDto> comments;
 
 	@Data
 	@AllArgsConstructor(access = AccessLevel.PRIVATE)
 	public static class ParentCommentDto {
-		private final Boolean is_mine;
-		private final Long comment_id;
+		private final Boolean isMine;
+		private final Long commentId;
 		private final String content;
 		private final String nickname;
-		private final Integer likes_count;
-		private final LocalDateTime created_at;
-		private final List<ChildCommentDto> child_comments;
+		private final Integer likesCount;
+		private final LocalDateTime createdAt;
+		private final List<ChildCommentDto> childComments;
 
 		public static ParentCommentDto of(Member member, ParentComment parentComment) {
 			return new ParentCommentDto(
@@ -61,11 +61,11 @@ public class FindPostAndCommentsByIdResponse {
 	@Data
 	@AllArgsConstructor
 	private static class ChildCommentDto {
-		private final Boolean is_mine;
-		private final Long child_comment_id;
+		private final Boolean isMine;
+		private final Long childCommentDd;
 		private final String content;
 		private final String nickname;
-		private final Integer likes_count;
-		private final LocalDateTime created_at;
+		private final Integer likesCount;
+		private final LocalDateTime createdAt;
 	}
 }
