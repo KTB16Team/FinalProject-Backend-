@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import aimo.backend.domains.member.dto.request.CreateProfileImageUrlRequest;
-import aimo.backend.domains.member.dto.request.DeleteRequest;
+import aimo.backend.domains.member.dto.request.DeleteMemberRequest;
 import aimo.backend.domains.member.dto.response.FindMyInfoResponse;
-import aimo.backend.domains.member.dto.request.LogOutRequest;
+import aimo.backend.domains.member.dto.request.LogoutRequest;
 import aimo.backend.domains.member.dto.response.NicknameExistsResponse;
 import aimo.backend.domains.member.dto.request.SendTemporaryPasswordRequest;
 import aimo.backend.domains.member.dto.request.SignUpRequest;
@@ -50,7 +50,7 @@ public class MemberController {
 		String accessToken = jwtTokenProvider.extractAccessToken(request).orElse(null);
 		String refreshToken = jwtTokenProvider.extractRefreshToken(request).orElse(null);
 		log.info("logout member access token: {} refresh token: {}", accessToken, refreshToken);
-		memberService.logoutMember(new LogOutRequest(accessToken, refreshToken));
+		memberService.logoutMember(new LogoutRequest(accessToken, refreshToken));
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
@@ -63,8 +63,8 @@ public class MemberController {
 	}
 
 	@DeleteMapping
-	public ResponseEntity<DataResponse<Void>> deleteMember(@RequestBody DeleteRequest deleteRequest) {
-		memberService.deleteMember(deleteRequest);
+	public ResponseEntity<DataResponse<Void>> deleteMember(@RequestBody DeleteMemberRequest deleteMemberRequest) {
+		memberService.deleteMember(deleteMemberRequest);
 
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(DataResponse.noContent());
 	}

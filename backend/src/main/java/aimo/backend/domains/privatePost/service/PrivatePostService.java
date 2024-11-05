@@ -20,7 +20,6 @@ import aimo.backend.domains.privatePost.dto.response.PrivatePostPreviewResponse;
 import aimo.backend.domains.privatePost.dto.response.PrivatePostResponse;
 import aimo.backend.domains.privatePost.dto.request.SummaryAndJudgementRequest;
 import aimo.backend.domains.privatePost.dto.response.JudgementFromAiResponse;
-import aimo.backend.domains.privatePost.dto.request.TextRecordRequest;
 import aimo.backend.domains.privatePost.entity.PrivatePost;
 import aimo.backend.domains.privatePost.repository.PrivatePostRepository;
 import aimo.backend.util.memberLoader.MemberLoader;
@@ -75,8 +74,8 @@ public class PrivatePostService {
 	}
 
 	@Transactional(rollbackFor = ApiException.class)
-	public PrivatePost save(JudgementResponse summaryAndJudgementResponse) {
-		PrivatePost privatePost = PrivatePostMapper.toEntity(summaryAndJudgementResponse);
+	public PrivatePost save(JudgementResponse judgementResponse) {
+		PrivatePost privatePost = PrivatePostMapper.toEntity(judgementResponse);
 
 		if (!isValid(memberLoader.getMember().getId(), privatePost)) {
 			throw ApiException.from(PRIVATE_POST_CREATE_UNAUTHORIZED);

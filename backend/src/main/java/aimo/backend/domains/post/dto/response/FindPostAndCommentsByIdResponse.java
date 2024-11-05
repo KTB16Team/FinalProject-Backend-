@@ -5,6 +5,9 @@ import java.util.List;
 
 import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.member.entity.Member;
+import aimo.backend.domains.post.model.Side;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,6 +16,9 @@ import lombok.Data;
 @AllArgsConstructor
 public class FindPostAndCommentsByIdResponse {
 	private final Boolean isMine;
+	private final Boolean isLiked;
+	@Enumerated(EnumType.STRING)
+	private final Side side;
 	private final String title;
 	private final String nickname;
 	private final String content;
@@ -29,6 +35,7 @@ public class FindPostAndCommentsByIdResponse {
 	@AllArgsConstructor(access = AccessLevel.PRIVATE)
 	public static class ParentCommentDto {
 		private final Boolean isMine;
+		private final Boolean isLiked;
 		private final Long commentId;
 		private final String content;
 		private final String nickname;
@@ -39,6 +46,8 @@ public class FindPostAndCommentsByIdResponse {
 		public static ParentCommentDto of(Member member, ParentComment parentComment) {
 			return new ParentCommentDto(
 				parentComment.getMember() == member,
+				parentComment.getParentCommentLikes().stream()
+					.anyMatch(like -> like.getMember() == member),
 				parentComment.getId(),
 				parentComment.getContent(),
 				parentComment.getNickname(),
@@ -46,7 +55,9 @@ public class FindPostAndCommentsByIdResponse {
 				parentComment.getCreatedAt(),
 				parentComment.getChildComments().stream()
 					.map(childComment -> new ChildCommentDto(
-						parentComment.getMember() == member,
+						childComment.getMember() == member,
+						childComment.getChildCommentLikes().stream()
+							.anyMatch(like -> like.getMember() == member),
 						childComment.getId(),
 						childComment.getContent(),
 						childComment.getNickname(),
@@ -62,6 +73,7 @@ public class FindPostAndCommentsByIdResponse {
 	@AllArgsConstructor
 	private static class ChildCommentDto {
 		private final Boolean isMine;
+		private final Boolean isLiked;
 		private final Long childCommentDd;
 		private final String content;
 		private final String nickname;

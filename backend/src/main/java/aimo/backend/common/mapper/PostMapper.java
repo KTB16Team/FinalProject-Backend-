@@ -9,6 +9,8 @@ import aimo.backend.domains.post.dto.response.FindPostAndCommentsByIdResponse;
 import aimo.backend.domains.post.dto.response.FindPostAndCommentsByIdResponse.ParentCommentDto;
 import aimo.backend.domains.post.dto.response.FindPostsByPostTypeResponse;
 import aimo.backend.domains.post.entity.Post;
+import aimo.backend.domains.post.entity.Vote;
+import aimo.backend.domains.post.model.Side;
 
 public class PostMapper {
 
@@ -67,6 +69,13 @@ public class PostMapper {
 	) {
 		return new FindPostAndCommentsByIdResponse(
 			post.getMember() == member,
+			post.getPostLikes().stream()
+				.anyMatch(postLike -> postLike.getMember() == member),
+			post.getVotes().stream()
+				.filter(vote -> vote.getMember() == member)
+				.findFirst()
+				.map(Vote::getSide)
+				.orElse(Side.NONE),
 			post.getTitle(),
 			post.getMember().getNickname(),
 			post.getSummaryAi(),
