@@ -62,8 +62,13 @@ public class ChildCommentService {
 	public void validateAndDeleteChildComment(Member member, Long childCommentId) {
 		validateChildCommentAuthority(member, childCommentId);
 
-		childCommentRepository.findById(childCommentId)
-			.ifPresent(ChildComment::deleteChildCommentSoftly);
+		ParentComment parentComment = childCommentRepository.findById(childCommentId)
+			.orElseThrow(() -> ApiException.from(CHILD_COMMENT_NOT_FOUND))
+			.getParentComment();
+
+		parentComment.deleteChildComment(childCommentId);
+		childCommentRepository.deleteById(childCommentId);
+		parentCommentService.deleteIfChildrenIsEmpty(parentComment);
 	}
 
 	// id로 자식 댓글 조회

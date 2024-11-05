@@ -3,6 +3,7 @@ package aimo.backend.domains.like.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import aimo.backend.common.exception.ApiException;
 import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.comment.service.ParentCommentService;
 import aimo.backend.domains.like.entity.ParentCommentLike;
@@ -19,12 +20,13 @@ public class ParentCommentLikeService {
 	private final ParentCommentLikeRepository parentCommentLikeRepository;
 	private final ParentCommentService parentCommentService;
 
+	@Transactional(rollbackFor = ApiException.class)
 	public void likeParentComment(Member member, Long parentCommentId, LikeType likeType) {
 		ParentComment parentComment = parentCommentService.findById(parentCommentId);
 
 		if (likeType == LikeType.LIKE) {
 			// 라이크가 이미 존재하면 무시
-			if (parentCommentLikeRepository.existsByParentCommentIdAndMemberId(parentCommentId, member.getId())) {
+			if (parentCommentLikeRepository.existsByParentComment_IdAndMember_Id(parentCommentId, member.getId())) {
 				return;
 			}
 
@@ -33,7 +35,7 @@ public class ParentCommentLikeService {
 				.member(member)
 				.build());
 		} else {
-			parentCommentLikeRepository.deleteByMemberIdAndParentCommentId(member.getId(), parentCommentId);
+			parentCommentLikeRepository.deleteByMember_IdAndParentComment_Id(member.getId(), parentCommentId);
 		}
 	}
 }

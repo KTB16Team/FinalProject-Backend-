@@ -2,8 +2,6 @@ package aimo.backend.domains.comment.service;
 
 import static aimo.backend.common.exception.ErrorCode.*;
 
-import java.util.List;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -62,12 +60,24 @@ public class ParentCommentService {
 		validateParentCommentAuthority(member, commentId);
 
 		parentCommentRepository.findById(commentId)
-			.ifPresent(ParentComment::deleteChildCommentSoftly);
+			.ifPresent((parentComment) -> {
+				if(!parentComment.getChildComments().isEmpty()){
+					parentComment.deleteParentCommentSoftlyWithContent();
+					return;
+				}
+				parentCommentRepository.delete(parentComment);
+			});
 	}
 
 	// 부모 댓글 조회
 	public ParentComment findById(Long commentId) {
 		return parentCommentRepository.findById(commentId)
 			.orElseThrow(() -> ApiException.from(PARENT_COMMENT_NOT_FOUND));
+	}
+
+	public void deleteIfChildrenIsEmpty(ParentComment parentComment){
+		if(parentComment.getChildComments().isEmpty()){
+			parentCommentRepository.delete(parentComment);
+		}
 	}
 }

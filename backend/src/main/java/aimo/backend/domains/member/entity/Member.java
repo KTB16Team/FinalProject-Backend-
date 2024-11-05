@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import aimo.backend.domains.comment.entity.ChildComment;
 import aimo.backend.domains.privatePost.entity.PrivatePost;
 import aimo.backend.domains.member.model.Gender;
 import aimo.backend.domains.member.model.MemberRole;
@@ -42,7 +43,7 @@ public class Member extends BaseEntity {
 	private Long id;
 
 	@Column(nullable = false, unique = true)
-	private String memberName;
+	private String nickname;
 
 	@Column(nullable = false, unique = true)
 	private String email;
@@ -78,6 +79,9 @@ public class Member extends BaseEntity {
 	@OneToMany(mappedBy = "member")
 	private List<ParentComment> parentComments = new ArrayList<>();
 
+	@OneToMany(mappedBy = "member")
+	private List<ChildComment> childComments = new ArrayList<>();
+
 	public void updateProfileImage(ProfileImage profileImage) {
 		this.profileImage = profileImage;
 	}
@@ -86,13 +90,15 @@ public class Member extends BaseEntity {
 		this.password = password;
 	}
 
-	public void updateMemberName(String memberName) {
-		this.memberName = memberName;
+	public void updateNickname(String nickname) {
+		this.nickname = nickname;
 	}
+
+
 
 	@Builder
 	private Member(
-		String memberName,
+		String nickname,
 		String email,
 		String password,
 		MemberRole memberRole,
@@ -100,7 +106,7 @@ public class Member extends BaseEntity {
 		Provider provider,
 		LocalDate birthDate) {
 
-		this.memberName = memberName;
+		this.nickname = nickname;
 		this.email = email;
 		this.password = password;
 		this.role = memberRole;

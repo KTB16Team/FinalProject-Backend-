@@ -9,8 +9,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
 
 public record SignUpRequest(
-	@NotBlank(message = "userName이 빈 문자열입니다.")
-	String memberName,
+	@NotBlank(message = "nickname이 빈 문자열입니다.")
+	String nickname,
 	@Email(message = "email 형식이 아닙니다.")
 	String email,
 	@NotBlank(message = "password가 빈 문자열입니다.")

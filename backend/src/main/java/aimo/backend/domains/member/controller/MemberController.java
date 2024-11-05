@@ -13,10 +13,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import aimo.backend.domains.comment.dto.request.LogoutRequest;
 import aimo.backend.domains.member.dto.request.CreateProfileImageUrlRequest;
-import aimo.backend.domains.member.dto.request.DeleteRequest;
+import aimo.backend.domains.member.dto.request.DeleteMemberRequest;
+import aimo.backend.domains.member.dto.request.LogoutRequest;
 import aimo.backend.domains.member.dto.response.FindMyInfoResponse;
+import aimo.backend.domains.member.dto.response.NicknameExistsResponse;
+import aimo.backend.domains.member.dto.request.SendTemporaryPasswordRequest;
 import aimo.backend.domains.member.dto.request.SignUpRequest;
 import aimo.backend.common.dto.DataResponse;
 import aimo.backend.domains.auth.security.jwtFilter.JwtTokenProvider;
@@ -27,6 +29,7 @@ import aimo.backend.infrastructure.s3.dto.CreatePresignedUrlResponse;
 import aimo.backend.infrastructure.s3.dto.SaveFileMetaDataRequest;
 
 import aimo.backend.domains.member.service.MemberService;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -60,8 +63,8 @@ public class MemberController {
 	}
 
 	@DeleteMapping
-	public ResponseEntity<DataResponse<Void>> deleteMember(@RequestBody DeleteRequest deleteRequest) {
-		memberService.deleteMember(deleteRequest);
+	public ResponseEntity<DataResponse<Void>> deleteMember(@RequestBody DeleteMemberRequest deleteMemberRequest) {
+		memberService.deleteMember(deleteMemberRequest);
 
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(DataResponse.noContent());
 	}
@@ -83,7 +86,6 @@ public class MemberController {
 	@DeleteMapping("/profile")
 	public ResponseEntity<DataResponse<Void>> deleteProfileImage() {
 		memberService.deleteProfileImage();
-
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(DataResponse.noContent());
 	}
 
@@ -97,28 +99,35 @@ public class MemberController {
 	// 내 정보 조회 (프로필 이미지 포함)
 	@GetMapping
 	public ResponseEntity<DataResponse<FindMyInfoResponse>> findMyInfo() {
-		return ResponseEntity.status(HttpStatus.OK)
-			.body(DataResponse.from(memberService.findMyInfo()));
+		return ResponseEntity.status(HttpStatus.OK).body(DataResponse.from(memberService.findMyInfo()));
 	}
 
+	// 비밀번호 수정(현재 비밀번호 확인)
 	@PutMapping("/password")
-	public ResponseEntity<DataResponse<Void>> updatePassword(@Valid @RequestBody UpdatePasswordRequest updatePasswordRequest) {
+	public ResponseEntity<DataResponse<Void>> updatePassword(
+		@Valid @RequestBody UpdatePasswordRequest updatePasswordRequest) {
 		memberService.updatePassword(updatePasswordRequest);
+		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
+	}
 
+	// 비밀번호 재발급(임시 비밀번호를 이메일로 전송)
+	@PostMapping("/password/temp")
+	public ResponseEntity<DataResponse<Void>> sendTemporaryPassword(
+		@Valid @RequestBody SendTemporaryPasswordRequest sendTemporaryPasswordRequest) throws MessagingException {
+		memberService.updateTemporaryPasswordAndSendMail(sendTemporaryPasswordRequest);
 		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
 
 	@GetMapping("/nickname/{nickname}/exists")
-	public ResponseEntity<DataResponse<Void>> checkNicknameExists(@PathVariable("nickname") String nickname) {
-		memberService.checkNicknameExists(nickname);
-
-		return ResponseEntity.status(HttpStatus.OK).body(DataResponse.ok());
+	public ResponseEntity<DataResponse<NicknameExistsResponse>> checkNicknameExists(
+		@PathVariable("nickname") String nickname) {
+		NicknameExistsResponse exist = new NicknameExistsResponse(memberService.checkNicknameExists(nickname));
+		return ResponseEntity.status(HttpStatus.OK).body(DataResponse.from(exist));
 	}
 
 	@PutMapping("/nickname")
 	public ResponseEntity<DataResponse<Void>> updateNickname(@RequestBody UpdateNicknameRequest updateNicknameRequest) {
 		memberService.updateNickname(updateNicknameRequest);
-
 		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
 }

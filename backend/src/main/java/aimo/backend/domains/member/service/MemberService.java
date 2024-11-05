@@ -2,9 +2,12 @@ package aimo.backend.domains.member.service;
 
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.exception.ErrorCode;
-import aimo.backend.domains.comment.dto.request.LogoutRequest;
-import aimo.backend.domains.member.dto.request.DeleteRequest;
+import aimo.backend.domains.comment.entity.ChildComment;
+import aimo.backend.domains.comment.entity.ParentComment;
+import aimo.backend.domains.member.dto.request.DeleteMemberRequest;
 import aimo.backend.domains.member.dto.response.FindMyInfoResponse;
+import aimo.backend.domains.member.dto.request.LogoutRequest;
+import aimo.backend.domains.member.dto.request.SendTemporaryPasswordRequest;
 import aimo.backend.domains.member.dto.request.SignUpRequest;
 import aimo.backend.domains.member.dto.request.UpdateNicknameRequest;
 import aimo.backend.domains.member.dto.request.UpdatePasswordRequest;
@@ -14,11 +17,14 @@ import aimo.backend.domains.member.entity.RefreshToken;
 import aimo.backend.common.mapper.MemberMapper;
 import aimo.backend.domains.member.repository.MemberRepository;
 import aimo.backend.domains.member.repository.ProfileImageRepository;
+import aimo.backend.domains.post.service.PostService;
 import aimo.backend.domains.privatePost.dto.request.CreateResourceUrlRequest;
 import aimo.backend.infrastructure.s3.S3Service;
 import aimo.backend.infrastructure.s3.dto.SaveFileMetaDataRequest;
 import aimo.backend.infrastructure.s3.model.PresignedUrlPrefix;
+import aimo.backend.infrastructure.smtp.MailService;
 import aimo.backend.util.memberLoader.MemberLoader;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,6 +33,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -41,6 +48,8 @@ public class MemberService {
 	private final MemberLoader memberLoader;
 	private final ProfileImageRepository profileImageRepository;
 	private final S3Service s3Service;
+	private final MailService mailService;
+	private final PostService postService;
 
 	// 이메일로 멤버 조회
 	public Optional<Member> findByEmail(String email) {
@@ -54,7 +63,7 @@ public class MemberService {
 		validateDuplicateEmail(signUpRequest.email());
 
 		// 중복 닉네임 검사
-		validateDuplicateUsername(signUpRequest.memberName());
+		validateDuplicateNickname(signUpRequest.nickname());
 
 		Member member = memberMapper.signUpMemberEntity(signUpRequest);
 		memberRepository.save(member);
@@ -72,13 +81,14 @@ public class MemberService {
 
 	// 회원 삭제
 	@Transactional(rollbackFor = ApiException.class)
-	public void deleteMember(DeleteRequest deleteRequest) {
+	public void deleteMember(DeleteMemberRequest deleteMemberRequest) {
 		Member member = memberLoader.getMember();
 
-		if (!isValid(deleteRequest.password(), member.getPassword())) {
+		if (!isValid(deleteMemberRequest.password(), member.getPassword())) {
 			throw ApiException.from(ErrorCode.INVALID_PASSWORD);
 		}
 
+		deleteMemberContents();
 		memberRepository.delete(member);
 	}
 
@@ -90,8 +100,8 @@ public class MemberService {
 			deleteProfileImage();
 		}
 
-		CreateResourceUrlRequest createResourceUrlRequest = new CreateResourceUrlRequest(PresignedUrlPrefix.IMAGE.getValue(),
-			request.filename(), request.extension());
+		CreateResourceUrlRequest createResourceUrlRequest =
+			new CreateResourceUrlRequest(PresignedUrlPrefix.IMAGE.getValue(), request.filename(), request.extension());
 
 		ProfileImage profileImage = ProfileImage.builder()
 			.member(memberLoader.getMember())
@@ -117,7 +127,7 @@ public class MemberService {
 	public void updatePassword(UpdatePasswordRequest updatePasswordRequest) {
 		Member member = memberLoader.getMember();
 
-		if(!isValid(updatePasswordRequest.password(), member.getPassword())) {
+		if (!isValid(updatePasswordRequest.password(), member.getPassword())) {
 			throw ApiException.from(ErrorCode.INVALID_PASSWORD);
 		}
 
@@ -127,8 +137,8 @@ public class MemberService {
 	@Transactional(rollbackFor = ApiException.class)
 	public void updateNickname(UpdateNicknameRequest updateNicknameRequest) {
 		Member member = memberLoader.getMember();
-		validateDuplicateUsername(updateNicknameRequest.newNickname());
-		member.updateMemberName(updateNicknameRequest.newNickname());
+		validateDuplicateNickname(updateNicknameRequest.newNickname());
+		member.updateNickname(updateNicknameRequest.newNickname());
 	}
 
 	public FindMyInfoResponse findMyInfo() {
@@ -139,14 +149,30 @@ public class MemberService {
 		return memberRepository.findById(memberId).orElseThrow(() -> ApiException.from(ErrorCode.MEMBER_NOT_FOUND));
 	}
 
-	public void checkNicknameExists(String nickname) {
-		if (memberRepository.existsByMemberName(nickname)) {
-			throw ApiException.from(ErrorCode.MEMBER_NAME_DUPLICATE);
-		}
+	public boolean checkNicknameExists(String nickname) {
+		return memberRepository.existsByNickname(nickname);
 	}
 
 	protected boolean isValid(String password, String encodedPassword) {
 		return passwordEncoder.matches(password, encodedPassword);
+	}
+
+	private void deleteMemberContents(){
+		Member member = memberLoader.getMember();
+
+		member.getPosts()
+			.forEach(post -> postService.softDeleteBy(post.getId()));
+
+		member.getParentComments()
+			.stream()
+			.filter(parentComment -> !parentComment.getIsDeleted())
+			.forEach(ParentComment::deleteParentCommentSoftly);
+
+		member.getChildComments()
+			.stream()
+			.filter(childComment -> !childComment.getIsDeleted())
+			.forEach(ChildComment::deleteChildCommentSoftly);
+
 	}
 
 	// 이메일 중복 검사
@@ -157,9 +183,23 @@ public class MemberService {
 	}
 
 	// 닉네임 중복 검사
-	private void validateDuplicateUsername(String username) {
-		if (memberRepository.existsByMemberName(username)) {
+	private void validateDuplicateNickname(String nickname) {
+		if (memberRepository.existsByNickname(nickname)) {
 			throw ApiException.from(ErrorCode.MEMBER_NAME_DUPLICATE);
 		}
+	}
+
+
+
+	@Transactional(rollbackFor = ApiException.class)
+	public void updateTemporaryPasswordAndSendMail(SendTemporaryPasswordRequest sendTemporaryPasswordRequest) throws
+		MessagingException {
+		String temporaryPassword = UUID.randomUUID().toString().substring(0, 8);
+
+		Member member = memberRepository.findByEmail(sendTemporaryPasswordRequest.email())
+			.orElseThrow(() -> ApiException.from(ErrorCode.MEMBER_NOT_FOUND));
+
+		member.updatePassword(passwordEncoder.encode(temporaryPassword));
+		mailService.sendMail(mailService.createMail(sendTemporaryPasswordRequest));
 	}
 }

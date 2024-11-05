@@ -19,7 +19,7 @@ public class MemberMapper {
 	public Member signUpMemberEntity(SignUpRequest signUpRequest) {
 		return Member
 			.builder()
-			.memberName(signUpRequest.memberName())
+			.nickname(signUpRequest.nickname())
 			.password(passwordEncoder.encode(signUpRequest.password()))
 			.email(signUpRequest.email())
 			.memberRole(MemberRole.USER)
@@ -31,9 +31,9 @@ public class MemberMapper {
 
 	public FindMyInfoResponse toFindMyInfoResponse(Member member) {
 		return new FindMyInfoResponse(
-			member.getMemberName(),
+			member.getNickname(),
 			member.getEmail(),
-			member.getProfileImage().getUrl()
+			member.getProfileImage() == null ? null : member.getProfileImage().getUrl()
 		);
 	}
 }

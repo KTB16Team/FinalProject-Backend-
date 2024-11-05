@@ -1,21 +1,22 @@
 package aimo.backend.common.mapper;
 
+import aimo.backend.domains.privatePost.dto.response.JudgementResponse;
 import aimo.backend.domains.privatePost.dto.response.PrivatePostPreviewResponse;
 import aimo.backend.domains.privatePost.dto.response.PrivatePostResponse;
-import aimo.backend.domains.privatePost.dto.response.SummaryAndJudgementResponse;
 import aimo.backend.domains.privatePost.entity.PrivatePost;
 
 public class PrivatePostMapper {
 
-	public static PrivatePost toEntity(SummaryAndJudgementResponse summaryAndJudgementResponse) {
+	public static PrivatePost toEntity(JudgementResponse judgementResponse) {
 		return PrivatePost.builder()
-			.title(summaryAndJudgementResponse.title())
-			.stancePlaintiff(summaryAndJudgementResponse.stancePlaintiff())
-			.stanceDefendant(summaryAndJudgementResponse.stanceDefendant())
-			.summaryAi(summaryAndJudgementResponse.summaryAi())
-			.judgement(summaryAndJudgementResponse.judgement())
-			.faultRate(summaryAndJudgementResponse.faultRate())
-			.originType(summaryAndJudgementResponse.originType())
+			.title(judgementResponse.title())
+			.stancePlaintiff(judgementResponse.stancePlaintiff())
+			.stanceDefendant(judgementResponse.stanceDefendant())
+			.summaryAi(judgementResponse.summary())
+			.judgement(judgementResponse.judgement())
+			.faultRatePlaintiff(judgementResponse.faultRatePlaintiff())
+			.faultRateDefendant(judgementResponse.faultRateDefendant())
+			.originType(judgementResponse.originType())
 			.build();
 	}
 
@@ -30,8 +31,14 @@ public class PrivatePostMapper {
 	}
 
 	public static PrivatePostResponse toResponse(PrivatePost privatePost) {
-		return new PrivatePostResponse(privatePost.getTitle(), privatePost.getSummaryAi(),
-			privatePost.getStancePlaintiff(), privatePost.getStanceDefendant(), privatePost.getJudgement(),
-			privatePost.getFaultRate(), privatePost.getPublished());
+		return new PrivatePostResponse(
+			privatePost.getTitle(),
+			privatePost.getSummaryAi(),
+			privatePost.getStancePlaintiff(),
+			privatePost.getStanceDefendant(),
+			privatePost.getJudgement(),
+			privatePost.getFaultRatePlaintiff(),
+			privatePost.getFaultRateDefendant(),
+			privatePost.getPublished());
 	}
 }

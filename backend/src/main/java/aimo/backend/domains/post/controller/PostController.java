@@ -14,14 +14,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import aimo.backend.common.dto.DataResponse;
 import aimo.backend.domains.like.service.PostLikeService;
-import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.post.dto.requset.SavePostRequest;
 import aimo.backend.domains.post.dto.response.FindPostAndCommentsByIdResponse;
 import aimo.backend.domains.post.dto.response.FindPostsByPostTypeResponse;
 import aimo.backend.domains.post.model.PostType;
 import aimo.backend.domains.post.service.PostService;
 import aimo.backend.domains.post.service.PostViewService;
-import aimo.backend.util.memberLoader.MemberLoader;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -33,49 +31,34 @@ public class PostController {
 
 	private final PostService postService;
 	private final PostViewService postViewService;
-	private final PostLikeService postLikeService;
-	private final MemberLoader memberLoader;
 
 	@PostMapping
 	public ResponseEntity<DataResponse<Void>> savePost(@RequestBody @Valid SavePostRequest request) {
-		postService.save(request, memberLoader.getMember());
-
-		return ResponseEntity
-			.status(HttpStatus.CREATED)
-			.body(DataResponse.created());
+		postService.save(request);
+		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
 
 	@GetMapping
 	public ResponseEntity<DataResponse<Page<FindPostsByPostTypeResponse>>> findPostsByPostType(
-		@RequestParam("type") @NotNull PostType postType,
-		@RequestParam("page") @NotNull Integer page,
-		@RequestParam("size") @NotNull Integer size
-	) {
-		Page<FindPostsByPostTypeResponse> responses = postService.findPostDtosByPostType(memberLoader.getMember(),
-			postType, page, size);
-
-		return ResponseEntity.ok(DataResponse.from(responses));
+		@RequestParam("type") @NotNull PostType postType, @RequestParam("page") @NotNull Integer page,
+		@RequestParam("size") @NotNull Integer size) {
+		return ResponseEntity.ok(DataResponse.from(postService.findPostDtosByPostType(postType, page, size)));
 	}
 
 	@GetMapping("/{postId}")
 	public ResponseEntity<DataResponse<FindPostAndCommentsByIdResponse>> findPostAndComments(
 		@PathVariable Long postId) {
-		Member member = memberLoader.getMember();
-
-		FindPostAndCommentsByIdResponse response = postService.findPostAndCommentsDtoById(member, postId);
-
-		return ResponseEntity.ok(DataResponse.from(response));
+		return ResponseEntity.ok(DataResponse.from(postService.findPostAndCommentsDtoById(postId)));
 	}
 
 	@DeleteMapping("/{postId}")
 	public ResponseEntity<DataResponse<Void>> deletePost(@PathVariable Long postId) {
-		postService.deletePost(memberLoader.getMemberId(), postId);
-
+		postService.deletePostBy(postId);
 		return ResponseEntity.ok(DataResponse.noContent());
 	}
 
 	@PostMapping("/{postId}/views")
 	public void increaseView(@PathVariable Long postId) {
-		postViewService.increaseView(memberLoader.getMember(), postId);
+		postViewService.increaseViewBy(postId);
 	}
 }

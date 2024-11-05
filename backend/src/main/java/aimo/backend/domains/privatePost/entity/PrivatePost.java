@@ -64,10 +64,21 @@ public class PrivatePost extends BaseEntity {
 	private OriginType originType;
 
 	@Column(nullable = false)
-	private Double faultRate;
+	private Integer faultRatePlaintiff;
+
+	@Column(nullable = false)
+	private Integer faultRateDefendant;
 
 	@Column(nullable = false)
 	private Boolean published;
+
+	public void publish() {
+		this.published = true;
+	}
+
+	public void unpublish() {
+		this.published = false;
+	}
 
 	@Builder
 	private PrivatePost(
@@ -80,8 +91,10 @@ public class PrivatePost extends BaseEntity {
 		AudioRecord audioRecord,
 		TextRecord textRecord,
 		OriginType originType,
-		Double faultRate,
+		Integer faultRatePlaintiff,
+		Integer faultRateDefendant,
 		Boolean published) {
+
 		this.title = title;
 		this.member = member;
 		this.stancePlaintiff = stancePlaintiff;
@@ -91,7 +104,8 @@ public class PrivatePost extends BaseEntity {
 		this.audioRecord = audioRecord;
 		this.textRecord = textRecord;
 		this.originType = originType;
-		this.faultRate = faultRate;
+		this.faultRatePlaintiff = faultRatePlaintiff;
+		this.faultRateDefendant = faultRateDefendant;
 		this.published = published;
 	}
 }

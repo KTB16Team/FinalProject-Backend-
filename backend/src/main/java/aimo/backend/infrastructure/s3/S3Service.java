@@ -33,9 +33,9 @@ public class S3Service {
 	}
 
 	public CreatePresignedUrlResponse createProfilePresignedUrl(CreateProfileImageUrlRequest request) {
-		String path = createPath(PresignedUrlPrefix.IMAGE.getValue(), request.memberName() + "." + request.extension());
+		String path = createPath(PresignedUrlPrefix.IMAGE.getValue(), request.nickname() + "." + request.extension());
 		String url = createGeneratePresignedUrlRequest(path);
-		String filename = request.memberName() + "." + request.extension();
+		String filename = request.nickname() + "." + request.extension();
 		return new CreatePresignedUrlResponse(url, filename);
 	}
 
