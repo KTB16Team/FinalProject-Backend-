@@ -1,4 +1,4 @@
-package aimo.backend.domains.privatePost.dto;
+package aimo.backend.domains.privatePost.dto.request;
 
 import org.springframework.web.multipart.MultipartFile;
 

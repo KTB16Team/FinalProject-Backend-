@@ -59,6 +59,7 @@ public class ParentCommentService {
 	public void validateAndDeleteParentComment(Member member, Long commentId) {
 		validateParentCommentAuthority(member, commentId);
 
+
 		parentCommentRepository.findById(commentId)
 			.ifPresent(ParentComment::deleteParentCommentSoftly);
 	}

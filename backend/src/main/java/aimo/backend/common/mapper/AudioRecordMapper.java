@@ -1,7 +1,7 @@
 package aimo.backend.common.mapper;
 
-import aimo.backend.domains.privatePost.dto.SaveAudioSuccessRequest;
-import aimo.backend.domains.privatePost.dto.SaveAudioSuccessResponse;
+import aimo.backend.domains.privatePost.dto.request.SaveAudioSuccessRequest;
+import aimo.backend.domains.privatePost.dto.response.SaveAudioSuccessResponse;
 import aimo.backend.domains.privatePost.entity.AudioRecord;
 
 public class AudioRecordMapper {

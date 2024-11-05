@@ -1,10 +1,8 @@
-package aimo.backend.domains.privatePost.dto;
+package aimo.backend.domains.privatePost.dto.response;
 
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonValue;
 
 import aimo.backend.domains.privatePost.model.OriginType;
 import jakarta.validation.constraints.NotNull;

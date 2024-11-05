@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import aimo.backend.domains.comment.entity.ChildComment;
 import aimo.backend.domains.privatePost.entity.PrivatePost;
 import aimo.backend.domains.member.model.Gender;
 import aimo.backend.domains.member.model.MemberRole;
@@ -77,6 +78,9 @@ public class Member extends BaseEntity {
 
 	@OneToMany(mappedBy = "member")
 	private List<ParentComment> parentComments = new ArrayList<>();
+
+	@OneToMany(mappedBy = "member")
+	private List<ChildComment> childComments = new ArrayList<>();
 
 	public void updateProfileImage(ProfileImage profileImage) {
 		this.profileImage = profileImage;

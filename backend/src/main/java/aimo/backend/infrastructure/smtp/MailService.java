@@ -7,15 +7,11 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.ui.freemarker.SpringTemplateLoader;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
-import aimo.backend.domains.member.dto.SendTemporaryPasswordRequest;
-import aimo.backend.domains.member.dto.SendTemporaryPasswordResponse;
-import aimo.backend.domains.member.dto.UpdatePasswordRequest;
-import aimo.backend.domains.member.entity.Member;
-import aimo.backend.domains.member.service.MemberService;
+import aimo.backend.domains.member.dto.request.SendTemporaryPasswordRequest;
+import aimo.backend.domains.member.dto.response.SendTemporaryPasswordResponse;
 import aimo.backend.infrastructure.smtp.model.Notice;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
