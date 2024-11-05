@@ -3,8 +3,9 @@ package aimo.backend.domains.post.model;
 import lombok.Getter;
 
 public enum Side {
-	PLAINTIFF("원고"),
-	DEFENDANT("피고");
+	PLAINTIFF("plaintiff"),
+	DEFENDANT("defendant"),
+	NONE("none");
 
 	private final String value;
 

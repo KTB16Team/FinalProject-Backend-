@@ -2,9 +2,9 @@ package aimo.backend.domains.member.service;
 
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.exception.ErrorCode;
-import aimo.backend.domains.member.dto.request.DeleteRequest;
+import aimo.backend.domains.member.dto.request.DeleteMemberRequest;
 import aimo.backend.domains.member.dto.response.FindMyInfoResponse;
-import aimo.backend.domains.member.dto.request.LogOutRequest;
+import aimo.backend.domains.member.dto.request.LogoutRequest;
 import aimo.backend.domains.member.dto.request.SendTemporaryPasswordRequest;
 import aimo.backend.domains.member.dto.request.SignUpRequest;
 import aimo.backend.domains.member.dto.request.UpdateNicknameRequest;
@@ -67,7 +67,7 @@ public class MemberService {
 
 	//로그아웃
 	@Transactional(rollbackFor = ApiException.class)
-	public void logoutMember(LogOutRequest logOutRequest) {
+	public void logoutMember(LogoutRequest logOutRequest) {
 		// 회원의 refreshToken 만료 처리
 		String accessToken = logOutRequest.accessToken(), refreshToken = logOutRequest.refreshToken();
 		RefreshToken expiredToken = new RefreshToken(accessToken, refreshToken);
@@ -77,10 +77,10 @@ public class MemberService {
 
 	// 회원 삭제
 	@Transactional(rollbackFor = ApiException.class)
-	public void deleteMember(DeleteRequest deleteRequest) {
+	public void deleteMember(DeleteMemberRequest deleteMemberRequest) {
 		Member member = memberLoader.getMember();
 
-		if (!isValid(deleteRequest.password(), member.getPassword())) {
+		if (!isValid(deleteMemberRequest.password(), member.getPassword())) {
 			throw ApiException.from(ErrorCode.INVALID_PASSWORD);
 		}
 

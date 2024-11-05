@@ -59,9 +59,9 @@ public class PrivatePostController {
 	@PostMapping("/judgement")
 	public ResponseEntity<DataResponse<Void>> summaryAndJudgment(@Valid @RequestBody JudgementToAiRequest judgementToAiRequest) {
 
-		JudgementResponse summaryAndJudgementResponse = privatePostService.serveScriptToAi(judgementToAiRequest);
+		JudgementResponse judgementResponse = privatePostService.serveScriptToAi(judgementToAiRequest);
 
-		privatePostService.save(summaryAndJudgementResponse);
+		privatePostService.save(judgementResponse);
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
@@ -87,7 +87,6 @@ public class PrivatePostController {
 		@Valid @RequestBody SpeachToTextRequest speachToTextRequest) {
 		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created(audioRecordService.speachToText(speachToTextRequest)));
 	}
-
 
 	@GetMapping("/audio/presigned")
 	public ResponseEntity<DataResponse<CreatePresignedUrlResponse>> getPresignedUrlTo(
