@@ -13,6 +13,7 @@ import aimo.backend.domains.like.entity.PostLike;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.post.model.Category;
 import aimo.backend.domains.post.model.Side;
+import aimo.backend.domains.privatePost.entity.PrivatePost;
 import aimo.backend.domains.privatePost.model.OriginType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -102,9 +103,14 @@ public class Post extends BaseEntity {
 			.reduce(1, Integer::sum);
 	}
 
-	public void deletePost() {
+	public void delete() {
 		this.member.getPosts().remove(this);
 		this.member = null;
+	}
+
+	public void softDelete() {
+		this.member = null;
+		this.privatePostId = null;
 	}
 
 	public Integer getPlaintiffVotesCount() {

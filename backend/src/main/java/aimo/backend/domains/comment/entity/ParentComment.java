@@ -73,18 +73,22 @@ public class ParentComment extends BaseEntity {
 
 	public void deleteParentCommentSoftly() {
 		this.member = null;
-		this.nickname = CommentConstants.DELETED_MEMBER.getValue();
+		this.nickname = CommentConstants.UNKNOWN_MEMBER.getValue();
 		this.isDeleted = true;
 	}
 
 	public void deleteParentCommentSoftlyWithContent() {
 		this.member = null;
-		this.nickname = CommentConstants.DELETED_MEMBER.getValue();
+		this.nickname = CommentConstants.UNKNOWN_MEMBER.getValue();
 		this.isDeleted = true;
 		content = CommentConstants.DELETED_COMMENT.getValue();
 	}
 
 	public void updateContent(String content) {
 		this.content = content;
+	}
+
+	public void deleteChildComment(Long childCommentId) {
+		childComments.removeIf(childComment -> childComment.getId().equals(childCommentId));
 	}
 }

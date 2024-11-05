@@ -74,8 +74,8 @@ public class PostMapper {
 			post.getVotes().stream()
 				.filter(vote -> vote.getMember() == member)
 				.findFirst()
-				.map(Vote::getSide)
-				.orElse(Side.NONE),
+				.map(vote -> vote.getSide().getValue())
+				.orElse(Side.NONE.getValue()),
 			post.getTitle(),
 			post.getMember().getNickname(),
 			post.getSummaryAi(),

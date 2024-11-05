@@ -2,10 +2,11 @@ package aimo.backend.domains.post.model;
 
 import lombok.Getter;
 
+@Getter
 public enum Side {
-	PLAINTIFF("plaintiff"),
-	DEFENDANT("defendant"),
-	NONE("none");
+	PLAINTIFF("PLAINTIFF"),
+	DEFENDANT("DEFENDANT"),
+	NONE("NONE");
 
 	private final String value;
 

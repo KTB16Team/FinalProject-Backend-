@@ -35,41 +35,30 @@ public class PostController {
 	@PostMapping
 	public ResponseEntity<DataResponse<Void>> savePost(@RequestBody @Valid SavePostRequest request) {
 		postService.save(request);
-
-		return ResponseEntity
-			.status(HttpStatus.CREATED)
-			.body(DataResponse.created());
+		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
 
 	@GetMapping
 	public ResponseEntity<DataResponse<Page<FindPostsByPostTypeResponse>>> findPostsByPostType(
-		@RequestParam("type") @NotNull PostType postType,
-		@RequestParam("page") @NotNull Integer page,
-		@RequestParam("size") @NotNull Integer size
-	) {
-		Page<FindPostsByPostTypeResponse> responses = postService.findPostDtosByPostType(postType, page, size);
-
-		return ResponseEntity.ok(DataResponse.from(responses));
+		@RequestParam("type") @NotNull PostType postType, @RequestParam("page") @NotNull Integer page,
+		@RequestParam("size") @NotNull Integer size) {
+		return ResponseEntity.ok(DataResponse.from(postService.findPostDtosByPostType(postType, page, size)));
 	}
 
 	@GetMapping("/{postId}")
 	public ResponseEntity<DataResponse<FindPostAndCommentsByIdResponse>> findPostAndComments(
 		@PathVariable Long postId) {
-
-		FindPostAndCommentsByIdResponse response = postService.findPostAndCommentsDtoById(postId);
-
-		return ResponseEntity.ok(DataResponse.from(response));
+		return ResponseEntity.ok(DataResponse.from(postService.findPostAndCommentsDtoById(postId)));
 	}
 
 	@DeleteMapping("/{postId}")
 	public ResponseEntity<DataResponse<Void>> deletePost(@PathVariable Long postId) {
-		postService.deletePost(postId);
-
+		postService.deletePostBy(postId);
 		return ResponseEntity.ok(DataResponse.noContent());
 	}
 
 	@PostMapping("/{postId}/views")
 	public void increaseView(@PathVariable Long postId) {
-		postViewService.increaseView(postId);
+		postViewService.increaseViewBy(postId);
 	}
 }

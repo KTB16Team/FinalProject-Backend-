@@ -94,6 +94,8 @@ public class Member extends BaseEntity {
 		this.nickname = nickname;
 	}
 
+
+
 	@Builder
 	private Member(
 		String nickname,

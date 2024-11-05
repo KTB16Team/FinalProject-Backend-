@@ -17,8 +17,7 @@ import lombok.Data;
 public class FindPostAndCommentsByIdResponse {
 	private final Boolean isMine;
 	private final Boolean isLiked;
-	@Enumerated(EnumType.STRING)
-	private final Side side;
+	private final String side;
 	private final String title;
 	private final String nickname;
 	private final String content;

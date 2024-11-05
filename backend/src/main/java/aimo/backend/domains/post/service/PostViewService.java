@@ -21,7 +21,7 @@ public class PostViewService {
 
 	// 조회수 증가
 	@Transactional(rollbackFor = Exception.class)
-	public void increaseView(Long postId) {
+	public void increaseViewBy(Long postId) {
 		Member member = memberLoader.getMember();
 		Post post = postService.findById(postId);
 
