@@ -5,11 +5,11 @@ import java.time.LocalDateTime;
 public record FindPostsByPostTypeResponse(
 		Long id,
 		String title,
-		String content_preview,
-		Integer likes_count,
-		Integer views_count,
-		Integer comments_count,
-		Float vote_rate_plaintiff,
-		Float vote_rate_defendant,
-		LocalDateTime created_at
+		String contentPreview,
+		Integer likesCount,
+		Integer viewsCount,
+		Integer commentsCount,
+		Float voteRatePlaintiff,
+		Float voteRateDefendant,
+		LocalDateTime createdAt
 ) {}

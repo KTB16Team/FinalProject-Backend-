@@ -12,18 +12,12 @@ public record SinglePostResponse(
 	String title,
 	String nickname,
 	String content,
-	@JsonProperty("votes_plaintiff")
 	Long votesPlaintiff,
-	@JsonProperty("votes_defendant")
 	Long votesDefendant,
-	Long likes,
-	@JsonProperty("views_count")
+	Long likesCount,
 	Long viewsCount,
-	@JsonProperty("votes_count")
 	Long votesCount,
-	@JsonProperty("comments_count")
 	Long commentsCount,
-	@JsonProperty("comments")
 	List<CommentResponse> comments,
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	LocalDateTime createdAt) {
