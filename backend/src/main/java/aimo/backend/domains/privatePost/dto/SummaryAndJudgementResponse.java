@@ -20,5 +20,4 @@ public record SummaryAndJudgementResponse(
 	Double faultRate,
 	@NotNull(message = "원본 타입이 비었습니다.")
 	OriginType originType
-) {
-}
+) { }

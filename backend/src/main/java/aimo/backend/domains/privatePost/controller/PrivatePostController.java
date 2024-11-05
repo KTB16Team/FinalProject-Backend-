@@ -110,9 +110,9 @@ public class PrivatePostController {
 
 	@GetMapping
 	public ResponseEntity<DataResponse<Page<PrivatePostPreviewResponse>>> findPrivatePostPage(
-		@Valid @RequestParam(defaultValue = "0")  Long pageNumber,
-		@Valid @RequestParam(defaultValue = "10") Long size) {
-		Pageable pageable = PageRequest.of(pageNumber.intValue(), size.intValue(), Sort.by("createdAt").descending());
+		@Valid @RequestParam(defaultValue = "0")  Integer page,
+		@Valid @RequestParam(defaultValue = "10") Integer size) {
+		Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
 
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(DataResponse.from(privatePostService.findPrivatePostPreviewsBy(pageable)));

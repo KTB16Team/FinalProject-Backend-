@@ -17,6 +17,7 @@ import aimo.backend.domains.member.dto.CreateProfileImageUrlRequest;
 import aimo.backend.domains.member.dto.DeleteRequest;
 import aimo.backend.domains.member.dto.FindMyInfoResponse;
 import aimo.backend.domains.member.dto.LogOutRequest;
+import aimo.backend.domains.member.dto.NicknameExistsResponse;
 import aimo.backend.domains.member.dto.SendTemporaryPasswordRequest;
 import aimo.backend.domains.member.dto.SignUpRequest;
 import aimo.backend.common.dto.DataResponse;
@@ -122,10 +123,10 @@ public class MemberController {
 
 
 	@GetMapping("/nickname/{nickname}/exists")
-	public ResponseEntity<DataResponse<Void>> checkNicknameExists(@PathVariable("nickname") String nickname) {
-		memberService.checkNicknameExists(nickname);
+	public ResponseEntity<DataResponse<NicknameExistsResponse>> checkNicknameExists(@PathVariable("nickname") String nickname) {
+		NicknameExistsResponse exist = new NicknameExistsResponse(memberService.checkNicknameExists(nickname));
 
-		return ResponseEntity.status(HttpStatus.OK).body(DataResponse.ok());
+		return ResponseEntity.status(HttpStatus.OK).body(DataResponse.from(exist));
 	}
 
 	@PutMapping("/nickname")

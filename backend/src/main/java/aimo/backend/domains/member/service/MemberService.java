@@ -144,10 +144,8 @@ public class MemberService {
 		return memberRepository.findById(memberId).orElseThrow(() -> ApiException.from(ErrorCode.MEMBER_NOT_FOUND));
 	}
 
-	public void checkNicknameExists(String nickname) {
-		if (memberRepository.existsByNickname(nickname)) {
-			throw ApiException.from(ErrorCode.MEMBER_NAME_DUPLICATE);
-		}
+	public boolean checkNicknameExists(String nickname) {
+		return memberRepository.existsByNickname(nickname);
 	}
 
 	protected boolean isValid(String password, String encodedPassword) {
