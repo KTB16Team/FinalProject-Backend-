@@ -1,6 +1,4 @@
-package aimo.backend.domains.privatePost.dto;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
+package aimo.backend.domains.privatePost.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 

@@ -24,7 +24,7 @@ public class ChildCommentLikeService {
 
 		if (likeType == LikeType.LIKE) {
 			// 라이크가 이미 존재하면 무시
-			if (childCommentLikeRepository.existsByChildComment_IdAndMember_Id(childCommentId, member.getId())) {
+			if (childCommentLikeRepository.existsByChildCommentIdAndMemberId(childCommentId, member.getId())) {
 				return;
 			}
 
@@ -33,7 +33,7 @@ public class ChildCommentLikeService {
 				.member(member)
 				.build());
 		} else {
-			childCommentLikeRepository.deleteByMember_IdAndChildComment_Id(member.getId(), childCommentId);
+			childCommentLikeRepository.deleteByMemberIdAndChildCommentId(member.getId(), childCommentId);
 		}
 	}
 }

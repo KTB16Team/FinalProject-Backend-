@@ -1,4 +1,4 @@
-package aimo.backend.domains.privatePost.dto;
+package aimo.backend.domains.privatePost.dto.request;
 
 import java.time.LocalDate;
 import aimo.backend.domains.member.model.Gender;

@@ -2,19 +2,19 @@ package aimo.backend.domains.member.service;
 
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.exception.ErrorCode;
-import aimo.backend.domains.member.dto.DeleteRequest;
-import aimo.backend.domains.member.dto.FindMyInfoResponse;
-import aimo.backend.domains.member.dto.LogOutRequest;
-import aimo.backend.domains.member.dto.SignUpRequest;
-import aimo.backend.domains.member.dto.UpdateNicknameRequest;
-import aimo.backend.domains.member.dto.UpdatePasswordRequest;
+import aimo.backend.domains.member.dto.request.DeleteRequest;
+import aimo.backend.domains.member.dto.response.FindMyInfoResponse;
+import aimo.backend.domains.member.dto.request.LogoutRequest;
+import aimo.backend.domains.member.dto.request.SignUpRequest;
+import aimo.backend.domains.member.dto.request.UpdateNicknameRequest;
+import aimo.backend.domains.member.dto.request.UpdatePasswordRequest;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.member.entity.ProfileImage;
 import aimo.backend.domains.member.entity.RefreshToken;
 import aimo.backend.common.mapper.MemberMapper;
 import aimo.backend.domains.member.repository.MemberRepository;
 import aimo.backend.domains.member.repository.ProfileImageRepository;
-import aimo.backend.domains.privatePost.dto.CreateResourceUrl;
+import aimo.backend.domains.privatePost.dto.request.CreateResourceUrlRequest;
 import aimo.backend.infrastructure.s3.S3Service;
 import aimo.backend.infrastructure.s3.dto.SaveFileMetaDataRequest;
 import aimo.backend.infrastructure.s3.model.PresignedUrlPrefix;
@@ -62,7 +62,7 @@ public class MemberService {
 
 	//로그아웃
 	@Transactional(rollbackFor = ApiException.class)
-	public void logoutMember(LogOutRequest logOutRequest) {
+	public void logoutMember(LogoutRequest logOutRequest) {
 		// 회원의 refreshToken 만료 처리
 		String accessToken = logOutRequest.accessToken(), refreshToken = logOutRequest.refreshToken();
 		RefreshToken expiredToken = new RefreshToken(accessToken, refreshToken);
@@ -90,7 +90,7 @@ public class MemberService {
 			deleteProfileImage();
 		}
 
-		CreateResourceUrl createResourceUrl = new CreateResourceUrl(PresignedUrlPrefix.IMAGE.getValue(),
+		CreateResourceUrlRequest createResourceUrlRequest = new CreateResourceUrlRequest(PresignedUrlPrefix.IMAGE.getValue(),
 			request.filename(), request.extension());
 
 		ProfileImage profileImage = ProfileImage.builder()
@@ -98,7 +98,7 @@ public class MemberService {
 			.filename(request.filename())
 			.size(request.size())
 			.extension(request.extension())
-			.url(s3Service.getResourceUrl(createResourceUrl))
+			.url(s3Service.getResourceUrl(createResourceUrlRequest))
 			.build();
 
 		profileImageRepository.save(profileImage);

@@ -1,8 +1,8 @@
 package aimo.backend.common.mapper;
 
-import aimo.backend.domains.privatePost.dto.PrivatePostPreviewResponse;
-import aimo.backend.domains.privatePost.dto.PrivatePostResponse;
-import aimo.backend.domains.privatePost.dto.SummaryAndJudgementResponse;
+import aimo.backend.domains.privatePost.dto.response.PrivatePostPreviewResponse;
+import aimo.backend.domains.privatePost.dto.response.PrivatePostResponse;
+import aimo.backend.domains.privatePost.dto.response.SummaryAndJudgementResponse;
 import aimo.backend.domains.privatePost.entity.PrivatePost;
 
 public class PrivatePostMapper {

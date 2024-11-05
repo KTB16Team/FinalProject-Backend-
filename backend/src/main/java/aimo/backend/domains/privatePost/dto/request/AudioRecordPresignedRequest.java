@@ -1,6 +1,5 @@
-package aimo.backend.domains.privatePost.dto;
+package aimo.backend.domains.privatePost.dto.request;
 
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
 public record AudioRecordPresignedRequest(
