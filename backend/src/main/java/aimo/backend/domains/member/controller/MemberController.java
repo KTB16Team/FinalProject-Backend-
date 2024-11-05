@@ -13,10 +13,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import aimo.backend.domains.comment.dto.request.LogoutRequest;
 import aimo.backend.domains.member.dto.request.CreateProfileImageUrlRequest;
 import aimo.backend.domains.member.dto.request.DeleteRequest;
 import aimo.backend.domains.member.dto.response.FindMyInfoResponse;
-import aimo.backend.domains.member.dto.request.LogoutRequest;
 import aimo.backend.domains.member.dto.request.SignUpRequest;
 import aimo.backend.common.dto.DataResponse;
 import aimo.backend.domains.auth.security.jwtFilter.JwtTokenProvider;

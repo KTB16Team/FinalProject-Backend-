@@ -2,9 +2,9 @@ package aimo.backend.domains.member.service;
 
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.exception.ErrorCode;
+import aimo.backend.domains.comment.dto.request.LogoutRequest;
 import aimo.backend.domains.member.dto.request.DeleteRequest;
 import aimo.backend.domains.member.dto.response.FindMyInfoResponse;
-import aimo.backend.domains.member.dto.request.LogoutRequest;
 import aimo.backend.domains.member.dto.request.SignUpRequest;
 import aimo.backend.domains.member.dto.request.UpdateNicknameRequest;
 import aimo.backend.domains.member.dto.request.UpdatePasswordRequest;
