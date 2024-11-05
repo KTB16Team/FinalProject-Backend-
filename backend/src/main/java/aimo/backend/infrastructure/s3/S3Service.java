@@ -8,14 +8,13 @@ import org.springframework.stereotype.Service;
 
 import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.Headers;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 
 import aimo.backend.common.properties.S3Properties;
-import aimo.backend.domains.member.dto.CreateProfileImageUrlRequest;
-import aimo.backend.domains.privatePost.dto.CreateResourceUrl;
+import aimo.backend.domains.member.dto.request.CreateProfileImageUrlRequest;
+import aimo.backend.domains.privatePost.dto.request.CreateResourceUrlRequest;
 import aimo.backend.infrastructure.s3.dto.CreatePresignedUrlRequest;
 import aimo.backend.infrastructure.s3.dto.CreatePresignedUrlResponse;
 import aimo.backend.infrastructure.s3.model.PresignedUrlPrefix;
@@ -54,8 +53,8 @@ public class S3Service {
 		return url.toString();
 	}
 
-	public String getResourceUrl(CreateResourceUrl createResourceUrl) {
-		String key = createResourceUrl.prefix() + "/" + createResourceUrl.filename() + "." + createResourceUrl.extension();
+	public String getResourceUrl(CreateResourceUrlRequest createResourceUrlRequest) {
+		String key = createResourceUrlRequest.prefix() + "/" + createResourceUrlRequest.filename() + "." + createResourceUrlRequest.extension();
 
 		return amazonS3Client.getUrl(s3Properties.getBucketName(), key).toString();
 	}

@@ -1,4 +1,4 @@
-package aimo.backend.domains.member.dto;
+package aimo.backend.domains.member.dto.request;
 
 import jakarta.validation.constraints.Email;
 

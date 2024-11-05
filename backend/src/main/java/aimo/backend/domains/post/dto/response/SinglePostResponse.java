@@ -1,10 +1,9 @@
-package aimo.backend.domains.post.dto;
+package aimo.backend.domains.post.dto.response;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import aimo.backend.domains.comment.dto.response.CommentResponse;
 

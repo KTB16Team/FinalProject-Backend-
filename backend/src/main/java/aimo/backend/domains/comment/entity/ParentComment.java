@@ -71,13 +71,13 @@ public class ParentComment extends BaseEntity {
 		this.post = post;
 	}
 
-	public void deleteChildCommentSoftly() {
+	public void deleteParentCommentSoftly() {
 		this.member = null;
-		this.nickname = CommentConstants.DELETED_COMMENT.getValue();
+		this.nickname = CommentConstants.DELETED_MEMBER.getValue();
 		this.isDeleted = true;
 	}
 
-	public void deleteChildCommentSoftlyWithContent() {
+	public void deleteParentCommentSoftlyWithContent() {
 		this.member = null;
 		this.nickname = CommentConstants.DELETED_MEMBER.getValue();
 		this.isDeleted = true;

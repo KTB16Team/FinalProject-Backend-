@@ -2,15 +2,8 @@ package aimo.backend.domains.privatePost.service;
 
 import static aimo.backend.common.exception.ErrorCode.*;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,11 +14,13 @@ import aimo.backend.common.exception.ErrorCode;
 import aimo.backend.common.mapper.PrivatePostMapper;
 import aimo.backend.common.properties.AiServerProperties;
 import aimo.backend.domains.member.entity.Member;
-import aimo.backend.domains.privatePost.dto.PrivatePostPreviewResponse;
-import aimo.backend.domains.privatePost.dto.PrivatePostResponse;
-import aimo.backend.domains.privatePost.dto.SummaryAndJudgementRequest;
-import aimo.backend.domains.privatePost.dto.SummaryAndJudgementResponse;
-import aimo.backend.domains.privatePost.dto.TextRecordRequest;
+import aimo.backend.domains.privatePost.dto.request.JudgementToAiRequest;
+import aimo.backend.domains.privatePost.dto.response.JudgementResponse;
+import aimo.backend.domains.privatePost.dto.response.PrivatePostPreviewResponse;
+import aimo.backend.domains.privatePost.dto.response.PrivatePostResponse;
+import aimo.backend.domains.privatePost.dto.request.SummaryAndJudgementRequest;
+import aimo.backend.domains.privatePost.dto.response.JudgementFromAiResponse;
+import aimo.backend.domains.privatePost.dto.request.TextRecordRequest;
 import aimo.backend.domains.privatePost.entity.PrivatePost;
 import aimo.backend.domains.privatePost.repository.PrivatePostRepository;
 import aimo.backend.util.memberLoader.MemberLoader;
@@ -42,11 +37,13 @@ public class PrivatePostService {
 	private final MemberLoader memberLoader;
 
 	@Transactional(rollbackFor = ApiException.class)
-	public SummaryAndJudgementResponse serveScriptToAi(TextRecordRequest textRecordRequest) {
+	public JudgementResponse serveScriptToAi(JudgementToAiRequest judgementToAiRequest) {
 		Member member = memberLoader.getMember();
 
 		SummaryAndJudgementRequest summaryAndJudgementRequest = new SummaryAndJudgementRequest(
-			textRecordRequest.title(), textRecordRequest.script(), member.getNickname(), member.getGender(),
+			judgementToAiRequest.content(),
+			member.getNickname(),
+			member.getGender(),
 			member.getBirthDate());
 
 		return webClient.post()
@@ -59,13 +56,26 @@ public class PrivatePostService {
 			.onStatus(HttpStatusCode::is5xxServerError, clientResponse -> {
 				throw ApiException.from(ErrorCode.AI_SEVER_ERROR);
 			})
-			.bodyToMono(new ParameterizedTypeReference<SummaryAndJudgementResponse>() {
+			.bodyToMono(JudgementFromAiResponse.class)
+			.map(judgementFromAi -> {
+				int faultRateDefendant = judgementFromAi.faultRate().intValue(),
+					faultRatePlaintiff = 100 - faultRateDefendant;
+
+				return new JudgementResponse(
+					judgementFromAi.title(),
+					judgementFromAi.summaryAi(),
+					judgementFromAi.stancePlaintiff(),
+					judgementFromAi.stanceDefendant(),
+					judgementFromAi.judgement(),
+					faultRatePlaintiff,
+					faultRateDefendant,
+					judgementToAiRequest.originType());
 			})
 			.block();
 	}
 
 	@Transactional(rollbackFor = ApiException.class)
-	public PrivatePost save(SummaryAndJudgementResponse summaryAndJudgementResponse) {
+	public PrivatePost save(JudgementResponse summaryAndJudgementResponse) {
 		PrivatePost privatePost = PrivatePostMapper.toEntity(summaryAndJudgementResponse);
 
 		if (!isValid(memberLoader.getMember().getId(), privatePost)) {

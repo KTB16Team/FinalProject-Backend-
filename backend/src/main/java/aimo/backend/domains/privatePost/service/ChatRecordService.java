@@ -1,21 +1,18 @@
 package aimo.backend.domains.privatePost.service;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StreamUtils;
-import org.springframework.web.multipart.MultipartFile;
 
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.exception.ErrorCode;
-import aimo.backend.domains.privatePost.dto.ChatRecordRequest;
+import aimo.backend.domains.privatePost.dto.request.ChatRecordRequest;
 import aimo.backend.domains.privatePost.entity.ChatRecord;
 import aimo.backend.domains.privatePost.repository.ChatRecordRepository;
 import lombok.RequiredArgsConstructor;

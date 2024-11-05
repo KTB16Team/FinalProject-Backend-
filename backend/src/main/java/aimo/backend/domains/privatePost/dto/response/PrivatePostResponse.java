@@ -1,4 +1,4 @@
-package aimo.backend.domains.privatePost.dto;
+package aimo.backend.domains.privatePost.dto.response;
 
 import jakarta.validation.constraints.NotNull;
 
@@ -13,8 +13,10 @@ public record PrivatePostResponse(
 	String stanceDefendant,
 	@NotNull(message = "판단이 비었습니다.")
 	String judgement,
-	@NotNull(message = "판결이 비었습니다.")
-	Double faultRate,
+	@NotNull(message = "원고 측 판결이 비었습니다.")
+	Integer faultRatePlaintiff,
+	@NotNull(message = "피고 측 판결이 비었습니다.")
+	Integer faultRateDefendant,
 	@NotNull(message = "발행이 비었습니다.")
 	Boolean published
 ) {

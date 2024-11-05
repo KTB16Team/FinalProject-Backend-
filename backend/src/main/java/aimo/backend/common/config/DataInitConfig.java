@@ -55,8 +55,8 @@ public class DataInitConfig {
 		for (int i = 1; i <= 3; i++) {
 			Member member = Member.builder()
 				.nickname("nickname" + i)
-				.email("email" + i + "@example.com")
-				.password(passwordEncoder.encode("password" + i))
+				.email("a" + i + "@naver.com")
+				.password(passwordEncoder.encode("a" + i))
 				.memberRole(MemberRole.USER)
 				.gender(Gender.MALE)
 				.provider(Provider.AIMO)
@@ -89,7 +89,8 @@ public class DataInitConfig {
 					.judgement("Judgement " + i)
 					.originType(OriginType.TEXT)
 					.textRecord(textRecords.get(i-1))
-					.faultRate(0.5)
+					.faultRatePlaintiff(50)
+					.faultRateDefendant(50)
 					.published(true)
 					.build();
 

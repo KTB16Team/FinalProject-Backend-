@@ -23,8 +23,6 @@ import aimo.backend.domains.post.dto.response.FindPostsByPostTypeResponse;
 import aimo.backend.domains.post.entity.Post;
 import aimo.backend.domains.post.model.PostType;
 import aimo.backend.domains.post.repository.PostRepository;
-import aimo.backend.domains.privatePost.dto.PrivatePostResponse;
-import aimo.backend.domains.privatePost.entity.PrivatePost;
 import aimo.backend.domains.privatePost.service.PrivatePostService;
 import aimo.backend.util.memberLoader.MemberLoader;
 import lombok.RequiredArgsConstructor;
