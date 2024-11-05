@@ -30,10 +30,11 @@ public class MemberMapper {
 	}
 
 	public FindMyInfoResponse toFindMyInfoResponse(Member member) {
+		String url = member.getProfileImage() == null ? null : member.getProfileImage().getUrl();
 		return new FindMyInfoResponse(
 			member.getNickname(),
 			member.getEmail(),
-			member.getProfileImage().getUrl()
+			url
 		);
 	}
 }
