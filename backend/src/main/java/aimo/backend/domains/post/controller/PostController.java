@@ -14,14 +14,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import aimo.backend.common.dto.DataResponse;
 import aimo.backend.domains.like.service.PostLikeService;
-import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.post.dto.requset.SavePostRequest;
 import aimo.backend.domains.post.dto.response.FindPostAndCommentsByIdResponse;
 import aimo.backend.domains.post.dto.response.FindPostsByPostTypeResponse;
 import aimo.backend.domains.post.model.PostType;
 import aimo.backend.domains.post.service.PostService;
 import aimo.backend.domains.post.service.PostViewService;
-import aimo.backend.util.memberLoader.MemberLoader;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +31,6 @@ public class PostController {
 
 	private final PostService postService;
 	private final PostViewService postViewService;
-	private final PostLikeService postLikeService;
 
 	@PostMapping
 	public ResponseEntity<DataResponse<Void>> savePost(@RequestBody @Valid SavePostRequest request) {
