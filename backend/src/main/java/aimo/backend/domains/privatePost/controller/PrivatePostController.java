@@ -30,7 +30,6 @@ import aimo.backend.domains.privatePost.dto.response.SaveAudioSuccessResponse;
 import aimo.backend.domains.privatePost.dto.request.SpeachToTextRequest;
 import aimo.backend.domains.privatePost.dto.response.SpeachToTextResponse;
 
-import aimo.backend.domains.privatePost.dto.response.JudgementFromAiResponse;
 import aimo.backend.domains.privatePost.dto.request.TextRecordRequest;
 import aimo.backend.domains.privatePost.service.AudioRecordService;
 import aimo.backend.domains.privatePost.service.ChatRecordService;

@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum CommentConstants {
 
+	UNKNOWN_MEMBER("알 수 없음"),
 	DELETED_COMMENT("댓글이 삭제되었습니다."),
 	DELETED_MEMBER("탈퇴한 회원"),
 	;

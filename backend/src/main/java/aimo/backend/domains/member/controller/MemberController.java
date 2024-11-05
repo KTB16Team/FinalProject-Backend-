@@ -86,7 +86,6 @@ public class MemberController {
 	@DeleteMapping("/profile")
 	public ResponseEntity<DataResponse<Void>> deleteProfileImage() {
 		memberService.deleteProfileImage();
-
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(DataResponse.noContent());
 	}
 
@@ -100,15 +99,14 @@ public class MemberController {
 	// 내 정보 조회 (프로필 이미지 포함)
 	@GetMapping
 	public ResponseEntity<DataResponse<FindMyInfoResponse>> findMyInfo() {
-		return ResponseEntity.status(HttpStatus.OK)
-			.body(DataResponse.from(memberService.findMyInfo()));
+		return ResponseEntity.status(HttpStatus.OK).body(DataResponse.from(memberService.findMyInfo()));
 	}
 
 	// 비밀번호 수정(현재 비밀번호 확인)
 	@PutMapping("/password")
-	public ResponseEntity<DataResponse<Void>> updatePassword(@Valid @RequestBody UpdatePasswordRequest updatePasswordRequest) {
+	public ResponseEntity<DataResponse<Void>> updatePassword(
+		@Valid @RequestBody UpdatePasswordRequest updatePasswordRequest) {
 		memberService.updatePassword(updatePasswordRequest);
-
 		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
 
@@ -117,22 +115,19 @@ public class MemberController {
 	public ResponseEntity<DataResponse<Void>> sendTemporaryPassword(
 		@Valid @RequestBody SendTemporaryPasswordRequest sendTemporaryPasswordRequest) throws MessagingException {
 		memberService.updateTemporaryPasswordAndSendMail(sendTemporaryPasswordRequest);
-
 		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
 
-
 	@GetMapping("/nickname/{nickname}/exists")
-	public ResponseEntity<DataResponse<NicknameExistsResponse>> checkNicknameExists(@PathVariable("nickname") String nickname) {
+	public ResponseEntity<DataResponse<NicknameExistsResponse>> checkNicknameExists(
+		@PathVariable("nickname") String nickname) {
 		NicknameExistsResponse exist = new NicknameExistsResponse(memberService.checkNicknameExists(nickname));
-
 		return ResponseEntity.status(HttpStatus.OK).body(DataResponse.from(exist));
 	}
 
 	@PutMapping("/nickname")
 	public ResponseEntity<DataResponse<Void>> updateNickname(@RequestBody UpdateNicknameRequest updateNicknameRequest) {
 		memberService.updateNickname(updateNicknameRequest);
-
 		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
 }

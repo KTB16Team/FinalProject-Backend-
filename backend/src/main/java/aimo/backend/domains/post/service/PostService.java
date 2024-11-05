@@ -128,7 +128,7 @@ public class PostService {
 
 	// 글 삭제
 	@Transactional
-	public void deletePost(Long postId) {
+	public void deletePostBy(Long postId) {
 		Long memberId = memberLoader.getMember().getId();
 		validateDeletePost(memberId, postId);
 
@@ -148,5 +148,11 @@ public class PostService {
 		if (!exists) {
 			throw ApiException.from(POST_DELETE_UNAUTHORIZED);
 		}
+	}
+
+	public void softDeleteBy(Long postId) {
+		Post post = findById(postId);
+		privatePostService.deletePrivatePostBy(post.getPrivatePostId());
+		post.softDelete();
 	}
 }

@@ -2,6 +2,8 @@ package aimo.backend.domains.member.service;
 
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.exception.ErrorCode;
+import aimo.backend.domains.comment.entity.ChildComment;
+import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.member.dto.request.DeleteMemberRequest;
 import aimo.backend.domains.member.dto.response.FindMyInfoResponse;
 import aimo.backend.domains.member.dto.request.LogoutRequest;
@@ -15,6 +17,7 @@ import aimo.backend.domains.member.entity.RefreshToken;
 import aimo.backend.common.mapper.MemberMapper;
 import aimo.backend.domains.member.repository.MemberRepository;
 import aimo.backend.domains.member.repository.ProfileImageRepository;
+import aimo.backend.domains.post.service.PostService;
 import aimo.backend.domains.privatePost.dto.request.CreateResourceUrlRequest;
 import aimo.backend.infrastructure.s3.S3Service;
 import aimo.backend.infrastructure.s3.dto.SaveFileMetaDataRequest;
@@ -46,6 +49,7 @@ public class MemberService {
 	private final ProfileImageRepository profileImageRepository;
 	private final S3Service s3Service;
 	private final MailService mailService;
+	private final PostService postService;
 
 	// 이메일로 멤버 조회
 	public Optional<Member> findByEmail(String email) {
@@ -84,6 +88,7 @@ public class MemberService {
 			throw ApiException.from(ErrorCode.INVALID_PASSWORD);
 		}
 
+		deleteMemberContents();
 		memberRepository.delete(member);
 	}
 
@@ -152,6 +157,24 @@ public class MemberService {
 		return passwordEncoder.matches(password, encodedPassword);
 	}
 
+	private void deleteMemberContents(){
+		Member member = memberLoader.getMember();
+
+		member.getPosts()
+			.forEach(post -> postService.softDeleteBy(post.getId()));
+
+		member.getParentComments()
+			.stream()
+			.filter(parentComment -> !parentComment.getIsDeleted())
+			.forEach(ParentComment::deleteParentCommentSoftly);
+
+		member.getChildComments()
+			.stream()
+			.filter(childComment -> !childComment.getIsDeleted())
+			.forEach(ChildComment::deleteChildCommentSoftly);
+
+	}
+
 	// 이메일 중복 검사
 	private void validateDuplicateEmail(String email) {
 		if (memberRepository.existsByEmail(email)) {
@@ -165,6 +188,8 @@ public class MemberService {
 			throw ApiException.from(ErrorCode.MEMBER_NAME_DUPLICATE);
 		}
 	}
+
+
 
 	@Transactional(rollbackFor = ApiException.class)
 	public void updateTemporaryPasswordAndSendMail(SendTemporaryPasswordRequest sendTemporaryPasswordRequest) throws

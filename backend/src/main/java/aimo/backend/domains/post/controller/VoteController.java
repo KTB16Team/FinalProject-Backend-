@@ -22,10 +22,7 @@ public class VoteController {
 	private final MemberLoader memberLoader;
 
 	@PostMapping("/{postId}/votes")
-	public ResponseEntity<DataResponse<Void>> votePost(
-		@PathVariable Long postId,
-		@RequestParam("side") Side side
-	) {
+	public ResponseEntity<DataResponse<Void>> votePost(@PathVariable Long postId, @RequestParam("side") Side side) {
 		voteService.votePost(memberLoader.getMember(), postId, side);
 
 		return ResponseEntity.ok(DataResponse.noContent());
