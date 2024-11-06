@@ -97,10 +97,10 @@ public class Post extends BaseEntity {
 	}
 
 	public Integer getCommentsCount() {
-		return parentComments
-			.stream()
-			.map(ParentComment::getCommentsCount)
-			.reduce(1, Integer::sum);
+		return parentComments.size() +
+			parentComments.stream()
+			.map(ParentComment::getChildCommentsCount)
+			.reduce(0, Integer::sum);
 	}
 
 	public void delete() {

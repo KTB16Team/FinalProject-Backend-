@@ -48,8 +48,8 @@ public class ParentComment extends BaseEntity {
 	@OneToMany(mappedBy = "parentComment", fetch = FetchType.LAZY)
 	private List<ParentCommentLike> parentCommentLikes;
 
-	public Integer getCommentsCount() {
-		return childComments.size() + 1;
+	public Integer getChildCommentsCount() {
+		return childComments.size();
 	}
 
 	public Integer getLikesCount() {
