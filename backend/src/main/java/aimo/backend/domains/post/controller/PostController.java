@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import aimo.backend.common.dto.DataResponse;
-import aimo.backend.domains.like.service.PostLikeService;
 import aimo.backend.domains.post.dto.requset.SavePostRequest;
 import aimo.backend.domains.post.dto.response.FindPostAndCommentsByIdResponse;
 import aimo.backend.domains.post.dto.response.FindPostsByPostTypeResponse;
