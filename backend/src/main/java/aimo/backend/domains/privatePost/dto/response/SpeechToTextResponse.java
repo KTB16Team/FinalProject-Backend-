@@ -1,5 +1,5 @@
 package aimo.backend.domains.privatePost.dto.response;
 
-public record SpeachToTextResponse(
+public record SpeechToTextResponse(
 	String script
 ) { }

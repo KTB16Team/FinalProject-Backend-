@@ -27,7 +27,7 @@ import aimo.backend.domains.privatePost.dto.response.PrivatePostResponse;
 import aimo.backend.domains.privatePost.dto.request.SaveAudioSuccessRequest;
 import aimo.backend.domains.privatePost.dto.response.SaveAudioSuccessResponse;
 import aimo.backend.domains.privatePost.dto.request.SpeechToTextRequest;
-import aimo.backend.domains.privatePost.dto.response.SpeachToTextResponse;
+import aimo.backend.domains.privatePost.dto.response.SpeechToTextResponse;
 
 import aimo.backend.domains.privatePost.dto.request.TextRecordRequest;
 import aimo.backend.domains.privatePost.service.AudioRecordService;
@@ -79,10 +79,12 @@ public class PrivatePostController {
 	}
 
 	@PostMapping("/speech-to-text")
-	public ResponseEntity<DataResponse<SpeachToTextResponse>> speechToText(
+	public ResponseEntity<DataResponse<SpeechToTextResponse>> speechToText(
 		@Valid @RequestBody SpeechToTextRequest speechToTextRequest) {
-		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created(audioRecordService.speachToText(
-			speechToTextRequest)));
+
+
+		return ResponseEntity.status(HttpStatus.CREATED)
+			.body(DataResponse.created(audioRecordService.speechToText(speechToTextRequest)));
 	}
 
 	@GetMapping("/audio/presigned")
