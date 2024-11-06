@@ -1,5 +1,6 @@
 package aimo.backend.common.mapper;
 
+import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.privatePost.dto.response.JudgementResponse;
 import aimo.backend.domains.privatePost.dto.response.PrivatePostPreviewResponse;
 import aimo.backend.domains.privatePost.dto.response.PrivatePostResponse;
@@ -7,9 +8,10 @@ import aimo.backend.domains.privatePost.entity.PrivatePost;
 
 public class PrivatePostMapper {
 
-	public static PrivatePost toEntity(JudgementResponse judgementResponse) {
+	public static PrivatePost toEntity(JudgementResponse judgementResponse, Member member) {
 		return PrivatePost.builder()
 			.title(judgementResponse.title())
+			.member(member)
 			.stancePlaintiff(judgementResponse.stancePlaintiff())
 			.stanceDefendant(judgementResponse.stanceDefendant())
 			.summaryAi(judgementResponse.summary())
@@ -17,6 +19,7 @@ public class PrivatePostMapper {
 			.faultRatePlaintiff(judgementResponse.faultRatePlaintiff())
 			.faultRateDefendant(judgementResponse.faultRateDefendant())
 			.originType(judgementResponse.originType())
+			.published(false)
 			.build();
 	}
 

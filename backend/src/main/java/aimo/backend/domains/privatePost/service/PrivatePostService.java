@@ -24,8 +24,10 @@ import aimo.backend.domains.privatePost.entity.PrivatePost;
 import aimo.backend.domains.privatePost.repository.PrivatePostRepository;
 import aimo.backend.util.memberLoader.MemberLoader;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class PrivatePostService {
@@ -38,18 +40,23 @@ public class PrivatePostService {
 	@Transactional(rollbackFor = ApiException.class)
 	public JudgementResponse serveScriptToAi(JudgementToAiRequest judgementToAiRequest) {
 		Member member = memberLoader.getMember();
-
+		String url = aiServerProperties.getDomainUrl() +
+			":"  + aiServerProperties.getPort() + aiServerProperties.getJudgementApi();
+		log.info("url: {}", url);
 		SummaryAndJudgementRequest summaryAndJudgementRequest = new SummaryAndJudgementRequest(
 			judgementToAiRequest.content(),
 			member.getNickname(),
-			member.getGender(),
+			member.getGender().getValue(),
 			member.getBirthDate());
 
+		log.info("summaryAndJudgementRequest: {}", summaryAndJudgementRequest);
+
 		return webClient.post()
-			.uri(aiServerProperties.getDomainUrl() + aiServerProperties.getJudgementApi())
+			.uri(url)
 			.bodyValue(summaryAndJudgementRequest)
 			.retrieve()
 			.onStatus(HttpStatusCode::is4xxClientError, clientResponse -> {
+				log.info("clientResponse: {}", clientResponse);
 				throw ApiException.from(ErrorCode.AI_BAD_GATEWAY);
 			})
 			.onStatus(HttpStatusCode::is5xxServerError, clientResponse -> {
@@ -75,9 +82,11 @@ public class PrivatePostService {
 
 	@Transactional(rollbackFor = ApiException.class)
 	public PrivatePost save(JudgementResponse judgementResponse) {
-		PrivatePost privatePost = PrivatePostMapper.toEntity(judgementResponse);
+		Member member = memberLoader.getMember();
 
-		if (!isValid(memberLoader.getMember().getId(), privatePost)) {
+		PrivatePost privatePost = PrivatePostMapper.toEntity(judgementResponse, member);
+
+		if (!isValid(member.getId(), privatePost)) {
 			throw ApiException.from(PRIVATE_POST_CREATE_UNAUTHORIZED);
 		}
 

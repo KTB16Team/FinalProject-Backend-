@@ -56,13 +56,11 @@ public class PrivatePostController {
 
 	// 판결
 	@PostMapping("/judgement")
-	public ResponseEntity<DataResponse<Void>> summaryAndJudgment(@Valid @RequestBody JudgementToAiRequest judgementToAiRequest) {
+	public ResponseEntity<DataResponse<JudgementResponse>> summaryAndJudgment(@Valid @RequestBody JudgementToAiRequest judgementToAiRequest) {
 
 		JudgementResponse judgementResponse = privatePostService.serveScriptToAi(judgementToAiRequest);
-
 		privatePostService.save(judgementResponse);
-
-		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
+		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created(judgementResponse));
 	}
 
 	// 대화록 업로드
