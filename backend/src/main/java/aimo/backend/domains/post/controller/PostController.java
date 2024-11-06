@@ -40,8 +40,10 @@ public class PostController {
 
 	@GetMapping
 	public ResponseEntity<DataResponse<Page<FindPostsByPostTypeResponse>>> findPostsByPostType(
-		@RequestParam("type") @NotNull PostType postType, @RequestParam("page") @NotNull Integer page,
-		@RequestParam("size") @NotNull Integer size) {
+		@RequestParam("type") @NotNull PostType postType,
+		@RequestParam("page") @NotNull Integer page,
+		@RequestParam("size") @NotNull Integer size
+	) {
 		return ResponseEntity.ok(DataResponse.from(postService.findPostDtosByPostType(postType, page, size)));
 	}
 
