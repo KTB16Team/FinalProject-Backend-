@@ -12,7 +12,7 @@ import aimo.backend.common.mapper.AudioRecordMapper;
 import aimo.backend.common.properties.AiServerProperties;
 import aimo.backend.domains.privatePost.dto.request.SaveAudioSuccessRequest;
 import aimo.backend.domains.privatePost.dto.response.SaveAudioSuccessResponse;
-import aimo.backend.domains.privatePost.dto.request.SpeachToTextRequest;
+import aimo.backend.domains.privatePost.dto.request.SpeechToTextRequest;
 import aimo.backend.domains.privatePost.dto.response.SpeachToTextResponse;
 import aimo.backend.domains.privatePost.entity.AudioRecord;
 import aimo.backend.domains.privatePost.repository.AudioRecordRepository;
@@ -43,10 +43,10 @@ public class AudioRecordService {
 		return new CreatePresignedUrlResponse(url, filename);
 	}
 
-	public SpeachToTextResponse speachToText(SpeachToTextRequest speachToTextRequest) {
+	public SpeachToTextResponse speachToText(SpeechToTextRequest speechToTextRequest) {
 		return webClient.post()
 			.uri(aiServerProperties.getDomainUrl() + aiServerProperties.getSpeechToTextApi())
-			.bodyValue(speachToTextRequest)
+			.bodyValue(speechToTextRequest)
 			.retrieve()
 			.onStatus(HttpStatusCode::is4xxClientError, clientResponse -> {
 				throw ApiException.from(ErrorCode.AI_BAD_GATEWAY);

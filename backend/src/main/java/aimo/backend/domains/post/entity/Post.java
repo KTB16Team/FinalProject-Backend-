@@ -116,15 +116,15 @@ public class Post extends BaseEntity {
 	public Integer getPlaintiffVotesCount() {
 		return votes.stream()
 			.filter(vote -> vote.getSide() == Side.PLAINTIFF)
-			.mapToInt(vote -> 1)
-			.sum();
+			.toList()
+			.size();
 	}
 
 	public Integer getDefendantVotesCount() {
 		return votes.stream()
 			.filter(vote -> vote.getSide() == Side.DEFENDANT)
-			.mapToInt(vote -> 1)
-			.sum();
+			.toList()
+			.size();
 	}
 
 	public Integer getVotesCount() {

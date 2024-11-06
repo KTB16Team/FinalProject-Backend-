@@ -2,14 +2,15 @@ package aimo.backend.common.mapper;
 
 import java.util.List;
 
+import aimo.backend.domains.comment.entity.ChildComment;
 import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.member.entity.Member;
+import aimo.backend.domains.post.dto.requset.FindCommentedPostsByIdRequest;
 import aimo.backend.domains.post.dto.requset.SavePostRequest;
 import aimo.backend.domains.post.dto.response.FindPostAndCommentsByIdResponse;
 import aimo.backend.domains.post.dto.response.FindPostAndCommentsByIdResponse.ParentCommentDto;
 import aimo.backend.domains.post.dto.response.FindPostsByPostTypeResponse;
 import aimo.backend.domains.post.entity.Post;
-import aimo.backend.domains.post.entity.Vote;
 import aimo.backend.domains.post.model.Side;
 
 public class PostMapper {
@@ -59,6 +60,76 @@ public class PostMapper {
 			voteRatePlaintiff,
 			voteRateDefendant,
 			post.getCreatedAt()
+		);
+	}
+
+	public static FindCommentedPostsByIdRequest toFindCommentedPostsByIdRequest(ParentComment parentComment) {
+		final Post post = parentComment.getPost();
+		final Float plaintiffVotesCount = (float)post.getPlaintiffVotesCount();
+		final Float defendantVotesCount = (float)post.getDefendantVotesCount();
+		final Float votesCount = (float)post.getVotesCount();
+
+		// 투표율 계산
+		float voteRatePlaintiff = 0f;
+		float voteRateDefendant = 0f;
+		if (votesCount != 0) {
+			voteRatePlaintiff = plaintiffVotesCount / votesCount;
+			voteRateDefendant = defendantVotesCount / votesCount;
+		}
+
+		return new FindCommentedPostsByIdRequest(
+			post.getId(),
+			post.getTitle(),
+			getPreview(post.getSummaryAi()),
+			post.getPostLikesCount(),
+			post.getPostViewsCount(),
+			post.getCommentsCount(),
+			voteRatePlaintiff,
+			voteRateDefendant,
+			post.getCreatedAt(),
+			parentComment.getCreatedAt()
+		);
+	}
+
+	public static FindCommentedPostsByIdRequest toFindCommentedPostsByIdRequest(ChildComment childComment) {
+		final Post post = childComment.getPost();
+		final Float plaintiffVotesCount = (float)post.getPlaintiffVotesCount();
+		final Float defendantVotesCount = (float)post.getDefendantVotesCount();
+		final Float votesCount = (float)post.getVotesCount();
+
+		// 투표율 계산
+		float voteRatePlaintiff = 0f;
+		float voteRateDefendant = 0f;
+		if (votesCount != 0) {
+			voteRatePlaintiff = plaintiffVotesCount / votesCount;
+			voteRateDefendant = defendantVotesCount / votesCount;
+		}
+
+		return new FindCommentedPostsByIdRequest(
+			post.getId(),
+			post.getTitle(),
+			getPreview(post.getSummaryAi()),
+			post.getPostLikesCount(),
+			post.getPostViewsCount(),
+			post.getCommentsCount(),
+			voteRatePlaintiff,
+			voteRateDefendant,
+			post.getCreatedAt(),
+			childComment.getCreatedAt()
+		);
+	}
+
+	public static FindPostsByPostTypeResponse toFindPostsByPostTypeResponse(FindCommentedPostsByIdRequest findCommentedPostsByIdRequest){
+		return new FindPostsByPostTypeResponse(
+			findCommentedPostsByIdRequest.id(),
+			findCommentedPostsByIdRequest.title(),
+			findCommentedPostsByIdRequest.contentPreview(),
+			findCommentedPostsByIdRequest.likesCount(),
+			findCommentedPostsByIdRequest.viewsCount(),
+			findCommentedPostsByIdRequest.commentsCount(),
+			findCommentedPostsByIdRequest.voteRatePlaintiff(),
+			findCommentedPostsByIdRequest.voteRateDefendant(),
+			findCommentedPostsByIdRequest.createdAt()
 		);
 	}
 

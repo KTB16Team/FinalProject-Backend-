@@ -21,13 +21,12 @@ import aimo.backend.common.dto.DataResponse;
 
 import aimo.backend.domains.privatePost.dto.request.ChatRecordRequest;
 import aimo.backend.domains.privatePost.dto.request.JudgementToAiRequest;
-import aimo.backend.domains.privatePost.dto.request.SummaryAndJudgementRequest;
 import aimo.backend.domains.privatePost.dto.response.JudgementResponse;
 import aimo.backend.domains.privatePost.dto.response.PrivatePostPreviewResponse;
 import aimo.backend.domains.privatePost.dto.response.PrivatePostResponse;
 import aimo.backend.domains.privatePost.dto.request.SaveAudioSuccessRequest;
 import aimo.backend.domains.privatePost.dto.response.SaveAudioSuccessResponse;
-import aimo.backend.domains.privatePost.dto.request.SpeachToTextRequest;
+import aimo.backend.domains.privatePost.dto.request.SpeechToTextRequest;
 import aimo.backend.domains.privatePost.dto.response.SpeachToTextResponse;
 
 import aimo.backend.domains.privatePost.dto.request.TextRecordRequest;
@@ -81,8 +80,9 @@ public class PrivatePostController {
 
 	@PostMapping("/speech-to-text")
 	public ResponseEntity<DataResponse<SpeachToTextResponse>> speechToText(
-		@Valid @RequestBody SpeachToTextRequest speachToTextRequest) {
-		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created(audioRecordService.speachToText(speachToTextRequest)));
+		@Valid @RequestBody SpeechToTextRequest speechToTextRequest) {
+		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created(audioRecordService.speachToText(
+			speechToTextRequest)));
 	}
 
 	@GetMapping("/audio/presigned")
