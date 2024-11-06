@@ -15,7 +15,7 @@ public record PrivatePostPreviewResponse(
 	String title,
 
 	@NotNull(message = "preview가 비었습니다.")
-	String privatePostPreview,
+	String contentPreview,
 
 	@NotNull(message = "원본 타입이 비었습니다.")
 	OriginType originType,

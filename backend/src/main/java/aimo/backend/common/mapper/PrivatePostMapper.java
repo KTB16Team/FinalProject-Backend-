@@ -35,6 +35,7 @@ public class PrivatePostMapper {
 
 	public static PrivatePostResponse toResponse(PrivatePost privatePost) {
 		return new PrivatePostResponse(
+			privatePost.getId(),
 			privatePost.getTitle(),
 			privatePost.getSummaryAi(),
 			privatePost.getStancePlaintiff(),

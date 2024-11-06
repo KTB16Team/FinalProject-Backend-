@@ -69,6 +69,7 @@ public class PostMapper {
 	) {
 		return new FindPostAndCommentsByIdResponse(
 			post.getMember() == member,
+			post.getId(),
 			post.getPostLikes().stream()
 				.anyMatch(postLike -> postLike.getMember() == member),
 			post.getVotes().stream()
