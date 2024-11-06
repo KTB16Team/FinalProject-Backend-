@@ -17,11 +17,10 @@ import aimo.backend.domains.member.entity.RefreshToken;
 import aimo.backend.common.mapper.MemberMapper;
 import aimo.backend.domains.member.repository.MemberRepository;
 import aimo.backend.domains.member.repository.ProfileImageRepository;
-import aimo.backend.domains.post.entity.Post;
 import aimo.backend.domains.post.service.PostService;
 import aimo.backend.domains.privatePost.dto.request.CreateResourceUrlRequest;
 import aimo.backend.infrastructure.s3.S3Service;
-import aimo.backend.infrastructure.s3.dto.SaveFileMetaDataRequest;
+import aimo.backend.infrastructure.s3.dto.request.SaveFileMetaDataRequest;
 import aimo.backend.infrastructure.s3.model.PresignedUrlPrefix;
 import aimo.backend.infrastructure.smtp.MailService;
 import aimo.backend.util.memberLoader.MemberLoader;
@@ -33,7 +32,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 

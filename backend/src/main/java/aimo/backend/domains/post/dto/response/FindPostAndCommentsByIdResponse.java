@@ -3,6 +3,8 @@ package aimo.backend.domains.post.dto.response;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.member.entity.Member;
 import lombok.AccessLevel;
@@ -37,6 +39,7 @@ public class FindPostAndCommentsByIdResponse {
 		private final String content;
 		private final String nickname;
 		private final Integer likesCount;
+		@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 		private final LocalDateTime createdAt;
 		private final List<ChildCommentDto> childComments;
 
@@ -75,6 +78,7 @@ public class FindPostAndCommentsByIdResponse {
 		private final String content;
 		private final String nickname;
 		private final Integer likesCount;
+		@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 		private final LocalDateTime createdAt;
 	}
 }

@@ -25,8 +25,8 @@ import aimo.backend.domains.auth.security.jwtFilter.JwtTokenProvider;
 import aimo.backend.domains.member.dto.request.UpdateNicknameRequest;
 import aimo.backend.domains.member.dto.request.UpdatePasswordRequest;
 import aimo.backend.infrastructure.s3.S3Service;
-import aimo.backend.infrastructure.s3.dto.CreatePresignedUrlResponse;
-import aimo.backend.infrastructure.s3.dto.SaveFileMetaDataRequest;
+import aimo.backend.infrastructure.s3.dto.response.CreatePresignedUrlResponse;
+import aimo.backend.infrastructure.s3.dto.request.SaveFileMetaDataRequest;
 
 import aimo.backend.domains.member.service.MemberService;
 import jakarta.mail.MessagingException;

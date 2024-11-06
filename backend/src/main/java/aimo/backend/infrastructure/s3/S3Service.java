@@ -15,8 +15,8 @@ import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import aimo.backend.common.properties.S3Properties;
 import aimo.backend.domains.member.dto.request.CreateProfileImageUrlRequest;
 import aimo.backend.domains.privatePost.dto.request.CreateResourceUrlRequest;
-import aimo.backend.infrastructure.s3.dto.CreatePresignedUrlRequest;
-import aimo.backend.infrastructure.s3.dto.CreatePresignedUrlResponse;
+import aimo.backend.infrastructure.s3.dto.request.CreatePresignedUrlRequest;
+import aimo.backend.infrastructure.s3.dto.response.CreatePresignedUrlResponse;
 import aimo.backend.infrastructure.s3.model.PresignedUrlPrefix;
 import lombok.RequiredArgsConstructor;
 

@@ -34,8 +34,8 @@ import aimo.backend.domains.privatePost.service.AudioRecordService;
 import aimo.backend.domains.privatePost.service.ChatRecordService;
 import aimo.backend.domains.privatePost.service.PrivatePostService;
 
-import aimo.backend.infrastructure.s3.dto.CreatePresignedUrlRequest;
-import aimo.backend.infrastructure.s3.dto.CreatePresignedUrlResponse;
+import aimo.backend.infrastructure.s3.dto.request.CreatePresignedUrlRequest;
+import aimo.backend.infrastructure.s3.dto.response.CreatePresignedUrlResponse;
 import jakarta.validation.Valid;
 
 import aimo.backend.domains.privatePost.service.TextRecordService;

@@ -17,8 +17,8 @@ import aimo.backend.domains.privatePost.dto.response.SpeachToTextResponse;
 import aimo.backend.domains.privatePost.entity.AudioRecord;
 import aimo.backend.domains.privatePost.repository.AudioRecordRepository;
 import aimo.backend.infrastructure.s3.S3Service;
-import aimo.backend.infrastructure.s3.dto.CreatePresignedUrlRequest;
-import aimo.backend.infrastructure.s3.dto.CreatePresignedUrlResponse;
+import aimo.backend.infrastructure.s3.dto.request.CreatePresignedUrlRequest;
+import aimo.backend.infrastructure.s3.dto.response.CreatePresignedUrlResponse;
 import lombok.RequiredArgsConstructor;
 
 @Service
