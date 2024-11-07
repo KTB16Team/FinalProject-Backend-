@@ -70,6 +70,16 @@ jobs:
           source: ${{ secrets.WORKING_DIRECTORY }}/build/libs/*.jar
           target: /home/ubuntu/
 
+      # CloudWatch 설정 파일을 EC2로 복사
+      - name: Copy CloudWatch config to EC2
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: backend/cloudwatch-config.json
+          target: /home/ubuntu/cloudwatch-config.json
+
       # EC2 연결 테스트 추가 (debug 옵션 활성화)
       - name: Test EC2 SSH Connection
         uses: appleboy/ssh-action@master
@@ -90,5 +100,11 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           debug: true
           script: |
+            # CloudWatch 에이전트를 설정 파일로 시작
+            sudo amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/home/ubuntu/cloudwatch-config.json -s
+            
+            # 기존 screen 세션이 있다면 종료
             if screen -list | grep -q "\bbe\b"; then screen -S be -X quit; fi
+            
+            # 새로운 screen 세션으로 애플리케이션 실행
             screen -dmS be java -jar /home/ubuntu/backend/build/libs/backend-server.jar --spring.profiles.active=dev
