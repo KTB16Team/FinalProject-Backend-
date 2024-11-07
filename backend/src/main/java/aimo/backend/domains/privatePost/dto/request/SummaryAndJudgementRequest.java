@@ -16,6 +16,6 @@ public record SummaryAndJudgementRequest(
 	@JsonFormat(pattern = "yyyy-MM-dd")
 	@NotNull(message = "생년월일이 비었습니다.")
 	LocalDate birth
-	
+
 ) {
 }
