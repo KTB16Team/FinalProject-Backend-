@@ -67,7 +67,7 @@ public class DataInitConfig {
 
 		List<TextRecord> textRecords = new ArrayList<>();
 
-		for(int i=1; i<=100; i++){
+		for(int i=1; i<=130; i++){
 			TextRecord textRecord = TextRecord.builder()
 				.script("This is a text record " + i)
 				.build();
@@ -76,7 +76,7 @@ public class DataInitConfig {
 
 		// PrivatePosts 생성
 		List<PrivatePost> privatePosts = new ArrayList<>();
-		for (int i = 1; i <= 100; i++) {
+		for (int i = 1; i <= 130; i++) {
 			Member member = members.get(i % 3);
 			PrivatePost privatePost =
 				PrivatePost.builder()
@@ -90,7 +90,7 @@ public class DataInitConfig {
 					.textRecord(textRecords.get(i-1))
 					.faultRatePlaintiff(50)
 					.faultRateDefendant(50)
-					.published(true)
+					.published(false)
 					.build();
 
 			privatePosts.add(privatePostRepo.save(privatePost));
@@ -101,8 +101,11 @@ public class DataInitConfig {
 		for (int i = 1; i <= 100; i++) {
 			Member member = members.get(i % 3);
 			PrivatePost privatePost = privatePosts.get(i - 1);
+			privatePosts.get(i - 1).publish();
+
 			Post post = new Post(privatePost.getId(), member, "Public Post Title " + i, "Summary AI " + i,
-				"Plaintiff Stance " + i, "Defendant Stance " + i, "Judgement " + i, OriginType.TEXT, Category.COMMON);
+				"Plaintiff Stance " + i, "Defendant Stance " + i, "Judgement " + i,
+				privatePost.getFaultRatePlaintiff(), privatePost.getFaultRateDefendant(), OriginType.TEXT, Category.COMMON);
 			posts.add(postRepo.save(post));
 		}
 

@@ -12,6 +12,7 @@ import aimo.backend.domains.post.dto.response.FindPostAndCommentsByIdResponse.Pa
 import aimo.backend.domains.post.dto.response.FindPostsByPostTypeResponse;
 import aimo.backend.domains.post.entity.Post;
 import aimo.backend.domains.post.model.Side;
+import aimo.backend.domains.privatePost.dto.response.JudgementResponse;
 
 public class PostMapper {
 
@@ -26,10 +27,24 @@ public class PostMapper {
 			.judgement(request.judgement())
 			.stancePlaintiff(request.stancePlaintiff())
 			.stanceDefendant(request.stanceDefendant())
+			.faultRatePlaintiff(request.faultRatePlaintiff())
+			.faultRateDefendant(request.faultRateDefendant())
 			.privatePostId(request.privatePostId())
 			.originType(request.originType())
 			.category(request.category())
 			.build();
+	}
+
+	public static JudgementResponse toJudgement(Post post){
+		return new JudgementResponse(
+			post.getTitle(),
+			post.getSummaryAi(),
+			post.getStancePlaintiff(),
+			post.getStanceDefendant(),
+			post.getJudgement(),
+			post.getFaultRatePlaintiff(),
+			post.getFaultRateDefendant(),
+			post.getOriginType());
 	}
 
 	private static String getPreview(String summaryAi) {

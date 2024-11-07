@@ -60,8 +60,8 @@ public class PostService {
 	}
 
 	public JudgementResponse findJudgementBy(Long postId) {
-		Long privatePostId = findById(postId).getPrivatePostId();
-		return PrivatePostMapper.toJudgement(privatePostService.findPrivatePostBy(privatePostId));
+		Post post = findById(postId);
+		return PostMapper.toJudgement(post);
 	}
 
 	// 글 조회, dto로 응답

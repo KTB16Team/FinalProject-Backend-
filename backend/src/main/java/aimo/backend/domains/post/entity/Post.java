@@ -64,6 +64,12 @@ public class Post extends BaseEntity {
 	private String stanceDefendant;
 
 	@Column(nullable = false)
+	private Integer faultRatePlaintiff;
+
+	@Column(nullable = false)
+	private Integer faultRateDefendant;
+
+	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
 	private OriginType originType;
 
@@ -140,6 +146,8 @@ public class Post extends BaseEntity {
 		String stancePlaintiff,
 		String stanceDefendant,
 		String judgement,
+		Integer faultRatePlaintiff,
+		Integer faultRateDefendant,
 		OriginType originType,
 		Category category) {
 
@@ -150,6 +158,8 @@ public class Post extends BaseEntity {
 		this.judgement = judgement;
 		this.stancePlaintiff = stancePlaintiff;
 		this.stanceDefendant = stanceDefendant;
+		this.faultRateDefendant = faultRateDefendant;
+		this.faultRatePlaintiff = faultRatePlaintiff;
 		this.originType = originType;
 		this.category = category;
 	}
