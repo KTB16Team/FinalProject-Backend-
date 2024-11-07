@@ -62,11 +62,11 @@ public class MemberController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
 
-	@DeleteMapping
+	@PostMapping
 	public ResponseEntity<DataResponse<Void>> deleteMember(@RequestBody DeleteMemberRequest deleteMemberRequest) {
 		memberService.deleteMember(deleteMemberRequest);
 
-		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(DataResponse.noContent());
+		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.noContent());
 	}
 
 	@PostMapping("/profile/presigned")
