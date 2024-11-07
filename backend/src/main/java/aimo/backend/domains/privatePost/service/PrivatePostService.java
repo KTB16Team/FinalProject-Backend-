@@ -40,8 +40,7 @@ public class PrivatePostService {
 	@Transactional(rollbackFor = ApiException.class)
 	public JudgementResponse serveScriptToAi(JudgementToAiRequest judgementToAiRequest) {
 		Member member = memberLoader.getMember();
-		String url = aiServerProperties.getDomainUrl() +
-			":"  + aiServerProperties.getPort() + aiServerProperties.getJudgementApi();
+		String url = aiServerProperties.getDomainUrl() + aiServerProperties.getJudgementApi();
 		log.info("url: {}", url);
 		SummaryAndJudgementRequest summaryAndJudgementRequest = new SummaryAndJudgementRequest(
 			judgementToAiRequest.content(),
