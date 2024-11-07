@@ -27,6 +27,7 @@ public class FindPostAndCommentsByIdResponse {
 	private final Integer votesCount;
 	private final Integer votesPlaintiff;
 	private final Integer votesDefendant;
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private final LocalDateTime createdAt;
 	private final List<ParentCommentDto> comments;
 

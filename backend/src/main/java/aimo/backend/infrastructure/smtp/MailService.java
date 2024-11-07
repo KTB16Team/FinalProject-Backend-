@@ -12,7 +12,6 @@ import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import aimo.backend.domains.member.dto.request.SendTemporaryPasswordRequest;
 import aimo.backend.domains.member.dto.response.SendTemporaryPasswordResponse;
-import aimo.backend.domains.member.entity.Member;
 import aimo.backend.infrastructure.smtp.model.Notice;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
