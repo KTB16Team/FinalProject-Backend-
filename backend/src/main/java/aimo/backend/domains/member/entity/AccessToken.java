@@ -1,20 +1,18 @@
 package aimo.backend.domains.member.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.index.Indexed;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
 @Getter
 @AllArgsConstructor
-@RedisHash(value = "refreshToken", timeToLive = 1209600)
-public class RefreshToken {
-
+@RedisHash(value = "accessToken", timeToLive = 3600)
+public class AccessToken {
 	@Id
 	private Long memberId;
-
 	@Indexed
-	private String refreshToken;
+	private String accessToken;
 }

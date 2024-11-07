@@ -3,7 +3,6 @@ package aimo.backend.domains.auth.security.jwtFilter;
 import static aimo.backend.common.exception.ErrorCode.*;
 
 import aimo.backend.common.exception.ApiException;
-import aimo.backend.common.exception.ErrorCode;
 import aimo.backend.common.properties.SecurityProperties;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -47,38 +46,37 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		HttpServletResponse response,
 		FilterChain filterChain) throws ServletException, IOException, ApiException {
 
-		final String refreshToken = jwtTokenProvider.extractRefreshToken(request).orElse(null);
 		final String accessToken = jwtTokenProvider.extractAccessToken(request).orElse(null);
+		final String refreshToken = jwtTokenProvider.extractRefreshToken(request).orElse(null);
 
-		//1. refresh토큰이 존재하며, refreshToken이 유효하면 access 토큰 재발급
-		//2. refresh토큰이 존재하며, refreshToken이 유효하지 않으면 로그인 유도
-		//3. access토큰이 존재하며, accessToken이 유효하면 인증
-		//4. access토큰이 존재하며, accesToken이 유효하지 않으면 에러 리턴
-		//5. 그 외 모든 경우는 에러 리턴
+		log.info("accessToken : {}", accessToken);
+		log.info("refreshToken : {}", refreshToken);
 
-		if (refreshToken != null && jwtTokenProvider.isTokenValid(refreshToken) && request.getRequestURI()
-			.matches("^\\/reissue$")) {
+		if (refreshToken != null) {
+			if(!jwtTokenProvider.isTokenValid(refreshToken)) throw ApiException.from(INVALID_REFRESH_TOKEN);
 			log.info("refresh토큰 인증 성공");
 			jwtTokenProvider.checkRefreshTokenAndReIssueAccessAndRefreshToken(response, accessToken, refreshToken);
-		} else if (refreshToken != null && !jwtTokenProvider.isTokenValid(refreshToken)) {
-			log.info("refresh토큰 인증 실패");
-			throw ApiException.from(INVALID_REFRESH_TOKEN);
-		} else if (accessToken != null && !jwtTokenProvider.isRefreshTokenValid(accessToken)) {
-			log.info("access토큰 만료(BlackList)");
-			throw ApiException.from(INVALID_REFRESH_TOKEN);
-		} else if (accessToken != null && jwtTokenProvider.isTokenValid(accessToken)) {
-			checkLogoutToken(accessToken);
-			log.info("access토큰 인증 성공");
-			Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
-			saveAuthentication(authentication);
-			filterChain.doFilter(request, response);
-		} else if (accessToken != null && !jwtTokenProvider.isTokenValid(accessToken)) {
-			log.info("access토큰 인증 실패");
-			throw ApiException.from(REISSUE_ACCESS_TOKEN);
-		} else {
-			log.info("인증 실패");
-			throw ApiException.from(ErrorCode.UNAUTHORIZED);
+			doFilter(request, response, filterChain);
 		}
+
+		if(accessToken == null) throw ApiException.from(ACCESS_TOKEN_IS_NULL);
+
+		if(jwtTokenProvider.isLogout(accessToken)){
+			log.info("access토큰 만료(BlackList)");
+			boolean isLogout = jwtTokenProvider.isLogout(accessToken);
+			log.info("isLogout : {}", isLogout);
+			throw ApiException.from(INVALID_ACCESS_TOKEN);
+		}
+
+		if(!jwtTokenProvider.isTokenValid(accessToken)){
+			log.info("access토큰 만료");
+			throw ApiException.from(INVALID_ACCESS_TOKEN);
+		}
+
+		log.info("access토큰 인증 성공");
+		Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
+		saveAuthentication(authentication);
+		filterChain.doFilter(request, response);
 	}
 
 	// contextHolder에 인증정보 저장

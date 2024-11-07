@@ -34,12 +34,11 @@ public interface JwtTokenProvider {
 
 	boolean isTokenValid(String token);
 
-	void expireRefreshToken(Long memberId, String accessToken, String refreshToken);
+	void expireTokens(String accessToken, String refreshToken);
 
 	void checkRefreshTokenAndReIssueAccessAndRefreshToken(HttpServletResponse response, String accessToken,
 		String refreshToken);
 
-	boolean isRefreshTokenValid(String refreshToken);
-
+	boolean isAccessTokenValid(String accessToken);
 	boolean isLogout(String accessToken);
 }

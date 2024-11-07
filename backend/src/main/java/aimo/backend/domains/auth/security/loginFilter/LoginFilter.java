@@ -22,6 +22,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
 	private final static String EMAIL_PARAMETER = "email";

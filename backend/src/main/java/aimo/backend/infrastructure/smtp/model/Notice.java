@@ -4,6 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum Notice {
+
 	TITLE("aimo 임시 비밀번호 발급 안내"),
 	INTRODUCE("임시 비밀번호 발급 안내입니다.\n"),
 	TEMPORARY_PASSWORD("님의 임시 비밀번호는 "),
