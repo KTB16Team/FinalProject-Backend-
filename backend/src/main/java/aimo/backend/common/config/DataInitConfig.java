@@ -67,7 +67,7 @@ public class DataInitConfig {
 
 		List<TextRecord> textRecords = new ArrayList<>();
 
-		for(int i=1; i<=10; i++){
+		for(int i=1; i<=100; i++){
 			TextRecord textRecord = TextRecord.builder()
 				.script("This is a text record " + i)
 				.build();
@@ -76,7 +76,7 @@ public class DataInitConfig {
 
 		// PrivatePosts 생성
 		List<PrivatePost> privatePosts = new ArrayList<>();
-		for (int i = 1; i <= 10; i++) {
+		for (int i = 1; i <= 100; i++) {
 			Member member = members.get(i % 3);
 			PrivatePost privatePost =
 				PrivatePost.builder()
@@ -98,7 +98,7 @@ public class DataInitConfig {
 
 		// Posts 생성
 		List<Post> posts = new ArrayList<>();
-		for (int i = 1; i <= 10; i++) {
+		for (int i = 1; i <= 100; i++) {
 			Member member = members.get(i % 3);
 			PrivatePost privatePost = privatePosts.get(i - 1);
 			Post post = new Post(privatePost.getId(), member, "Public Post Title " + i, "Summary AI " + i,
