@@ -23,6 +23,18 @@ public class PrivatePostMapper {
 			.build();
 	}
 
+	public static JudgementResponse toJudgement(PrivatePost privatePost) {
+		return new JudgementResponse(
+			privatePost.getTitle(),
+			privatePost.getSummaryAi(),
+			privatePost.getStancePlaintiff(),
+			privatePost.getStanceDefendant(),
+			privatePost.getJudgement(),
+			privatePost.getFaultRatePlaintiff(),
+			privatePost.getFaultRateDefendant(),
+			privatePost.getOriginType());
+	}
+
 	public static PrivatePostPreviewResponse toPreviewResponse(PrivatePost privatePost) {
 		return new PrivatePostPreviewResponse(privatePost.getId(), privatePost.getTitle(),
 			getPreview(privatePost.getSummaryAi(), 21), privatePost.getOriginType(), privatePost.getCreatedAt(),
@@ -34,15 +46,8 @@ public class PrivatePostMapper {
 	}
 
 	public static PrivatePostResponse toResponse(PrivatePost privatePost) {
-		return new PrivatePostResponse(
-			privatePost.getId(),
-			privatePost.getTitle(),
-			privatePost.getSummaryAi(),
-			privatePost.getStancePlaintiff(),
-			privatePost.getStanceDefendant(),
-			privatePost.getJudgement(),
-			privatePost.getFaultRatePlaintiff(),
-			privatePost.getFaultRateDefendant(),
-			privatePost.getPublished());
+		return new PrivatePostResponse(privatePost.getId(), privatePost.getTitle(), privatePost.getSummaryAi(),
+			privatePost.getStancePlaintiff(), privatePost.getStanceDefendant(), privatePost.getJudgement(),
+			privatePost.getFaultRatePlaintiff(), privatePost.getFaultRateDefendant(), privatePost.getPublished());
 	}
 }

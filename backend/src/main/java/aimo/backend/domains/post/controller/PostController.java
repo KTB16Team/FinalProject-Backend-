@@ -19,6 +19,7 @@ import aimo.backend.domains.post.dto.response.FindPostsByPostTypeResponse;
 import aimo.backend.domains.post.model.PostType;
 import aimo.backend.domains.post.service.PostService;
 import aimo.backend.domains.post.service.PostViewService;
+import aimo.backend.domains.privatePost.dto.response.JudgementResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +51,11 @@ public class PostController {
 	public ResponseEntity<DataResponse<FindPostAndCommentsByIdResponse>> findPostAndComments(
 		@PathVariable Long postId) {
 		return ResponseEntity.ok(DataResponse.from(postService.findPostAndCommentsDtoById(postId)));
+	}
+
+	@GetMapping("/{postId}/judgement")
+	public ResponseEntity<DataResponse<JudgementResponse>> findJudgement(@PathVariable Long postId) {
+		return ResponseEntity.ok(DataResponse.from(postService.findJudgementBy(postId)));
 	}
 
 	@DeleteMapping("/{postId}")

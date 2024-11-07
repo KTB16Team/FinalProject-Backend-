@@ -105,7 +105,7 @@ public class PrivatePostController {
 	public ResponseEntity<DataResponse<PrivatePostResponse>> findPrivatePost(
 		@Valid @PathVariable Long privatePostId) {
 		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(DataResponse.from(privatePostService.findPrivatePostBy(privatePostId)));
+			.body(DataResponse.from(privatePostService.findPrivatePostResponseBy(privatePostId)));
 	}
 
 	@GetMapping

@@ -107,7 +107,7 @@ public class PrivatePostService {
 		privatePostRepository.delete(privatePost);
 	}
 
-	public PrivatePostResponse findPrivatePostBy(Long id) {
+	public PrivatePostResponse findPrivatePostResponseBy(Long id) {
 		PrivatePost privatePost = privatePostRepository.findById(id)
 			.orElseThrow(() -> ApiException.from(ErrorCode.PRIVATE_POST_NOT_FOUND));
 
@@ -116,6 +116,11 @@ public class PrivatePostService {
 		}
 
 		return PrivatePostMapper.toResponse(privatePost);
+	}
+
+	public PrivatePost findPrivatePostBy(Long id){
+		return privatePostRepository.findById(id)
+			.orElseThrow(() -> ApiException.from(ErrorCode.PRIVATE_POST_NOT_FOUND));
 	}
 
 	public Page<PrivatePostPreviewResponse> findPrivatePostPreviewsBy(Pageable pageable) {

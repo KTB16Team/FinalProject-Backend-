@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.mapper.PostMapper;
+import aimo.backend.common.mapper.PrivatePostMapper;
 import aimo.backend.domains.comment.entity.ChildComment;
 import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.member.entity.Member;
@@ -27,6 +28,7 @@ import aimo.backend.domains.post.dto.response.FindPostsByPostTypeResponse;
 import aimo.backend.domains.post.entity.Post;
 import aimo.backend.domains.post.model.PostType;
 import aimo.backend.domains.post.repository.PostRepository;
+import aimo.backend.domains.privatePost.dto.response.JudgementResponse;
 import aimo.backend.domains.privatePost.service.PrivatePostService;
 import aimo.backend.util.memberLoader.MemberLoader;
 import lombok.RequiredArgsConstructor;
@@ -55,6 +57,11 @@ public class PostService {
 	public Post findById(Long postId) {
 		return postRepository.findById(postId)
 			.orElseThrow(() -> ApiException.from(POST_NOT_FOUND));
+	}
+
+	public JudgementResponse findJudgementBy(Long postId) {
+		Long privatePostId = findById(postId).getPrivatePostId();
+		return PrivatePostMapper.toJudgement(privatePostService.findPrivatePostBy(privatePostId));
 	}
 
 	// 글 조회, dto로 응답

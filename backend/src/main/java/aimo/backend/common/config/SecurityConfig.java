@@ -36,7 +36,7 @@ public class SecurityConfig {
 	private final UserDetailsService userDetailsService;
 	private final JwtTokenProvider jwtTokenProvider;
 
-	private final UrlBasedCorsConfigurationSource ConfigurationSource;
+	private final UrlBasedCorsConfigurationSource configurationSource;
 	private final SecurityProperties securityProperties;
 	private final PasswordEncoder passwordEncoder;
 	private final AntPathMatcher pathMatcher = new AntPathMatcher();
@@ -54,7 +54,7 @@ public class SecurityConfig {
 
 		// cors 설정
 		http
-			.cors(cors -> cors.configurationSource(ConfigurationSource));
+			.cors(cors -> cors.configurationSource(configurationSource));
 
 		// url 관리
 		http
