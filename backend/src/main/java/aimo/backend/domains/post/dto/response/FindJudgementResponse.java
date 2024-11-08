@@ -5,7 +5,6 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 
 public record FindJudgementResponse(
-	Long postId,
 	String title,
 	String summary,
 	String stancePlaintiff,

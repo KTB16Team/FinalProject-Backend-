@@ -38,7 +38,6 @@ public class PostMapper {
 
 	public static FindJudgementResponse toJudgement(Post post){
 		return new FindJudgementResponse(
-			post.getId(),
 			post.getTitle(),
 			post.getSummaryAi(),
 			post.getStancePlaintiff(),

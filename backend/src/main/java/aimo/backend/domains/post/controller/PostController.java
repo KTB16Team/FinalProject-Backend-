@@ -17,6 +17,8 @@ import aimo.backend.domains.post.dto.requset.SavePostRequest;
 import aimo.backend.domains.post.dto.response.FindJudgementResponse;
 import aimo.backend.domains.post.dto.response.FindPostAndCommentsByIdResponse;
 import aimo.backend.domains.post.dto.response.FindPostsByPostTypeResponse;
+import aimo.backend.domains.post.dto.response.SavePostResponse;
+import aimo.backend.domains.post.entity.Post;
 import aimo.backend.domains.post.model.PostType;
 import aimo.backend.domains.post.service.PostService;
 import aimo.backend.domains.post.service.PostViewService;
@@ -34,9 +36,10 @@ public class PostController {
 	private final PostViewService postViewService;
 
 	@PostMapping
-	public ResponseEntity<DataResponse<Void>> savePost(@RequestBody @Valid SavePostRequest request) {
-		postService.save(request);
-		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
+	public ResponseEntity<DataResponse<SavePostResponse>> savePost(@RequestBody @Valid SavePostRequest request) {
+		Post post = postService.save(request);
+		return ResponseEntity.status(HttpStatus.CREATED)
+			.body(DataResponse.created(new SavePostResponse(post.getId())));
 	}
 
 	@GetMapping

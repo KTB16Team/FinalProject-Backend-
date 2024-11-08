@@ -48,10 +48,10 @@ public class PostService {
 
 	// 글 저장
 	@Transactional
-	public void save(SavePostRequest savePostRequest) {
+	public Post save(SavePostRequest savePostRequest) {
 		Member member = memberLoader.getMember();
 		privatePostService.publishPrivatePost(savePostRequest.privatePostId());
-		postRepository.save(PostMapper.toEntity(savePostRequest, member));
+		return postRepository.save(PostMapper.toEntity(savePostRequest, member));
 	}
 
 	// 글 조회

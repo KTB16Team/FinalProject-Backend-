@@ -27,9 +27,11 @@ import aimo.backend.domains.privatePost.dto.response.PrivatePostResponse;
 import aimo.backend.domains.privatePost.dto.request.SaveAudioSuccessRequest;
 import aimo.backend.domains.privatePost.dto.response.SaveAudioSuccessResponse;
 import aimo.backend.domains.privatePost.dto.request.SpeechToTextRequest;
+import aimo.backend.domains.privatePost.dto.response.SavePrivatePostResponse;
 import aimo.backend.domains.privatePost.dto.response.SpeechToTextResponse;
 
 import aimo.backend.domains.privatePost.dto.request.TextRecordRequest;
+import aimo.backend.domains.privatePost.entity.PrivatePost;
 import aimo.backend.domains.privatePost.service.AudioRecordService;
 import aimo.backend.domains.privatePost.service.ChatRecordService;
 import aimo.backend.domains.privatePost.service.PrivatePostService;
@@ -57,11 +59,13 @@ public class PrivatePostController {
 
 	// 판결
 	@PostMapping("/judgement")
-	public ResponseEntity<DataResponse<JudgementResponse>> summaryAndJudgment(@Valid @RequestBody JudgementToAiRequest judgementToAiRequest) {
+	public ResponseEntity<DataResponse<SavePrivatePostResponse>> summaryAndJudgment(@Valid @RequestBody JudgementToAiRequest judgementToAiRequest) {
 
 		JudgementResponse judgementResponse = privatePostService.serveScriptToAi(judgementToAiRequest);
-		privatePostService.save(judgementResponse);
-		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created(judgementResponse));
+		PrivatePost privatePost = privatePostService.save(judgementResponse);
+
+		return ResponseEntity.status(HttpStatus.CREATED)
+			.body(DataResponse.created(new SavePrivatePostResponse(privatePost.getId())));
 	}
 
 	// 대화록 업로드
