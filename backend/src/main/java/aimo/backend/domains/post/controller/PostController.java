@@ -22,7 +22,6 @@ import aimo.backend.domains.post.entity.Post;
 import aimo.backend.domains.post.model.PostType;
 import aimo.backend.domains.post.service.PostService;
 import aimo.backend.domains.post.service.PostViewService;
-import aimo.backend.domains.privatePost.dto.response.JudgementResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;

@@ -33,11 +33,10 @@ public class S3Service {
 		return new CreatePresignedUrlResponse(url, request.filename());
 	}
 
-	public CreatePresignedUrlResponse createProfilePresignedUrl(CreateProfileImageUrlRequest request) {
-		String path = createPath(PresignedUrlPrefix.IMAGE.getValue(), request.nickname() + "." + request.extension());
+	public CreatePresignedUrlResponse createProfilePresignedUrl(CreatePresignedUrlRequest request) {
+		String path = createPath(PresignedUrlPrefix.IMAGE.getValue(), request.filename());
 		String url = createGeneratePresignedUrlRequest(path);
-		String filename = request.nickname() + "." + request.extension();
-		return new CreatePresignedUrlResponse(url, filename);
+		return new CreatePresignedUrlResponse(url, request.filename());
 	}
 
 	private String createGeneratePresignedUrlRequest(String path) {
@@ -45,13 +44,7 @@ public class S3Service {
 			s3Properties.getBucketName(), path)
 			.withMethod(HttpMethod.PUT)
 			.withExpiration(getPreSignedUrlExpiration());
-
-		generatePresignedUrlRequest.addRequestParameter(Headers.S3_CANNED_ACL,
-			CannedAccessControlList.PublicRead.toString());
-
-		URL url = amazonS3Client.generatePresignedUrl(generatePresignedUrlRequest);
-
-		return url.toString();
+		return amazonS3Client.generatePresignedUrl(generatePresignedUrlRequest).toString();
 	}
 
 	public String getResourceUrl(CreateResourceUrlRequest createResourceUrlRequest) {

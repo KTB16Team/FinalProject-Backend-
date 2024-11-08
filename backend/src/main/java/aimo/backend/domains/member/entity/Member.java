@@ -73,8 +73,8 @@ public class Member extends BaseEntity {
 	@JsonFormat(pattern = "yyyy-MM-dd")
 	private LocalDate birthDate;
 
-	@OneToMany(mappedBy = "member")
-	private List<PrivatePost> privatePosts;
+	@OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true)
+	private List<PrivatePost> privatePosts = new ArrayList<>();
 
 	@OneToMany(mappedBy = "member")
 	private List<Post> posts = new ArrayList<>();

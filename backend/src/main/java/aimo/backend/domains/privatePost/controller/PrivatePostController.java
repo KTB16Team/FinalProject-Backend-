@@ -93,9 +93,9 @@ public class PrivatePostController {
 			.body(DataResponse.created(audioRecordService.speechToText(speechToTextRequest)));
 	}
 
-	@GetMapping("/audio/presigned")
+	@GetMapping("/audio/presigned/{filename}")
 	public ResponseEntity<DataResponse<CreatePresignedUrlResponse>> getPresignedUrlTo(
-		@Valid @RequestBody CreatePresignedUrlRequest createPresignedUrlRequest) {
+		@Valid @PathVariable("filename") CreatePresignedUrlRequest createPresignedUrlRequest) {
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(DataResponse.created(s3Service.createAudioPreSignedUrl(createPresignedUrlRequest)));
 	}
