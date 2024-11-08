@@ -7,6 +7,7 @@ import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.post.dto.requset.FindCommentedPostsByIdRequest;
 import aimo.backend.domains.post.dto.requset.SavePostRequest;
+import aimo.backend.domains.post.dto.response.FindJudgementResponse;
 import aimo.backend.domains.post.dto.response.FindPostAndCommentsByIdResponse;
 import aimo.backend.domains.post.dto.response.FindPostAndCommentsByIdResponse.ParentCommentDto;
 import aimo.backend.domains.post.dto.response.FindPostsByPostTypeResponse;
@@ -35,8 +36,9 @@ public class PostMapper {
 			.build();
 	}
 
-	public static JudgementResponse toJudgement(Post post){
-		return new JudgementResponse(
+	public static FindJudgementResponse toJudgement(Post post){
+		return new FindJudgementResponse(
+			post.getId(),
 			post.getTitle(),
 			post.getSummaryAi(),
 			post.getStancePlaintiff(),

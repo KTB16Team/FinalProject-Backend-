@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import aimo.backend.common.dto.DataResponse;
 import aimo.backend.domains.post.dto.requset.SavePostRequest;
+import aimo.backend.domains.post.dto.response.FindJudgementResponse;
 import aimo.backend.domains.post.dto.response.FindPostAndCommentsByIdResponse;
 import aimo.backend.domains.post.dto.response.FindPostsByPostTypeResponse;
 import aimo.backend.domains.post.model.PostType;
@@ -54,7 +55,7 @@ public class PostController {
 	}
 
 	@GetMapping("/{postId}/judgement")
-	public ResponseEntity<DataResponse<JudgementResponse>> findJudgement(@PathVariable Long postId) {
+	public ResponseEntity<DataResponse<FindJudgementResponse>> findJudgement(@PathVariable Long postId) {
 		return ResponseEntity.ok(DataResponse.from(postService.findJudgementBy(postId)));
 	}
 

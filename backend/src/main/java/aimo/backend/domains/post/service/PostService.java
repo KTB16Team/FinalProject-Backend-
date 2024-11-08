@@ -23,6 +23,7 @@ import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.post.dto.requset.FindCommentedPostsByIdRequest;
 import aimo.backend.domains.post.dto.requset.SavePostRequest;
+import aimo.backend.domains.post.dto.response.FindJudgementResponse;
 import aimo.backend.domains.post.dto.response.FindPostAndCommentsByIdResponse;
 import aimo.backend.domains.post.dto.response.FindPostsByPostTypeResponse;
 import aimo.backend.domains.post.entity.Post;
@@ -59,7 +60,7 @@ public class PostService {
 			.orElseThrow(() -> ApiException.from(POST_NOT_FOUND));
 	}
 
-	public JudgementResponse findJudgementBy(Long postId) {
+	public FindJudgementResponse findJudgementBy(Long postId) {
 		Post post = findById(postId);
 		return PostMapper.toJudgement(post);
 	}
