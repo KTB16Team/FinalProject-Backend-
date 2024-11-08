@@ -78,7 +78,7 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           source: cloudwatch-config.json
-          target: /home/ubuntu/cloudwatch-config.json
+          target: /home/ubuntu/
 
       # EC2 연결 테스트 추가 (debug 옵션 활성화)
       - name: Test EC2 SSH Connection
