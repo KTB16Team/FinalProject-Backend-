@@ -27,9 +27,10 @@ public class S3Service {
 	private final AmazonS3 amazonS3Client;
 	private final S3Properties s3Properties;
 
-	public String createAudioPreSignedUrl(CreatePresignedUrlRequest request) {
+	public CreatePresignedUrlResponse createAudioPreSignedUrl(CreatePresignedUrlRequest request) {
 		String path = createPath(PresignedUrlPrefix.AUDIO.getValue(), request.filename());
-		return createGeneratePresignedUrlRequest(path);
+		String url = createGeneratePresignedUrlRequest(path);
+		return new CreatePresignedUrlResponse(url, request.filename());
 	}
 
 	public CreatePresignedUrlResponse createProfilePresignedUrl(CreateProfileImageUrlRequest request) {

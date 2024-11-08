@@ -34,6 +34,7 @@ import aimo.backend.domains.privatePost.service.AudioRecordService;
 import aimo.backend.domains.privatePost.service.ChatRecordService;
 import aimo.backend.domains.privatePost.service.PrivatePostService;
 
+import aimo.backend.infrastructure.s3.S3Service;
 import aimo.backend.infrastructure.s3.dto.request.CreatePresignedUrlRequest;
 import aimo.backend.infrastructure.s3.dto.response.CreatePresignedUrlResponse;
 import jakarta.validation.Valid;
@@ -52,6 +53,7 @@ public class PrivatePostController {
 	private final PrivatePostService privatePostService;
 	private final TextRecordService textRecordService;
 	private final ChatRecordService chatRecordService;
+	private final S3Service s3Service;
 
 	// 판결
 	@PostMapping("/judgement")
@@ -91,7 +93,7 @@ public class PrivatePostController {
 	public ResponseEntity<DataResponse<CreatePresignedUrlResponse>> getPresignedUrlTo(
 		@Valid @RequestBody CreatePresignedUrlRequest createPresignedUrlRequest) {
 		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(DataResponse.created(audioRecordService.createPresignedUrl(createPresignedUrlRequest)));
+			.body(DataResponse.created(s3Service.createAudioPreSignedUrl(createPresignedUrlRequest)));
 	}
 
 	@PostMapping("/audio/success")

@@ -72,8 +72,8 @@ public class PrivatePostService {
 					judgementFromAi.stancePlaintiff(),
 					judgementFromAi.stanceDefendant(),
 					judgementFromAi.judgement(),
-					faultRatePlaintiff,
-					faultRateDefendant,
+					100 - faultRatePlaintiff,
+					100 - faultRateDefendant,
 					judgementToAiRequest.originType());
 			})
 			.block();

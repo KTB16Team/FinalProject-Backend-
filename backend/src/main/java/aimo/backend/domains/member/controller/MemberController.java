@@ -71,7 +71,7 @@ public class MemberController {
 
 	@PostMapping("/profile/presigned")
 	public ResponseEntity<DataResponse<CreatePresignedUrlResponse>> createProfileImagePreSignedUrl(
-		@RequestBody CreateProfileImageUrlRequest request) {
+		@Valid @RequestBody CreateProfileImageUrlRequest request) {
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(DataResponse.created(s3Service.createProfilePresignedUrl(request)));
 	}

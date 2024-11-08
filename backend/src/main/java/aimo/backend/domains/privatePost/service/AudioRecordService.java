@@ -32,18 +32,6 @@ public class AudioRecordService {
 	private final WebClient webClient;
 	private final AiServerProperties aiServerProperties;
 
-	public CreatePresignedUrlResponse createPresignedUrl(CreatePresignedUrlRequest createPresignedUrlRequest) {
-		String url = s3Service.createAudioPreSignedUrl(createPresignedUrlRequest);
-		String filename = createPresignedUrlRequest.filename();
-		String extension = filename.substring(filename.lastIndexOf(".") + 1);
-
-		if (!isAudioFile(extension)) {
-			throw ApiException.from(ErrorCode.INVALID_FILE_EXTENSION);
-		}
-
-		return new CreatePresignedUrlResponse(url, filename);
-	}
-
 	public SpeechToTextResponse speechToText(SpeechToTextRequest speechToTextRequest) {
 		return webClient.post()
 			.uri(aiServerProperties.getDomainUrl() + aiServerProperties.getSpeechToTextApi())
