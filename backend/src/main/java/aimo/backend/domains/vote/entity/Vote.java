@@ -1,11 +1,15 @@
-package aimo.backend.domains.post.entity;
+package aimo.backend.domains.vote.entity;
 
 import static lombok.AccessLevel.*;
 
 import aimo.backend.common.entity.BaseEntity;
 import aimo.backend.domains.member.entity.Member;
+import aimo.backend.domains.post.entity.Post;
+import aimo.backend.domains.vote.model.Side;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -21,16 +25,17 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @Table(
-	name = "post_views",
+	name = "votes",
 	uniqueConstraints = {
 		@UniqueConstraint(columnNames = {"post_id", "member_id"})
 	})
 @NoArgsConstructor(access = PROTECTED)
-public class PostView extends BaseEntity {
+public class Vote extends BaseEntity {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "view_id")
-	private Long viewId;
+	@Column(name = "vote_id")
+	private Long voteId;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "post_id")
@@ -40,9 +45,18 @@ public class PostView extends BaseEntity {
 	@JoinColumn(name = "member_id")
 	private Member member;
 
+	@Column(nullable = false)
+	@Enumerated(EnumType.STRING)
+	private Side side;
+
 	@Builder
-	public PostView(Post post, Member member) {
+	public Vote(Post post, Member member, Side side) {
 		this.post = post;
 		this.member = member;
+		this.side = side;
+	}
+
+	public void changeSide(Side side) {
+		this.side = side;
 	}
 }

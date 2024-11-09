@@ -12,9 +12,11 @@ import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.like.entity.PostLike;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.post.model.Category;
-import aimo.backend.domains.post.model.Side;
-import aimo.backend.domains.privatePost.entity.PrivatePost;
+import aimo.backend.domains.vote.entity.Vote;
+import aimo.backend.domains.vote.model.Side;
 import aimo.backend.domains.privatePost.model.OriginType;
+import aimo.backend.domains.view.entity.PostView;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -74,13 +76,13 @@ public class Post extends BaseEntity {
 	@Column(nullable = false, columnDefinition = "VARCHAR(100) DEFAULT 'COMMON'")
 	private Category category;
 
-	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY, orphanRemoval = true, cascade = ALL)
+	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY, orphanRemoval = true, cascade = {CascadeType.REMOVE})
 	private List<PostLike> postLikes;
 
-	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY, orphanRemoval = true, cascade = ALL)
+	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY, orphanRemoval = true, cascade = {CascadeType.REMOVE})
 	private List<PostView> postViews;
 
-	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY, orphanRemoval = true, cascade = ALL)
+	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY, orphanRemoval = true, cascade = {CascadeType.REMOVE})
 	private List<Vote> votes;
 
 	public void setMember(Member member) {

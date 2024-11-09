@@ -1,4 +1,4 @@
-package aimo.backend.domains.post.model;
+package aimo.backend.domains.vote.model;
 
 import lombok.Getter;
 

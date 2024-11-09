@@ -1,13 +1,10 @@
-package aimo.backend.domains.post.service;
-
-import static aimo.backend.common.exception.ErrorCode.*;
+package aimo.backend.domains.comment.service;
 
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import aimo.backend.common.exception.ApiException;
 import aimo.backend.domains.comment.entity.ChildComment;
 import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.comment.repository.ChildCommentRepository;

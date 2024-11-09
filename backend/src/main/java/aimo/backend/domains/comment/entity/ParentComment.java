@@ -2,6 +2,7 @@ package aimo.backend.domains.comment.entity;
 
 import static lombok.AccessLevel.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import aimo.backend.common.entity.BaseEntity;
@@ -48,8 +49,8 @@ public class ParentComment extends BaseEntity {
 	@OneToMany(mappedBy = "parentComment", fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.REMOVE)
 	private List<ParentCommentLike> parentCommentLikes;
 
-	public Integer getCommentsCount() {
-		return childComments.size() + 1;
+	public Integer getChildCommentsCount() {
+		return childComments.size();
 	}
 
 	public Integer getLikesCount() {
@@ -62,13 +63,17 @@ public class ParentComment extends BaseEntity {
 		String content,
 		Boolean isDeleted,
 		Member member,
-		Post post
+		Post post,
+		List<ChildComment> childComments,
+		List<ParentCommentLike> parentCommentLikes
 	) {
 		this.nickname = nickname;
 		this.content = content;
 		this.isDeleted = isDeleted;
 		this.member = member;
 		this.post = post;
+		this.childComments = childComments;
+		this.parentCommentLikes = parentCommentLikes;
 	}
 
 	public void deleteParentCommentSoftly() {

@@ -19,7 +19,7 @@ import aimo.backend.domains.post.dto.response.FindPostAndCommentsByIdResponse;
 import aimo.backend.domains.post.dto.response.FindPostsByPostTypeResponse;
 import aimo.backend.domains.post.model.PostType;
 import aimo.backend.domains.post.service.PostService;
-import aimo.backend.domains.post.service.PostViewService;
+import aimo.backend.domains.view.service.PostViewService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -55,10 +55,5 @@ public class PostController {
 	public ResponseEntity<DataResponse<Void>> deletePost(@PathVariable Long postId) {
 		postService.deletePostBy(postId);
 		return ResponseEntity.ok(DataResponse.noContent());
-	}
-
-	@PostMapping("/{postId}/views")
-	public void increaseView(@PathVariable Long postId) {
-		postViewService.increaseViewBy(postId);
 	}
 }

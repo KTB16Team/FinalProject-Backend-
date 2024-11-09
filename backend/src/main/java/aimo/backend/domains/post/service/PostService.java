@@ -16,6 +16,7 @@ import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.mapper.PostMapper;
 import aimo.backend.domains.comment.entity.ChildComment;
 import aimo.backend.domains.comment.entity.ParentComment;
+import aimo.backend.domains.comment.service.PostCommentService;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.post.dto.requset.SavePostRequest;
 import aimo.backend.domains.post.dto.response.FindPostAndCommentsByIdResponse;

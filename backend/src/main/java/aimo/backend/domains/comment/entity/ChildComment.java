@@ -57,7 +57,7 @@ public class ChildComment extends BaseEntity {
 	@JoinColumn(name = "post_id")
 	private Post post;
 
-	@OneToMany(mappedBy = "childComment", fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.REMOVE)
+	@OneToMany(mappedBy = "childComment", fetch = FetchType.LAZY)
 	private List<ChildCommentLike> childCommentLikes;
 
 	@Builder

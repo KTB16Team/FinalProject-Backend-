@@ -25,7 +25,6 @@ public class ChildCommentController {
 
 	private final ChildCommentService childCommentService;
 	private final MemberLoader memberLoader;
-	private final ChildCommentLikeService childCommentLikeService;
 
 	@PostMapping("/{postId}/comments/{parentCommentId}/child")
 	public ResponseEntity<DataResponse<Void>> saveChildComment(
