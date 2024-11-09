@@ -4,12 +4,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import aimo.backend.domains.member.entity.Member;
+import aimo.backend.domains.member.service.MemberService;
 import aimo.backend.domains.post.entity.Post;
 import aimo.backend.domains.post.service.PostService;
-import aimo.backend.domains.view.dto.IncreasePostViewRequest;
+import aimo.backend.domains.view.dto.IncreasePostViewParameter;
 import aimo.backend.domains.view.entity.PostView;
 import aimo.backend.domains.view.repository.PostViewRepository;
-import aimo.backend.util.memberLoader.MemberLoader;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -19,16 +19,17 @@ public class PostViewService {
 
 	private final PostViewRepository postViewRepository;
 	private final PostService postService;
-	private final MemberLoader memberLoader;
+	private final MemberService memberService;
 
 	// 조회수 증가
 	@Transactional(rollbackFor = Exception.class)
-	public void increasePostViewBy(IncreasePostViewRequest increasePostViewRequest) {
-		Long postId = increasePostViewRequest.postId();
-		Member member = memberLoader.getMember();
+	public void increasePostViewBy(IncreasePostViewParameter increasePostViewParameter) {
+		Long memberId = increasePostViewParameter.memberId();
+		Long postId = increasePostViewParameter.postId();
 		Post post = postService.findById(postId);
+		Member member = memberService.findBy(memberId);
 
-		postViewRepository.findByMemberIdAndPostId(member.getId(), postId)
+		postViewRepository.findByMemberIdAndPostId(memberId, postId)
 			.ifPresentOrElse(
 				(postView) -> {},
 				() -> postViewRepository.save(new PostView(post, member))

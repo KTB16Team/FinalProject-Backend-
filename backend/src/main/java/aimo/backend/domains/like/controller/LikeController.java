@@ -18,7 +18,7 @@ import aimo.backend.domains.like.service.ChildCommentLikeService;
 import aimo.backend.domains.like.service.ParentCommentLikeService;
 import aimo.backend.domains.like.service.PostLikeService;
 import aimo.backend.domains.member.entity.Member;
-import aimo.backend.util.memberLoader.MemberLoader;
+import aimo.backend.common.util.memberLoader.MemberLoader;
 import lombok.RequiredArgsConstructor;
 
 @RestController

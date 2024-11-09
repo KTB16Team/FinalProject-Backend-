@@ -1,4 +1,4 @@
-package aimo.backend.util.validator;
+package aimo.backend.common.util.validator;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

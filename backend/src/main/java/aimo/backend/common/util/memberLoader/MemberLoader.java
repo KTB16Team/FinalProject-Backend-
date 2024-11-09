@@ -1,4 +1,4 @@
-package aimo.backend.util.memberLoader;
+package aimo.backend.common.util.memberLoader;
 
 import static aimo.backend.common.exception.ErrorCode.*;
 

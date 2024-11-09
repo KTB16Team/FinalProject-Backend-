@@ -23,7 +23,7 @@ import aimo.backend.domains.privatePost.dto.request.SummaryAndJudgementRequest;
 import aimo.backend.domains.privatePost.dto.response.JudgementFromAiResponse;
 import aimo.backend.domains.privatePost.entity.PrivatePost;
 import aimo.backend.domains.privatePost.repository.PrivatePostRepository;
-import aimo.backend.util.memberLoader.MemberLoader;
+import aimo.backend.common.util.memberLoader.MemberLoader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

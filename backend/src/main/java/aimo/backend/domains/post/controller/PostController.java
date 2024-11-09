@@ -28,7 +28,7 @@ import aimo.backend.domains.post.dto.response.FindPostsByPostTypeResponse;
 import aimo.backend.domains.post.dto.response.SavePostResponse;
 import aimo.backend.domains.post.model.PostType;
 import aimo.backend.domains.post.service.PostService;
-import aimo.backend.util.memberLoader.MemberLoader;
+import aimo.backend.common.util.memberLoader.MemberLoader;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;

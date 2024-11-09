@@ -1,4 +1,4 @@
-package aimo.backend.util.responseWriter;
+package aimo.backend.common.util.responseWriter;
 
 import java.io.IOException;
 

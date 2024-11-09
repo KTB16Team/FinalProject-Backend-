@@ -13,7 +13,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import aimo.backend.domains.auth.security.jwtFilter.JwtTokenProvider;
 import aimo.backend.common.dto.DataResponse;
 import aimo.backend.common.exception.ApiException;
-import aimo.backend.util.responseWriter.ResponseWriter;
+import aimo.backend.common.util.responseWriter.ResponseWriter;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.member.service.MemberService;
 import jakarta.servlet.FilterChain;

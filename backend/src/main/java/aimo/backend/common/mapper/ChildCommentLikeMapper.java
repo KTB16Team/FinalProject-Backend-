@@ -7,7 +7,6 @@ import aimo.backend.domains.like.dto.LikeChildCommentRequest;
 import aimo.backend.domains.like.entity.ChildCommentLike;
 import aimo.backend.domains.like.model.LikeType;
 import aimo.backend.domains.member.entity.Member;
-import aimo.backend.util.memberLoader.MemberLoader;
 import lombok.RequiredArgsConstructor;
 
 @Component

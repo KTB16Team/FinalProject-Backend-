@@ -16,8 +16,7 @@ import aimo.backend.domains.comment.dto.request.ValidAndDeleteParentCommentParam
 import aimo.backend.domains.comment.dto.request.ValidAndUpdateChildCommentParameter;
 import aimo.backend.domains.comment.mapper.ChildCommentMapper;
 import aimo.backend.domains.comment.service.ChildCommentService;
-import aimo.backend.domains.member.entity.Member;
-import aimo.backend.util.memberLoader.MemberLoader;
+import aimo.backend.common.util.memberLoader.MemberLoader;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 

@@ -23,7 +23,7 @@ import aimo.backend.infrastructure.s3.S3Service;
 import aimo.backend.infrastructure.s3.dto.SaveFileMetaDataRequest;
 import aimo.backend.infrastructure.s3.model.PresignedUrlPrefix;
 import aimo.backend.infrastructure.smtp.MailService;
-import aimo.backend.util.memberLoader.MemberLoader;
+import aimo.backend.common.util.memberLoader.MemberLoader;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

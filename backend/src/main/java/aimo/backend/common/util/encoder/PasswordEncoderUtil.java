@@ -1,4 +1,4 @@
-package aimo.backend.util.encoder;
+package aimo.backend.common.util.encoder;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

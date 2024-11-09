@@ -14,7 +14,7 @@ import aimo.backend.domains.comment.dto.request.SaveParentCommentRequest;
 import aimo.backend.domains.comment.dto.request.UpdateParentCommentRequest;
 import aimo.backend.domains.comment.service.ParentCommentService;
 import aimo.backend.domains.member.entity.Member;
-import aimo.backend.util.memberLoader.MemberLoader;
+import aimo.backend.common.util.memberLoader.MemberLoader;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
