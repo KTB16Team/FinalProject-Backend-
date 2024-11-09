@@ -38,7 +38,7 @@ public class ParentCommentLikeService {
 			parentCommentLikeRepository.save(ParentCommentLikeMapper.toEntity(member, parentComment));
 			return;
 		}
-		
+
 		parentCommentLikeRepository.deleteByMember_IdAndParentComment_Id(member.getId(), parentCommentId);
 	}
 }

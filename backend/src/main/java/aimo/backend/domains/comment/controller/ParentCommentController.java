@@ -29,8 +29,7 @@ public class ParentCommentController {
 	@PostMapping("/{postId}/comments")
 	public ResponseEntity<DataResponse<Void>> saveParentComment(
 		@Valid @PathVariable Long postId,
-		@Valid @RequestBody SaveParentCommentRequest request
-	) {
+		@Valid @RequestBody SaveParentCommentRequest request) {
 		Member member = memberLoader.getMember();
 		parentCommentService.saveParentComment(member, postId, request);
 
@@ -40,8 +39,7 @@ public class ParentCommentController {
 	@PutMapping("comments/{commentId}")
 	public ResponseEntity<DataResponse<Void>> updateParentComment(
 		@Valid @PathVariable Long commentId,
-		@Valid @RequestBody UpdateParentCommentRequest request
-	) {
+		@Valid @RequestBody UpdateParentCommentRequest request) {
 		Member member = memberLoader.getMember();
 		parentCommentService.validateAndUpdateParentComment(member, commentId, request);
 
@@ -49,9 +47,7 @@ public class ParentCommentController {
 	}
 
 	@DeleteMapping("comments/{commentId}")
-	public ResponseEntity<DataResponse<Void>> deleteParentComment(
-		@Valid @PathVariable Long commentId
-	) {
+	public ResponseEntity<DataResponse<Void>> deleteParentComment(@Valid @PathVariable Long commentId) {
 		Member member = memberLoader.getMember();
 		parentCommentService.validateAndDeleteParentComment(member, commentId);
 
