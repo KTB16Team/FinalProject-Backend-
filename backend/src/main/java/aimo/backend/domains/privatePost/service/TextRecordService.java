@@ -19,6 +19,7 @@ public class TextRecordService {
 	public void save(TextRecordRequest textRecordRequest) {
 		TextRecord textRecord = TextRecord
 			.builder()
+			.title(textRecordRequest.title())
 			.script(textRecordRequest.script())
 			.build();
 

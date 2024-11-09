@@ -43,7 +43,9 @@ public class DataInitConfig {
 	CommandLineRunner initData(MemberRepository memberRepo, PrivatePostRepository privatePostRepo, PostRepository postRepo,
 		ParentCommentRepository parentCommentRepo, ChildCommentRepository childCommentRepo, TextRecordRepository textRecordRepo) {
 		return args -> {
-			initializeData(memberRepo, privatePostRepo, postRepo, parentCommentRepo, childCommentRepo, textRecordRepo);
+			if (memberRepo.count() == 0) {
+				initializeData(memberRepo, privatePostRepo, postRepo, parentCommentRepo, childCommentRepo, textRecordRepo);
+			}
 		};
 	}
 
@@ -67,8 +69,9 @@ public class DataInitConfig {
 
 		List<TextRecord> textRecords = new ArrayList<>();
 
-		for(int i=1; i<=130; i++){
+		for(int i=1; i<=10; i++){
 			TextRecord textRecord = TextRecord.builder()
+				.title("Text Record Title " + i)
 				.script("This is a text record " + i)
 				.build();
 			textRecords.add(textRecordRepo.save(textRecord));
@@ -76,7 +79,7 @@ public class DataInitConfig {
 
 		// PrivatePosts 생성
 		List<PrivatePost> privatePosts = new ArrayList<>();
-		for (int i = 1; i <= 130; i++) {
+		for (int i = 1; i <= 10; i++) {
 			Member member = members.get(i % 3);
 			PrivatePost privatePost =
 				PrivatePost.builder()
@@ -90,7 +93,7 @@ public class DataInitConfig {
 					.textRecord(textRecords.get(i-1))
 					.faultRatePlaintiff(50)
 					.faultRateDefendant(50)
-					.published(false)
+					.published(true)
 					.build();
 
 			privatePosts.add(privatePostRepo.save(privatePost));
@@ -98,14 +101,11 @@ public class DataInitConfig {
 
 		// Posts 생성
 		List<Post> posts = new ArrayList<>();
-		for (int i = 1; i <= 100; i++) {
+		for (int i = 1; i <= 10; i++) {
 			Member member = members.get(i % 3);
 			PrivatePost privatePost = privatePosts.get(i - 1);
-			privatePosts.get(i - 1).publish();
-
 			Post post = new Post(privatePost.getId(), member, "Public Post Title " + i, "Summary AI " + i,
-				"Plaintiff Stance " + i, "Defendant Stance " + i, "Judgement " + i,
-				privatePost.getFaultRatePlaintiff(), privatePost.getFaultRateDefendant(), OriginType.TEXT, Category.COMMON);
+				"Plaintiff Stance " + i, "Defendant Stance " + i, "Judgement " + i, OriginType.TEXT, Category.COMMON);
 			posts.add(postRepo.save(post));
 		}
 

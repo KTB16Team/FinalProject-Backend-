@@ -1,15 +1,17 @@
 package aimo.backend.domains.comment.entity;
 
+import static jakarta.persistence.CascadeType.*;
 import static jakarta.persistence.GenerationType.*;
 import static lombok.AccessLevel.*;
 
 import java.util.List;
 
 import aimo.backend.common.entity.BaseEntity;
-import aimo.backend.domains.comment.costants.CommentConstants;
+import aimo.backend.domains.comment.model.CommentConstants;
 import aimo.backend.domains.like.entity.ChildCommentLike;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.post.entity.Post;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -55,7 +57,7 @@ public class ChildComment extends BaseEntity {
 	@JoinColumn(name = "post_id")
 	private Post post;
 
-	@OneToMany(mappedBy = "childComment", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "childComment", fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.REMOVE)
 	private List<ChildCommentLike> childCommentLikes;
 
 	@Builder

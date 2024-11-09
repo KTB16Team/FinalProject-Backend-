@@ -2,7 +2,7 @@ package aimo.backend.infrastructure.smtp;
 
 import java.util.UUID;
 
-import org.springframework.mail.SimpleMailMessage;
+
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -28,11 +28,11 @@ public class MailService {
 	private final SpringTemplateEngine templateEngine;
 
 	public SendTemporaryPasswordResponse createMail(SendTemporaryPasswordRequest sendTemporaryPasswordRequest) {
+
 		return new SendTemporaryPasswordResponse(
 			sendTemporaryPasswordRequest.email(),
 			Notice.TITLE.getValue(),
-			Notice.INTRODUCE.getValue() + sendTemporaryPasswordRequest.nickname() +
-				Notice.TEMPORARY_PASSWORD.getValue() + createTempPassword() + Notice.END_MESSAGE.getValue() + Notice.FROM.getValue(),
+			Notice.INTRODUCE.getValue() + Notice.TEMPORARY_PASSWORD.getValue() + createTempPassword() + Notice.END_MESSAGE.getValue() + Notice.FROM.getValue(),
 			Notice.SERVICE_ADDRESS.getValue());
 	}
 
@@ -40,7 +40,7 @@ public class MailService {
 		return UUID.randomUUID().toString().substring(0, 8);
 	}
 
-	public void sendHtmlMail(SendTemporaryPasswordResponse sendTemporaryPasswordResponse) throws MessagingException {
+	public void sendMail(SendTemporaryPasswordResponse sendTemporaryPasswordResponse) throws MessagingException {
 		// 메일 전송 로직
 		MimeMessage message = javaMailSender.createMimeMessage();
 		MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -58,17 +58,6 @@ public class MailService {
 		helper.setText(html, true);
 
 
-		javaMailSender.send(message);
-	}
-
-	public void sendMail(SendTemporaryPasswordResponse sendTemporaryPasswordResponse) {
-		// 메일 전송 로직
-		SimpleMailMessage message = new SimpleMailMessage();
-		message.setTo(sendTemporaryPasswordResponse.to());
-		message.setSubject(sendTemporaryPasswordResponse.title());
-		message.setText(sendTemporaryPasswordResponse.content());
-		message.setFrom(sendTemporaryPasswordResponse.from());
-		message.setReplyTo(sendTemporaryPasswordResponse.from());
 		javaMailSender.send(message);
 	}
 }

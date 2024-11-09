@@ -13,12 +13,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import aimo.backend.common.dto.DataResponse;
+import aimo.backend.domains.like.service.PostLikeService;
 import aimo.backend.domains.post.dto.requset.SavePostRequest;
-import aimo.backend.domains.post.dto.response.FindJudgementResponse;
 import aimo.backend.domains.post.dto.response.FindPostAndCommentsByIdResponse;
 import aimo.backend.domains.post.dto.response.FindPostsByPostTypeResponse;
-import aimo.backend.domains.post.dto.response.SavePostResponse;
-import aimo.backend.domains.post.entity.Post;
 import aimo.backend.domains.post.model.PostType;
 import aimo.backend.domains.post.service.PostService;
 import aimo.backend.domains.post.service.PostViewService;
@@ -35,18 +33,15 @@ public class PostController {
 	private final PostViewService postViewService;
 
 	@PostMapping
-	public ResponseEntity<DataResponse<SavePostResponse>> savePost(@RequestBody @Valid SavePostRequest request) {
-		Post post = postService.save(request);
-		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(DataResponse.created(new SavePostResponse(post.getId())));
+	public ResponseEntity<DataResponse<Void>> savePost(@RequestBody @Valid SavePostRequest request) {
+		postService.save(request);
+		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
 
 	@GetMapping
 	public ResponseEntity<DataResponse<Page<FindPostsByPostTypeResponse>>> findPostsByPostType(
-		@RequestParam("type") @NotNull PostType postType,
-		@RequestParam("page") @NotNull Integer page,
-		@RequestParam("size") @NotNull Integer size
-	) {
+		@RequestParam("type") @NotNull PostType postType, @RequestParam("page") @NotNull Integer page,
+		@RequestParam("size") @NotNull Integer size) {
 		return ResponseEntity.ok(DataResponse.from(postService.findPostDtosByPostType(postType, page, size)));
 	}
 
@@ -54,11 +49,6 @@ public class PostController {
 	public ResponseEntity<DataResponse<FindPostAndCommentsByIdResponse>> findPostAndComments(
 		@PathVariable Long postId) {
 		return ResponseEntity.ok(DataResponse.from(postService.findPostAndCommentsDtoById(postId)));
-	}
-
-	@GetMapping("/{postId}/judgement")
-	public ResponseEntity<DataResponse<FindJudgementResponse>> findJudgement(@PathVariable Long postId) {
-		return ResponseEntity.ok(DataResponse.from(postService.findJudgementBy(postId)));
 	}
 
 	@DeleteMapping("/{postId}")

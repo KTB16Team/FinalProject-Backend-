@@ -9,7 +9,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record SavePostRequest(
-	@NotNull(message = "개인 게시글 아이디가 null입니다.")
+	@NotNull(message = "개인게시글 아이디가 null입니다.")
 	Long privatePostId,
 	@NotBlank(message = "title이 null이거나 빈 문자열입니다.")
 	String title,
@@ -21,10 +21,6 @@ public record SavePostRequest(
 	String summaryAi,
 	@NotBlank(message = "judgement이 null이거나 빈 문자열입니다.")
 	String judgement,
-	@NotNull(message = "faultRateDefendant가 null입니다.")
-	Integer faultRateDefendant,
-	@NotNull(message = "faultRatePlaintiff가 null입니다.")
-	Integer faultRatePlaintiff,
 	@NotNull(message = "originType이 null입니다.")
 	OriginType originType,
 	@JsonSetter(nulls = Nulls.SKIP)

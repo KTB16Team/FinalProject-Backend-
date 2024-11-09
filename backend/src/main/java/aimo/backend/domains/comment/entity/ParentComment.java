@@ -5,7 +5,7 @@ import static lombok.AccessLevel.*;
 import java.util.List;
 
 import aimo.backend.common.entity.BaseEntity;
-import aimo.backend.domains.comment.costants.CommentConstants;
+import aimo.backend.domains.comment.model.CommentConstants;
 import aimo.backend.domains.like.entity.ParentCommentLike;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.post.entity.Post;
@@ -45,11 +45,11 @@ public class ParentComment extends BaseEntity {
 	@Column(nullable = false)
 	private Boolean isDeleted;
 
-	@OneToMany(mappedBy = "parentComment", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "parentComment", fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.REMOVE)
 	private List<ParentCommentLike> parentCommentLikes;
 
-	public Integer getChildCommentsCount() {
-		return childComments.size();
+	public Integer getCommentsCount() {
+		return childComments.size() + 1;
 	}
 
 	public Integer getLikesCount() {

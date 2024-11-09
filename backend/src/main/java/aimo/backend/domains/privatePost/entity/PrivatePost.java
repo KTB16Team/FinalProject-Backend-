@@ -56,7 +56,7 @@ public class PrivatePost extends BaseEntity {
 	private AudioRecord audioRecord;
 
 	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "text_record_id", referencedColumnName = "text_record_id")
+	@JoinColumn(name = "text_record_id", referencedColumnName = "text_record_id", nullable = false)
 	private TextRecord textRecord;
 
 	@Enumerated(EnumType.STRING)

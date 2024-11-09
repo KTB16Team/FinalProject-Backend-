@@ -16,23 +16,23 @@ public class RefreshTokenService {
 
 	private final RefreshTokenRepository refreshTokenRepository;
 
-	public Optional<RefreshToken> findBy(Long memberId) {
-		return refreshTokenRepository.findBy(memberId);
+	public Optional<RefreshToken> findByAccessToken(String accessToken) {
+		return refreshTokenRepository.findByAccessToken(accessToken);
 	}
 
 	public void save(RefreshToken refreshToken) {
 		refreshTokenRepository.save(refreshToken);
 	}
 
-	public Optional<RefreshToken> findBy(String token) {
-		return refreshTokenRepository.findBy(token);
+	public Optional<RefreshToken> findByToken(String token) {
+		return refreshTokenRepository.findById(token);
 	}
 
-	public void deleteBy(Long memberId) {
-		refreshTokenRepository.deleteBy(memberId);
+	public void deleteByAccessToken(String accessToken) {
+		refreshTokenRepository.deleteByAccessToken(accessToken);
 	}
 
-	public boolean existsBy(Long memberId) {
-		return refreshTokenRepository.existsBy(memberId);
+	public boolean existsByAccessToken(String accessToken) {
+		return refreshTokenRepository.existsByAccessToken(accessToken);
 	}
 }

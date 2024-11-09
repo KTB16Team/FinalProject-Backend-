@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import aimo.backend.domains.member.dto.request.CreateProfileImageUrlRequest;
 import aimo.backend.domains.member.dto.request.DeleteMemberRequest;
 import aimo.backend.domains.member.dto.request.LogoutRequest;
 import aimo.backend.domains.member.dto.response.FindMyInfoResponse;
@@ -24,9 +25,8 @@ import aimo.backend.domains.auth.security.jwtFilter.JwtTokenProvider;
 import aimo.backend.domains.member.dto.request.UpdateNicknameRequest;
 import aimo.backend.domains.member.dto.request.UpdatePasswordRequest;
 import aimo.backend.infrastructure.s3.S3Service;
-import aimo.backend.infrastructure.s3.dto.request.CreatePresignedUrlRequest;
-import aimo.backend.infrastructure.s3.dto.response.CreatePresignedUrlResponse;
-import aimo.backend.infrastructure.s3.dto.request.SaveFileMetaDataRequest;
+import aimo.backend.infrastructure.s3.dto.CreatePresignedUrlResponse;
+import aimo.backend.infrastructure.s3.dto.SaveFileMetaDataRequest;
 
 import aimo.backend.domains.member.service.MemberService;
 import jakarta.mail.MessagingException;
@@ -62,18 +62,18 @@ public class MemberController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
 
-	@PostMapping
+	@DeleteMapping
 	public ResponseEntity<DataResponse<Void>> deleteMember(@RequestBody DeleteMemberRequest deleteMemberRequest) {
 		memberService.deleteMember(deleteMemberRequest);
 
-		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(DataResponse.noContent());
 	}
 
-	@GetMapping("/profile/presigned/{filename}")
+	@PostMapping("/profile/presigned")
 	public ResponseEntity<DataResponse<CreatePresignedUrlResponse>> createProfileImagePreSignedUrl(
-		@Valid @PathVariable("filename") CreatePresignedUrlRequest createPresignedUrlRequest) {
+		@RequestBody CreateProfileImageUrlRequest request) {
 		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(DataResponse.created(s3Service.createProfilePresignedUrl(createPresignedUrlRequest)));
+			.body(DataResponse.created(s3Service.createProfilePresignedUrl(request)));
 	}
 
 	@PostMapping("/profile/success")

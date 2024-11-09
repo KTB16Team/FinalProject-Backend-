@@ -6,8 +6,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 import aimo.backend.domains.comment.entity.ChildComment;
 import aimo.backend.domains.privatePost.entity.PrivatePost;
 import aimo.backend.domains.member.model.Gender;
@@ -70,11 +68,10 @@ public class Member extends BaseEntity {
 	private ProfileImage profileImage;
 
 	@Column(nullable = false, name = "birth_date")
-	@JsonFormat(pattern = "yyyy-MM-dd")
 	private LocalDate birthDate;
 
-	@OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true)
-	private List<PrivatePost> privatePosts = new ArrayList<>();
+	@OneToMany(mappedBy = "member")
+	private List<PrivatePost> privatePosts;
 
 	@OneToMany(mappedBy = "member")
 	private List<Post> posts = new ArrayList<>();

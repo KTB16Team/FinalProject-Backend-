@@ -23,6 +23,7 @@ public class JwtProperties {
 	@Getter
 	@Setter
 	public static class Access {
+
 		private int expiration;
 		private String header;
 	}
@@ -30,6 +31,7 @@ public class JwtProperties {
 	@Getter
 	@Setter
 	public static class Refresh {
+
 		private int expiration;
 		private String header;
 	}

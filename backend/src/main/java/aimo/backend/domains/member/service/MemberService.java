@@ -2,7 +2,6 @@ package aimo.backend.domains.member.service;
 
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.exception.ErrorCode;
-import aimo.backend.domains.auth.security.jwtFilter.JwtTokenProvider;
 import aimo.backend.domains.comment.entity.ChildComment;
 import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.member.dto.request.DeleteMemberRequest;
@@ -12,16 +11,16 @@ import aimo.backend.domains.member.dto.request.SendTemporaryPasswordRequest;
 import aimo.backend.domains.member.dto.request.SignUpRequest;
 import aimo.backend.domains.member.dto.request.UpdateNicknameRequest;
 import aimo.backend.domains.member.dto.request.UpdatePasswordRequest;
-import aimo.backend.domains.member.entity.AccessToken;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.member.entity.ProfileImage;
+import aimo.backend.domains.member.entity.RefreshToken;
 import aimo.backend.common.mapper.MemberMapper;
 import aimo.backend.domains.member.repository.MemberRepository;
 import aimo.backend.domains.member.repository.ProfileImageRepository;
 import aimo.backend.domains.post.service.PostService;
 import aimo.backend.domains.privatePost.dto.request.CreateResourceUrlRequest;
 import aimo.backend.infrastructure.s3.S3Service;
-import aimo.backend.infrastructure.s3.dto.request.SaveFileMetaDataRequest;
+import aimo.backend.infrastructure.s3.dto.SaveFileMetaDataRequest;
 import aimo.backend.infrastructure.s3.model.PresignedUrlPrefix;
 import aimo.backend.infrastructure.smtp.MailService;
 import aimo.backend.util.memberLoader.MemberLoader;
@@ -43,7 +42,7 @@ import java.util.UUID;
 public class MemberService {
 
 	private final MemberRepository memberRepository;
-	private final JwtTokenProvider jwtTokenProvider;
+	private final RefreshTokenService refreshTokenService;
 	private final MemberMapper memberMapper;
 	private final PasswordEncoder passwordEncoder;
 	private final MemberLoader memberLoader;
@@ -73,8 +72,11 @@ public class MemberService {
 	//로그아웃
 	@Transactional(rollbackFor = ApiException.class)
 	public void logoutMember(LogoutRequest logOutRequest) {
+		// 회원의 refreshToken 만료 처리
 		String accessToken = logOutRequest.accessToken(), refreshToken = logOutRequest.refreshToken();
-		jwtTokenProvider.expireTokens(accessToken, refreshToken);
+		RefreshToken expiredToken = new RefreshToken(accessToken, refreshToken);
+		refreshTokenService.save(expiredToken);
+		log.info("Logout successful {}", refreshTokenService.existsByAccessToken(accessToken));
 	}
 
 	// 회원 삭제
@@ -143,7 +145,7 @@ public class MemberService {
 		return memberMapper.toFindMyInfoResponse(memberLoader.getMember());
 	}
 
-	public Member findBy(Long memberId) {
+	public Member findById(Long memberId) {
 		return memberRepository.findById(memberId).orElseThrow(() -> ApiException.from(ErrorCode.MEMBER_NOT_FOUND));
 	}
 
@@ -186,6 +188,8 @@ public class MemberService {
 			throw ApiException.from(ErrorCode.MEMBER_NAME_DUPLICATE);
 		}
 	}
+
+
 
 	@Transactional(rollbackFor = ApiException.class)
 	public void updateTemporaryPasswordAndSendMail(SendTemporaryPasswordRequest sendTemporaryPasswordRequest) throws

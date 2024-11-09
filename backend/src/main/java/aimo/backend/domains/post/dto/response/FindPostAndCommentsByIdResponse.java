@@ -3,10 +3,11 @@ package aimo.backend.domains.post.dto.response;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.member.entity.Member;
+import aimo.backend.domains.post.model.Side;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,7 +16,6 @@ import lombok.Data;
 @AllArgsConstructor
 public class FindPostAndCommentsByIdResponse {
 	private final Boolean isMine;
-	private final Long postId;
 	private final Boolean isLiked;
 	private final String side;
 	private final String title;
@@ -27,7 +27,6 @@ public class FindPostAndCommentsByIdResponse {
 	private final Integer votesCount;
 	private final Integer votesPlaintiff;
 	private final Integer votesDefendant;
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private final LocalDateTime createdAt;
 	private final List<ParentCommentDto> comments;
 
@@ -40,7 +39,6 @@ public class FindPostAndCommentsByIdResponse {
 		private final String content;
 		private final String nickname;
 		private final Integer likesCount;
-		@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 		private final LocalDateTime createdAt;
 		private final List<ChildCommentDto> childComments;
 
@@ -75,11 +73,10 @@ public class FindPostAndCommentsByIdResponse {
 	private static class ChildCommentDto {
 		private final Boolean isMine;
 		private final Boolean isLiked;
-		private final Long childCommentId;
+		private final Long childCommentDd;
 		private final String content;
 		private final String nickname;
 		private final Integer likesCount;
-		@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 		private final LocalDateTime createdAt;
 	}
 }

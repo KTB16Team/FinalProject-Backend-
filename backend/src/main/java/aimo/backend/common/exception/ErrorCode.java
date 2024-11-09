@@ -21,8 +21,8 @@ public enum ErrorCode {
 	INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 액세스 토큰입니다.", "AUTH-001"),
 	INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 리프레시 토큰입니다.", "AUTH-002"),
 	REISSUE_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "액세스 토큰 재발급이 필요합니다.", "AUTH-003"),
-	ACCESS_TOKEN_IS_NULL(HttpStatus.UNAUTHORIZED, "액세스 토큰이 비어있습니다.", "AUTH-004"),
-	EMAIL_AUTHENTICATION_FAIL(HttpStatus.BAD_REQUEST, "이메일 인증에 실패하였습니다.", "AUTH-005"),
+	EMAIL_AUTHENTICATION_FAIL(HttpStatus.BAD_REQUEST, "이메일 인증에 실패하였습니다.", "AUTH-004"),
+	UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "인증에 실패하였습니다.", "AUTH-005"),
 
 	//Member
 	INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호가 잘못 되었습니다.", "MEMBER-001"),

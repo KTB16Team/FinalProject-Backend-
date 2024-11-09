@@ -1,4 +1,4 @@
-package aimo.backend.domains.comment.costants;
+package aimo.backend.domains.comment.model;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

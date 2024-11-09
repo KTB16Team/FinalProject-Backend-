@@ -64,12 +64,6 @@ public class Post extends BaseEntity {
 	private String stanceDefendant;
 
 	@Column(nullable = false)
-	private Integer faultRatePlaintiff;
-
-	@Column(nullable = false)
-	private Integer faultRateDefendant;
-
-	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
 	private OriginType originType;
 
@@ -103,10 +97,10 @@ public class Post extends BaseEntity {
 	}
 
 	public Integer getCommentsCount() {
-		return parentComments.size() +
-			parentComments.stream()
-			.map(ParentComment::getChildCommentsCount)
-			.reduce(0, Integer::sum);
+		return parentComments
+			.stream()
+			.map(ParentComment::getCommentsCount)
+			.reduce(1, Integer::sum);
 	}
 
 	public void delete() {
@@ -122,15 +116,15 @@ public class Post extends BaseEntity {
 	public Integer getPlaintiffVotesCount() {
 		return votes.stream()
 			.filter(vote -> vote.getSide() == Side.PLAINTIFF)
-			.toList()
-			.size();
+			.mapToInt(vote -> 1)
+			.sum();
 	}
 
 	public Integer getDefendantVotesCount() {
 		return votes.stream()
 			.filter(vote -> vote.getSide() == Side.DEFENDANT)
-			.toList()
-			.size();
+			.mapToInt(vote -> 1)
+			.sum();
 	}
 
 	public Integer getVotesCount() {
@@ -146,8 +140,6 @@ public class Post extends BaseEntity {
 		String stancePlaintiff,
 		String stanceDefendant,
 		String judgement,
-		Integer faultRatePlaintiff,
-		Integer faultRateDefendant,
 		OriginType originType,
 		Category category) {
 
@@ -158,8 +150,6 @@ public class Post extends BaseEntity {
 		this.judgement = judgement;
 		this.stancePlaintiff = stancePlaintiff;
 		this.stanceDefendant = stanceDefendant;
-		this.faultRateDefendant = faultRateDefendant;
-		this.faultRatePlaintiff = faultRatePlaintiff;
 		this.originType = originType;
 		this.category = category;
 	}

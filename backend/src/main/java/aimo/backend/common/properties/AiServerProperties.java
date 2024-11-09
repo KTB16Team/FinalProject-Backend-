@@ -13,5 +13,4 @@ public class AiServerProperties {
 	private String domainUrl;
 	private String judgementApi;
 	private String speechToTextApi;
-	private int port;
 }

@@ -24,10 +24,8 @@ import aimo.backend.domains.privatePost.entity.PrivatePost;
 import aimo.backend.domains.privatePost.repository.PrivatePostRepository;
 import aimo.backend.util.memberLoader.MemberLoader;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class PrivatePostService {
@@ -40,22 +38,18 @@ public class PrivatePostService {
 	@Transactional(rollbackFor = ApiException.class)
 	public JudgementResponse serveScriptToAi(JudgementToAiRequest judgementToAiRequest) {
 		Member member = memberLoader.getMember();
-		String url = aiServerProperties.getDomainUrl() + aiServerProperties.getJudgementApi();
-		log.info("url: {}", url);
+
 		SummaryAndJudgementRequest summaryAndJudgementRequest = new SummaryAndJudgementRequest(
 			judgementToAiRequest.content(),
 			member.getNickname(),
-			member.getGender().getValue(),
+			member.getGender(),
 			member.getBirthDate());
 
-		log.info("summaryAndJudgementRequest: {}", summaryAndJudgementRequest);
-
 		return webClient.post()
-			.uri(url)
+			.uri(aiServerProperties.getDomainUrl() + aiServerProperties.getJudgementApi())
 			.bodyValue(summaryAndJudgementRequest)
 			.retrieve()
 			.onStatus(HttpStatusCode::is4xxClientError, clientResponse -> {
-				log.info("clientResponse: {}", clientResponse);
 				throw ApiException.from(ErrorCode.AI_BAD_GATEWAY);
 			})
 			.onStatus(HttpStatusCode::is5xxServerError, clientResponse -> {
@@ -72,8 +66,8 @@ public class PrivatePostService {
 					judgementFromAi.stancePlaintiff(),
 					judgementFromAi.stanceDefendant(),
 					judgementFromAi.judgement(),
-					100 - faultRatePlaintiff,
-					100 - faultRateDefendant,
+					faultRatePlaintiff,
+					faultRateDefendant,
 					judgementToAiRequest.originType());
 			})
 			.block();
@@ -81,11 +75,9 @@ public class PrivatePostService {
 
 	@Transactional(rollbackFor = ApiException.class)
 	public PrivatePost save(JudgementResponse judgementResponse) {
-		Member member = memberLoader.getMember();
+		PrivatePost privatePost = PrivatePostMapper.toEntity(judgementResponse);
 
-		PrivatePost privatePost = PrivatePostMapper.toEntity(judgementResponse, member);
-
-		if (!isValid(member.getId(), privatePost)) {
+		if (!isValid(memberLoader.getMember().getId(), privatePost)) {
 			throw ApiException.from(PRIVATE_POST_CREATE_UNAUTHORIZED);
 		}
 
@@ -107,7 +99,7 @@ public class PrivatePostService {
 		privatePostRepository.delete(privatePost);
 	}
 
-	public PrivatePostResponse findPrivatePostResponseBy(Long id) {
+	public PrivatePostResponse findPrivatePostBy(Long id) {
 		PrivatePost privatePost = privatePostRepository.findById(id)
 			.orElseThrow(() -> ApiException.from(ErrorCode.PRIVATE_POST_NOT_FOUND));
 
@@ -116,11 +108,6 @@ public class PrivatePostService {
 		}
 
 		return PrivatePostMapper.toResponse(privatePost);
-	}
-
-	public PrivatePost findPrivatePostBy(Long id){
-		return privatePostRepository.findById(id)
-			.orElseThrow(() -> ApiException.from(ErrorCode.PRIVATE_POST_NOT_FOUND));
 	}
 
 	public Page<PrivatePostPreviewResponse> findPrivatePostPreviewsBy(Pageable pageable) {
