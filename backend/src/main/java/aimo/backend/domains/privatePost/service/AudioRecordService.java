@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import aimo.backend.common.dto.DataResponse;
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.exception.ErrorCode;
 import aimo.backend.common.mapper.AudioRecordMapper;
@@ -17,9 +16,6 @@ import aimo.backend.domains.privatePost.dto.request.SpeechToTextRequest;
 import aimo.backend.domains.privatePost.dto.response.SpeechToTextResponse;
 import aimo.backend.domains.privatePost.entity.AudioRecord;
 import aimo.backend.domains.privatePost.repository.AudioRecordRepository;
-import aimo.backend.infrastructure.s3.S3Service;
-import aimo.backend.infrastructure.s3.dto.request.CreatePresignedUrlRequest;
-import aimo.backend.infrastructure.s3.dto.response.CreatePresignedUrlResponse;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -28,7 +24,6 @@ import lombok.RequiredArgsConstructor;
 public class AudioRecordService {
 
 	private final AudioRecordRepository audioRecordRepository;
-	private final S3Service s3Service;
 	private final WebClient webClient;
 	private final AiServerProperties aiServerProperties;
 
