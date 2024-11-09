@@ -10,7 +10,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import aimo.backend.common.dto.DataResponse;
 import aimo.backend.common.mapper.ChildCommentLikeMapper;
+import aimo.backend.common.mapper.ParentCommentLikeMapper;
 import aimo.backend.domains.like.dto.LikeChildCommentRequest;
+import aimo.backend.domains.like.dto.LikeParentCommentRequest;
 import aimo.backend.domains.like.model.LikeType;
 import aimo.backend.domains.like.service.ChildCommentLikeService;
 import aimo.backend.domains.like.service.ParentCommentLikeService;
@@ -54,8 +56,10 @@ public class LikeController {
 	public ResponseEntity<DataResponse<Void>> likeParentComment(
 		@PathVariable Long parentCommentId,
 		@RequestParam("likeType") LikeType likeType) {
-		Member member = memberLoader.getMember();
-		parentCommentLikeService.likeParentComment(member, parentCommentId, likeType);
+		Long memberId = memberLoader.getMemberId();
+		LikeParentCommentRequest likeParentCommentRequest = ParentCommentLikeMapper
+			.toLikeParentCommentRequest(memberId, parentCommentId, likeType);
+		parentCommentLikeService.likeParentComment(likeParentCommentRequest);
 
 		return ResponseEntity.ok(DataResponse.ok());
 	}

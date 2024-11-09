@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import aimo.backend.domains.member.dto.request.CreateProfileImageUrlRequest;
 import aimo.backend.domains.member.dto.request.DeleteMemberRequest;
 import aimo.backend.domains.member.dto.request.LogoutRequest;
 import aimo.backend.domains.member.dto.response.FindMyInfoResponse;
@@ -62,18 +61,17 @@ public class MemberController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
 
-	@DeleteMapping
+	@PostMapping
 	public ResponseEntity<DataResponse<Void>> deleteMember(@RequestBody DeleteMemberRequest deleteMemberRequest) {
 		memberService.deleteMember(deleteMemberRequest);
-
-		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(DataResponse.noContent());
+		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
 
-	@PostMapping("/profile/presigned")
+	@GetMapping("/profile/presigned/{filename}")
 	public ResponseEntity<DataResponse<CreatePresignedUrlResponse>> createProfileImagePreSignedUrl(
-		@RequestBody CreateProfileImageUrlRequest request) {
+		@Valid @PathVariable("filename") CreatePresignedUrlRequest createPresignedUrlRequest) {
 		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(DataResponse.created(s3Service.createProfilePresignedUrl(request)));
+			.body(DataResponse.created(s3Service.createProfilePresignedUrl(createPresignedUrlRequest)));
 	}
 
 	@PostMapping("/profile/success")
