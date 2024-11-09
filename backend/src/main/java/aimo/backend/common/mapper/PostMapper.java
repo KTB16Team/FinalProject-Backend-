@@ -2,34 +2,42 @@ package aimo.backend.common.mapper;
 
 import java.util.List;
 
+import aimo.backend.domains.comment.entity.ChildComment;
 import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.member.entity.Member;
+import aimo.backend.domains.post.dto.parameter.DeletePostParameter;
+import aimo.backend.domains.post.dto.parameter.FindPostAndCommentsByIdParameter;
+import aimo.backend.domains.post.dto.parameter.FindPostByPostTypeParameter;
+import aimo.backend.domains.post.dto.parameter.SavePostParameter;
+import aimo.backend.domains.post.dto.requset.FindCommentedPostsByIdRequest;
 import aimo.backend.domains.post.dto.requset.SavePostRequest;
+import aimo.backend.domains.post.dto.response.FindJudgementResponse;
 import aimo.backend.domains.post.dto.response.FindPostAndCommentsByIdResponse;
 import aimo.backend.domains.post.dto.response.FindPostAndCommentsByIdResponse.ParentCommentDto;
 import aimo.backend.domains.post.dto.response.FindPostsByPostTypeResponse;
+import aimo.backend.domains.post.dto.response.SavePostResponse;
 import aimo.backend.domains.post.entity.Post;
+import aimo.backend.domains.post.model.PostType;
 import aimo.backend.domains.vote.model.Side;
-
 
 public class PostMapper {
 
 	private final static int PREVIEW_CONTENT_LENGTH = 90;
 
-	public static Post toEntity(SavePostRequest request, Member member) {
+	public static Post toEntity(SavePostParameter parameter, Member member) {
 		return Post
 			.builder()
 			.member(member)
-			.title(request.title())
-			.summaryAi(request.summaryAi())
-			.judgement(request.judgement())
-			.stancePlaintiff(request.stancePlaintiff())
-			.stanceDefendant(request.stanceDefendant())
-			.faultRatePlaintiff(request.faultRatePlaintiff())
-			.faultRateDefendant(request.faultRateDefendant())
-			.privatePostId(request.privatePostId())
-			.originType(request.originType())
-			.category(request.category())
+			.title(parameter.title())
+			.summaryAi(parameter.summaryAi())
+			.judgement(parameter.judgement())
+			.stancePlaintiff(parameter.stancePlaintiff())
+			.stanceDefendant(parameter.stanceDefendant())
+			.faultRatePlaintiff(parameter.faultRatePlaintiff())
+			.faultRateDefendant(parameter.faultRateDefendant())
+			.privatePostId(parameter.privatePostId())
+			.originType(parameter.originType())
+			.category(parameter.category())
 			.build();
 	}
 
@@ -149,8 +157,7 @@ public class PostMapper {
 	public static FindPostAndCommentsByIdResponse toFindPostAndCommentsByIdResponse(
 		Member member,
 		Post post,
-		List<ParentComment> parentComments
-	) {
+		List<ParentComment> parentComments) {
 		return new FindPostAndCommentsByIdResponse(
 			post.getMember() == member,
 			post.getId(),
@@ -175,5 +182,37 @@ public class PostMapper {
 				.map(parentComment -> ParentCommentDto.of(member, parentComment))
 				.toList()
 		);
+	}
+
+	public static SavePostParameter toSavePostParameter(SavePostRequest request, Long memberId) {
+		return new SavePostParameter(
+			memberId,
+			request.privatePostId(),
+			request.title(),
+			request.stancePlaintiff(),
+			request.stanceDefendant(),
+			request.summaryAi(),
+			request.judgement(),
+			request.faultRateDefendant(),
+			request.faultRatePlaintiff(),
+			request.originType(),
+			request.category()
+		);
+	}
+
+	public static SavePostResponse toSavePostResponse(Long postId) {
+		return new SavePostResponse(postId);
+	}
+
+	public static FindPostAndCommentsByIdParameter toFindPostAndCommentsByIdParameter(Long memberId, Long postId) {
+		return new FindPostAndCommentsByIdParameter(memberId, postId);
+	}
+
+	public static FindPostByPostTypeParameter toFindPostByPostTypeParameter(Long memberId, PostType postType, Integer page, Integer size) {
+		return new FindPostByPostTypeParameter(memberId, postType, page, size);
+	}
+
+	public static DeletePostParameter toDeletePostParameter(Long memberId, Long postId) {
+		return new DeletePostParameter(memberId, postId);
 	}
 }

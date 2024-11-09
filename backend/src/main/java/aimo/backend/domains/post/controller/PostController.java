@@ -13,47 +13,74 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import aimo.backend.common.dto.DataResponse;
-import aimo.backend.domains.like.service.PostLikeService;
+import aimo.backend.common.mapper.PostMapper;
+import aimo.backend.domains.post.dto.parameter.DeletePostParameter;
+import aimo.backend.domains.post.dto.parameter.FindPostAndCommentsByIdParameter;
+import aimo.backend.domains.post.dto.parameter.FindPostByPostTypeParameter;
+import aimo.backend.domains.post.dto.parameter.SavePostParameter;
+import aimo.backend.domains.post.dto.requset.DeletePostRequest;
+import aimo.backend.domains.post.dto.requset.FindJudgementRequest;
+import aimo.backend.domains.post.dto.requset.FindPostAndCommentsRequest;
 import aimo.backend.domains.post.dto.requset.SavePostRequest;
+import aimo.backend.domains.post.dto.response.FindJudgementResponse;
 import aimo.backend.domains.post.dto.response.FindPostAndCommentsByIdResponse;
 import aimo.backend.domains.post.dto.response.FindPostsByPostTypeResponse;
+import aimo.backend.domains.post.dto.response.SavePostResponse;
 import aimo.backend.domains.post.model.PostType;
 import aimo.backend.domains.post.service.PostService;
-import aimo.backend.domains.view.service.PostViewService;
+import aimo.backend.util.memberLoader.MemberLoader;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/posts")
 @RequiredArgsConstructor
 public class PostController {
 
 	private final PostService postService;
-	private final PostViewService postViewService;
+	private final MemberLoader memberLoader;
 
 	@PostMapping
-	public ResponseEntity<DataResponse<Void>> savePost(@RequestBody @Valid SavePostRequest request) {
-		postService.save(request);
-		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
+	public ResponseEntity<DataResponse<SavePostResponse>> savePost(@RequestBody @Valid SavePostRequest request) {
+		Long memberId = memberLoader.getMemberId();
+		SavePostParameter parameter = PostMapper.toSavePostParameter(request, memberId);
+		Long postId = postService.save(parameter);
+		return ResponseEntity.status(HttpStatus.CREATED)
+			.body(DataResponse.created(PostMapper.toSavePostResponse(postId)));
 	}
 
 	@GetMapping
 	public ResponseEntity<DataResponse<Page<FindPostsByPostTypeResponse>>> findPostsByPostType(
-		@RequestParam("type") @NotNull PostType postType, @RequestParam("page") @NotNull Integer page,
+		@RequestParam("type") @NotNull PostType postType,
+		@RequestParam("page") @NotNull Integer page,
 		@RequestParam("size") @NotNull Integer size) {
-		return ResponseEntity.ok(DataResponse.from(postService.findPostDtosByPostType(postType, page, size)));
+		Long memberId = memberLoader.getMemberId();
+		FindPostByPostTypeParameter parameter = PostMapper.toFindPostByPostTypeParameter(memberId, postType, page, size);
+		return ResponseEntity.ok(DataResponse.from(postService.findPostDtosByPostType(parameter)));
 	}
 
 	@GetMapping("/{postId}")
 	public ResponseEntity<DataResponse<FindPostAndCommentsByIdResponse>> findPostAndComments(
-		@PathVariable Long postId) {
-		return ResponseEntity.ok(DataResponse.from(postService.findPostAndCommentsDtoById(postId)));
+		@PathVariable("postId") FindPostAndCommentsRequest request) {
+		Long memberId = memberLoader.getMemberId();
+		FindPostAndCommentsByIdParameter parameter = PostMapper.toFindPostAndCommentsByIdParameter(memberId, request.postId());
+		return ResponseEntity.ok(DataResponse.from(postService.findPostAndCommentsDtoById(parameter)));
+	}
+
+	@GetMapping("/{postId}/judgement")
+	public ResponseEntity<DataResponse<FindJudgementResponse>> findJudgement(
+		@PathVariable("postId") FindJudgementRequest request) {
+		return ResponseEntity.ok(DataResponse.from(postService.findJudgementBy(request.postId())));
 	}
 
 	@DeleteMapping("/{postId}")
-	public ResponseEntity<DataResponse<Void>> deletePost(@PathVariable Long postId) {
-		postService.deletePostBy(postId);
+	public ResponseEntity<DataResponse<Void>> deletePost(@PathVariable("postId") DeletePostRequest request) {
+		Long memberId = memberLoader.getMemberId();
+		DeletePostParameter parameter = PostMapper.toDeletePostParameter(memberId, request.postId());
+		postService.deletePostBy(parameter);
 		return ResponseEntity.ok(DataResponse.noContent());
 	}
 }

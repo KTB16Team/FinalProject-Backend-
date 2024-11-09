@@ -21,22 +21,24 @@ import aimo.backend.common.dto.DataResponse;
 
 import aimo.backend.domains.privatePost.dto.request.ChatRecordRequest;
 import aimo.backend.domains.privatePost.dto.request.JudgementToAiRequest;
-import aimo.backend.domains.privatePost.dto.request.SummaryAndJudgementRequest;
 import aimo.backend.domains.privatePost.dto.response.JudgementResponse;
 import aimo.backend.domains.privatePost.dto.response.PrivatePostPreviewResponse;
 import aimo.backend.domains.privatePost.dto.response.PrivatePostResponse;
 import aimo.backend.domains.privatePost.dto.request.SaveAudioSuccessRequest;
 import aimo.backend.domains.privatePost.dto.response.SaveAudioSuccessResponse;
-import aimo.backend.domains.privatePost.dto.request.SpeachToTextRequest;
-import aimo.backend.domains.privatePost.dto.response.SpeachToTextResponse;
+import aimo.backend.domains.privatePost.dto.request.SpeechToTextRequest;
+import aimo.backend.domains.privatePost.dto.response.SavePrivatePostResponse;
+import aimo.backend.domains.privatePost.dto.response.SpeechToTextResponse;
 
 import aimo.backend.domains.privatePost.dto.request.TextRecordRequest;
+import aimo.backend.domains.privatePost.entity.PrivatePost;
 import aimo.backend.domains.privatePost.service.AudioRecordService;
 import aimo.backend.domains.privatePost.service.ChatRecordService;
 import aimo.backend.domains.privatePost.service.PrivatePostService;
 
-import aimo.backend.infrastructure.s3.dto.CreatePresignedUrlRequest;
-import aimo.backend.infrastructure.s3.dto.CreatePresignedUrlResponse;
+import aimo.backend.infrastructure.s3.S3Service;
+import aimo.backend.infrastructure.s3.dto.request.CreatePresignedUrlRequest;
+import aimo.backend.infrastructure.s3.dto.response.CreatePresignedUrlResponse;
 import jakarta.validation.Valid;
 
 import aimo.backend.domains.privatePost.service.TextRecordService;
@@ -53,16 +55,15 @@ public class PrivatePostController {
 	private final PrivatePostService privatePostService;
 	private final TextRecordService textRecordService;
 	private final ChatRecordService chatRecordService;
+	private final S3Service s3Service;
 
 	// 판결
 	@PostMapping("/judgement")
-	public ResponseEntity<DataResponse<Void>> summaryAndJudgment(@Valid @RequestBody JudgementToAiRequest judgementToAiRequest) {
-
+	public ResponseEntity<DataResponse<SavePrivatePostResponse>> summaryAndJudgment(@Valid @RequestBody JudgementToAiRequest judgementToAiRequest) {
 		JudgementResponse judgementResponse = privatePostService.serveScriptToAi(judgementToAiRequest);
-
-		privatePostService.save(judgementResponse);
-
-		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
+		Long privatePostId = privatePostService.save(judgementResponse);
+		return ResponseEntity.status(HttpStatus.CREATED)
+			.body(DataResponse.created(new SavePrivatePostResponse(privatePostId)));
 	}
 
 	// 대화록 업로드
@@ -76,22 +77,22 @@ public class PrivatePostController {
 	@PostMapping("/chat")
 	public ResponseEntity<DataResponse<Void>> uploadChatRecord(
 		@Valid @RequestParam("chat_record") ChatRecordRequest chatRecordRequest) throws IOException {
-
 		chatRecordService.save(chatRecordRequest);
 		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
 
 	@PostMapping("/speech-to-text")
-	public ResponseEntity<DataResponse<SpeachToTextResponse>> speechToText(
-		@Valid @RequestBody SpeachToTextRequest speachToTextRequest) {
-		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created(audioRecordService.speachToText(speachToTextRequest)));
+	public ResponseEntity<DataResponse<SpeechToTextResponse>> speechToText(
+		@Valid @RequestBody SpeechToTextRequest speechToTextRequest) {
+		return ResponseEntity.status(HttpStatus.CREATED)
+			.body(DataResponse.created(audioRecordService.speechToText(speechToTextRequest)));
 	}
 
-	@GetMapping("/audio/presigned")
+	@GetMapping("/audio/presigned/{filename}")
 	public ResponseEntity<DataResponse<CreatePresignedUrlResponse>> getPresignedUrlTo(
-		@Valid @RequestBody CreatePresignedUrlRequest createPresignedUrlRequest) {
+		@Valid @PathVariable("filename") CreatePresignedUrlRequest createPresignedUrlRequest) {
 		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(DataResponse.created(audioRecordService.createPresignedUrl(createPresignedUrlRequest)));
+			.body(DataResponse.created(s3Service.createAudioPreSignedUrl(createPresignedUrlRequest)));
 	}
 
 	@PostMapping("/audio/success")
@@ -105,7 +106,7 @@ public class PrivatePostController {
 	public ResponseEntity<DataResponse<PrivatePostResponse>> findPrivatePost(
 		@Valid @PathVariable Long privatePostId) {
 		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(DataResponse.from(privatePostService.findPrivatePostBy(privatePostId)));
+			.body(DataResponse.from(privatePostService.findPrivatePostResponseBy(privatePostId)));
 	}
 
 	@GetMapping
@@ -113,7 +114,6 @@ public class PrivatePostController {
 		@Valid @RequestParam(defaultValue = "0")  Integer page,
 		@Valid @RequestParam(defaultValue = "10") Integer size) {
 		Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(DataResponse.from(privatePostService.findPrivatePostPreviewsBy(pageable)));
 	}

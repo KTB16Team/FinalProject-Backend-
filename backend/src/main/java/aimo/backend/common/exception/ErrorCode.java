@@ -59,6 +59,7 @@ public enum ErrorCode {
 	POST_CREATE_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "게시글 작성 권한이 없습니다.", "POST-009"),
 	POST_VOTE_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "게시글 투표 권한이 없습니다.", "POST-010"),
 	POST_LIKE_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "게시글 좋아요 권한이 없습니다.", "POST-011"),
+	POST_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당하는 게시글 타입을 찾을 수 없습니다.", "POST-012"),
 
 	//ParentComment
 	PARENT_COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당하는 부모 댓글을 찾을 수 없습니다.", "PARENT_COMMENT-001"),

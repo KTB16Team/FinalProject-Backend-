@@ -29,7 +29,6 @@ public class VoteController {
 		SaveVotePostRequest saveVotePostRequest = new SaveVotePostRequest(postId, memberId, side);
 
 		voteService.votePost(saveVotePostRequest);
-
 		return ResponseEntity.ok(DataResponse.noContent());
 	}
 }

@@ -1,5 +1,6 @@
 package aimo.backend.domains.view.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,10 +21,11 @@ public class ViewController {
 
 	@PostMapping("/{postId}/views")
 	public ResponseEntity<DataResponse<Void>> increasePostView(
-		@PathVariable("postId") IncreasePostViewRequest increasePostViewRequest
-	) {
+		@PathVariable("postId") IncreasePostViewRequest increasePostViewRequest) {
 		postViewService.increasePostViewBy(increasePostViewRequest);
-		return ResponseEntity.ok(DataResponse.created());
+		return ResponseEntity
+			.status(HttpStatus.CREATED)
+			.body(DataResponse.created());
 	}
 
 }
