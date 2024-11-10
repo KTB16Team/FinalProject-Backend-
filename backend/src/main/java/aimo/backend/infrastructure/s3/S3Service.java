@@ -10,7 +10,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 
 import aimo.backend.common.properties.S3Properties;
-import aimo.backend.infrastructure.s3.dto.request.CreateResourceUrlParameter;
+import aimo.backend.infrastructure.s3.dto.parameter.CreateResourceUrlParameter;
 import aimo.backend.infrastructure.s3.dto.request.CreatePresignedUrlRequest;
 import aimo.backend.infrastructure.s3.dto.response.CreatePresignedUrlResponse;
 import aimo.backend.infrastructure.s3.model.PresignedUrlPrefix;

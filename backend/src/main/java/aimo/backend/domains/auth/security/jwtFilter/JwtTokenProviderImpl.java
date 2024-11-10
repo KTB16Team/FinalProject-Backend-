@@ -95,7 +95,7 @@ public class JwtTokenProviderImpl implements JwtTokenProvider {
 
 	@Override
 	@Transactional
-	public void expireTokens(String accessToken, String refreshToken) {
+	public void expireTokens(String accessToken) {
 		// accessToken을 Black List에 저장
 		Long memberId = extractMemberId(accessToken)
 			.orElseThrow(() -> ApiException.from(INVALID_ACCESS_TOKEN));
@@ -210,13 +210,8 @@ public class JwtTokenProviderImpl implements JwtTokenProvider {
 		String newAccessToken = createAccessToken(memberId);
 		String newRefreshToken = createRefreshToken(memberId);
 
-		expireTokens(accessToken, refreshToken);
+		expireTokens(accessToken);
 		sendAccessAndRefreshToken(response, newAccessToken, newRefreshToken);
-	}
-
-	@Override
-	public boolean isAccessTokenValid(String accessToken) {
-		return !accessTokenService.isBlackListed(accessToken);
 	}
 
 	@Override

@@ -50,8 +50,9 @@ public class PrivatePostMapper {
 
 	public static PrivatePostResponse toResponse(PrivatePost privatePost) {
 		return new PrivatePostResponse(privatePost.getId(), privatePost.getTitle(), privatePost.getSummaryAi(),
-			privatePost.getStancePlaintiff(), privatePost.getStanceDefendant(), privatePost.getJudgement(),
-			privatePost.getFaultRatePlaintiff(), privatePost.getFaultRateDefendant(), privatePost.getPublished());
+			privatePost.getStancePlaintiff(), privatePost.getStanceDefendant(),
+			privatePost.getFaultRatePlaintiff(), privatePost.getFaultRateDefendant(),
+			privatePost.getJudgement(), privatePost.getPublished());
 	}
 
 	public static SummaryAndJudgementRequest toSummaryAndJudgementRequest(

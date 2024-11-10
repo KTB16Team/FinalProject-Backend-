@@ -5,7 +5,7 @@ import aimo.backend.domains.member.dto.parameter.DeleteProfileImageParameter;
 import aimo.backend.domains.member.dto.parameter.SaveFileMetaDataParameter;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.member.entity.ProfileImage;
-import aimo.backend.infrastructure.s3.dto.request.CreateResourceUrlParameter;
+import aimo.backend.infrastructure.s3.dto.parameter.CreateResourceUrlParameter;
 import aimo.backend.infrastructure.s3.dto.request.SaveFileMetaDataRequest;
 import aimo.backend.infrastructure.s3.model.PresignedUrlPrefix;
 

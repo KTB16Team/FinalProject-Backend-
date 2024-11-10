@@ -21,6 +21,10 @@ public record SavePostRequest(
 	String summaryAi,
 	@NotBlank(message = "judgement이 null이거나 빈 문자열입니다.")
 	String judgement,
+	@NotNull(message = "원고 측 과실비율이 누락됐습니다.")
+	Integer faultRatePlaintiff,
+	@NotNull(message = "피고 측 과실비율이 누락됐습니다.")
+	Integer faultRateDefendant,
 	@NotNull(message = "originType이 null입니다.")
 	OriginType originType,
 	@JsonSetter(nulls = Nulls.SKIP)

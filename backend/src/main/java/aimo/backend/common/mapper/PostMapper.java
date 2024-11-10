@@ -114,7 +114,7 @@ public class PostMapper {
 
 	public static FindPostsByPostTypeResponse toFindPostsByPostTypeResponse(FindCommentedPostsByIdRequest findCommentedPostsByIdRequest){
 		return new FindPostsByPostTypeResponse(
-			findCommentedPostsByIdRequest.id(),
+			findCommentedPostsByIdRequest.postId(),
 			findCommentedPostsByIdRequest.title(),
 			findCommentedPostsByIdRequest.contentPreview(),
 			findCommentedPostsByIdRequest.likesCount(),
@@ -132,7 +132,6 @@ public class PostMapper {
 		List<ParentComment> parentComments) {
 		return new FindPostAndCommentsByIdResponse(
 			post.getMember() == member,
-			post.getId(),
 			post.getPostLikes().stream()
 				.anyMatch(postLike -> postLike.getMember() == member),
 			post.getVotes().stream()

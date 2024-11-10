@@ -23,13 +23,13 @@ import aimo.backend.domains.member.entity.ProfileImage;
 import aimo.backend.common.mapper.MemberMapper;
 import aimo.backend.domains.member.repository.MemberRepository;
 import aimo.backend.domains.member.repository.ProfileImageRepository;
-import aimo.backend.domains.post.dto.SoftDeletePostParameter;
+import aimo.backend.domains.post.dto.parameter.SoftDeletePostParameter;
 import aimo.backend.domains.post.service.PostService;
-import aimo.backend.infrastructure.s3.dto.request.CreateResourceUrlParameter;
+import aimo.backend.infrastructure.s3.dto.parameter.CreateResourceUrlParameter;
 import aimo.backend.infrastructure.s3.S3Service;
 import aimo.backend.infrastructure.s3.model.PresignedUrlPrefix;
 import aimo.backend.infrastructure.smtp.MailService;
-import aimo.backend.common.util.memberLoader.MemberLoader;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -76,8 +76,8 @@ public class MemberService {
 	//로그아웃
 	@Transactional(rollbackFor = ApiException.class)
 	public void logoutMember(LogoutRequest logOutRequest) {
-		String accessToken = logOutRequest.accessToken(), refreshToken = logOutRequest.refreshToken();
-		jwtTokenProvider.expireTokens(accessToken, refreshToken);
+		String accessToken = logOutRequest.accessToken();
+		jwtTokenProvider.expireTokens(accessToken);
 	}
 
 	// 회원 삭제
@@ -183,7 +183,7 @@ public class MemberService {
 
 	@Transactional(rollbackFor = ApiException.class)
 	public void updateTemporaryPasswordAndSendMail(
-		SendTemporaryPasswordRequest sendTemporaryPasswordRequest) {
+		SendTemporaryPasswordRequest sendTemporaryPasswordRequest) throws MessagingException {
 		String temporaryPassword = UUID.randomUUID().toString().substring(0, 8);
 
 		Member member = memberRepository.findByEmail(sendTemporaryPasswordRequest.email())

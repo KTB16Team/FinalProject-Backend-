@@ -7,12 +7,5 @@ import java.util.Optional;
 
 import aimo.backend.domains.member.entity.RefreshToken;
 
-@Repository
-public interface RefreshTokenRepository extends CrudRepository<RefreshToken, String> {
-
-	Optional<RefreshToken> findByAccessToken(String accessToken);
-
-	boolean existsByAccessToken(String accessToken);
-
-	void deleteByAccessToken(String accessToken);
+public interface RefreshTokenRepository extends CrudRepository<RefreshToken, Long> {
 }

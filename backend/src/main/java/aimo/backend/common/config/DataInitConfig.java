@@ -105,7 +105,7 @@ public class DataInitConfig {
 			Member member = members.get(i % 3);
 			PrivatePost privatePost = privatePosts.get(i - 1);
 			Post post = new Post(privatePost.getId(), member, "Public Post Title " + i, "Summary AI " + i,
-				"Plaintiff Stance " + i, "Defendant Stance " + i, "Judgement " + i, OriginType.TEXT, Category.COMMON);
+				"Plaintiff Stance " + i, "Defendant Stance " + i, privatePost.getFaultRatePlaintiff(), privatePost.getFaultRateDefendant(), "Judgement " + i, OriginType.TEXT, Category.COMMON);
 			posts.add(postRepo.save(post));
 		}
 

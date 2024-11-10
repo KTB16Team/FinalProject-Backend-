@@ -1,4 +1,4 @@
-package aimo.backend.infrastructure.s3.dto.request;
+package aimo.backend.infrastructure.s3.dto.parameter;
 
 public record CreateResourceUrlParameter(
 	String prefix,

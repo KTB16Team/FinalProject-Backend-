@@ -1,4 +1,4 @@
-package aimo.backend.infrastructure.s3.dto;
+package aimo.backend.infrastructure.s3.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 

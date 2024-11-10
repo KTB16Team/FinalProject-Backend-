@@ -1,6 +1,4 @@
-package aimo.backend.infrastructure.s3.dto;
-
-import jakarta.validation.constraints.NotNull;
+package aimo.backend.infrastructure.s3.dto.parameter;
 
 public record SaveProfileImageMetaDataParameter(
 	Long memberId,

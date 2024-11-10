@@ -56,29 +56,38 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		//4. access토큰이 존재하며, accesToken이 유효하지 않으면 에러 리턴
 		//5. 그 외 모든 경우는 에러 리턴
 
-		if (refreshToken != null && jwtTokenProvider.isTokenValid(refreshToken) && request.getRequestURI()
-			.matches("^\\/reissue$")) {
+		if (refreshToken != null && jwtTokenProvider.isTokenValid(refreshToken)) {
 			log.info("refresh토큰 인증 성공");
 			jwtTokenProvider.checkRefreshTokenAndReIssueAccessAndRefreshToken(response, accessToken, refreshToken);
-		} else if (refreshToken != null && !jwtTokenProvider.isTokenValid(refreshToken)) {
+		}
+
+		if (refreshToken != null && !jwtTokenProvider.isTokenValid(refreshToken)) {
 			log.info("refresh토큰 인증 실패");
 			throw ApiException.from(INVALID_REFRESH_TOKEN);
-		} else if (accessToken != null && !jwtTokenProvider.isRefreshTokenValid(accessToken)) {
+		}
+
+		if (accessToken == null) throw ApiException.from(ACCESS_TOKEN_IS_NULL);
+
+		if (jwtTokenProvider.isLogout(accessToken)) {
 			log.info("access토큰 만료(BlackList)");
-			throw ApiException.from(INVALID_REFRESH_TOKEN);
-		} else if (accessToken != null && jwtTokenProvider.isTokenValid(accessToken)) {
+			throw ApiException.from(INVALID_ACCESS_TOKEN);
+		}
+
+		if (jwtTokenProvider.isTokenValid(accessToken)) {
 			checkLogoutToken(accessToken);
-			log.info("access토큰 인증 성공");
+			log.info("access 토큰 인증 성공");
 			Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
 			saveAuthentication(authentication);
 			filterChain.doFilter(request, response);
-		} else if (accessToken != null && !jwtTokenProvider.isTokenValid(accessToken)) {
-			log.info("access토큰 인증 실패");
-			throw ApiException.from(REISSUE_ACCESS_TOKEN);
-		} else {
-			log.info("인증 실패");
-			throw ApiException.from(ErrorCode.UNAUTHORIZED);
 		}
+
+		if (!jwtTokenProvider.isTokenValid(accessToken)) {
+			log.info("access 토큰 만료");
+			throw ApiException.from(REISSUE_ACCESS_TOKEN);
+		}
+
+		log.info("인증 실패");
+		throw ApiException.from(ErrorCode.UNAUTHORIZED);
 	}
 
 	// contextHolder에 인증정보 저장
