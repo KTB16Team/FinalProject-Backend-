@@ -66,12 +66,11 @@ public class JwtTokenProviderImpl implements JwtTokenProvider {
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> ApiException.from(MEMBER_NOT_FOUND));
 
-		String email = member.getEmail();
 		String pw = member.getPassword();
 
 		List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(member.getRole().getValue()));
 
-		return UsernamePasswordAuthenticationToken.authenticated(email, pw, authorities);
+		return UsernamePasswordAuthenticationToken.authenticated(memberId, pw, authorities);
 	}
 
 	@Override
@@ -198,8 +197,7 @@ public class JwtTokenProviderImpl implements JwtTokenProvider {
 	public void checkRefreshTokenAndReIssueAccessAndRefreshToken(
 		HttpServletResponse response,
 		String accessToken,
-		String refreshToken
-	) {
+		String refreshToken) {
 		//refreshToken이 유효한지 확인
 
 		Long memberId = extractMemberId(refreshToken)

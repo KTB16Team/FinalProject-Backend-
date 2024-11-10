@@ -7,12 +7,11 @@ import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.mapper.ParentCommentLikeMapper;
 import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.comment.service.ParentCommentService;
-import aimo.backend.domains.like.dto.LikeParentCommentRequest;
-import aimo.backend.domains.like.entity.ParentCommentLike;
+import aimo.backend.domains.like.dto.parameter.LikeParentCommentParameter;
 import aimo.backend.domains.like.model.LikeType;
 import aimo.backend.domains.like.repository.ParentCommentLikeRepository;
 import aimo.backend.domains.member.entity.Member;
-import aimo.backend.domains.member.service.MemberService;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -20,16 +19,16 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class ParentCommentLikeService {
 
-	private final MemberService memberService;
 	private final ParentCommentLikeRepository parentCommentLikeRepository;
 	private final ParentCommentService parentCommentService;
+	private final EntityManager em;
 
 	@Transactional(rollbackFor = ApiException.class)
-	public void likeParentComment(LikeParentCommentRequest likeParentCommentRequest) {
-		Long memberId = likeParentCommentRequest.memberId();
-		Long parentCommentId = likeParentCommentRequest.parentCommentId();
-		LikeType likeType = likeParentCommentRequest.likeType();
-		Member member = memberService.findBy(memberId);
+	public void likeParentComment(LikeParentCommentParameter parameter) {
+		Long memberId = parameter.memberId();
+		Long parentCommentId = parameter.parentCommentId();
+		LikeType likeType = parameter.likeType();
+		Member member = em.getReference(Member.class, memberId);
 		ParentComment parentComment = parentCommentService.findById(parentCommentId);
 
 		if (likeType == LikeType.LIKE) {

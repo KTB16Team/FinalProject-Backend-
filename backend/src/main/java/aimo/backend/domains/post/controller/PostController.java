@@ -45,8 +45,7 @@ public class PostController {
 
 	@PostMapping
 	public ResponseEntity<DataResponse<SavePostResponse>> savePost(@RequestBody @Valid SavePostRequest request) {
-		Long memberId = memberLoader.getMemberId();
-		SavePostParameter parameter = PostMapper.toSavePostParameter(request, memberId);
+		SavePostParameter parameter = PostMapper.toSavePostParameter(request);
 		Long postId = postService.save(parameter);
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(DataResponse.created(PostMapper.toSavePostResponse(postId)));
@@ -57,16 +56,14 @@ public class PostController {
 		@RequestParam("type") @NotNull PostType postType,
 		@RequestParam("page") @NotNull Integer page,
 		@RequestParam("size") @NotNull Integer size) {
-		Long memberId = memberLoader.getMemberId();
-		FindPostByPostTypeParameter parameter = PostMapper.toFindPostByPostTypeParameter(memberId, postType, page, size);
+		FindPostByPostTypeParameter parameter = PostMapper.toFindPostByPostTypeParameter(postType, page, size);
 		return ResponseEntity.ok(DataResponse.from(postService.findPostDtosByPostType(parameter)));
 	}
 
 	@GetMapping("/{postId}")
 	public ResponseEntity<DataResponse<FindPostAndCommentsByIdResponse>> findPostAndComments(
 		@PathVariable("postId") FindPostAndCommentsRequest request) {
-		Long memberId = memberLoader.getMemberId();
-		FindPostAndCommentsByIdParameter parameter = PostMapper.toFindPostAndCommentsByIdParameter(memberId, request.postId());
+		FindPostAndCommentsByIdParameter parameter = PostMapper.toFindPostAndCommentsByIdParameter(request.postId());
 		return ResponseEntity.ok(DataResponse.from(postService.findPostAndCommentsDtoById(parameter)));
 	}
 
@@ -78,8 +75,7 @@ public class PostController {
 
 	@DeleteMapping("/{postId}")
 	public ResponseEntity<DataResponse<Void>> deletePost(@PathVariable("postId") DeletePostRequest request) {
-		Long memberId = memberLoader.getMemberId();
-		DeletePostParameter parameter = PostMapper.toDeletePostParameter(memberId, request.postId());
+		DeletePostParameter parameter = PostMapper.toDeletePostParameter(request.postId());
 		postService.deletePostBy(parameter);
 		return ResponseEntity.ok(DataResponse.noContent());
 	}

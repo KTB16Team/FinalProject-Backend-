@@ -1,4 +1,4 @@
-package aimo.backend.common.swagger;
+package aimo.backend.common.config;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -16,7 +16,6 @@ public class SwaggerConfig {
 
 	@Bean
 	public OpenAPI openAPI() {
-
 		SecurityScheme securityScheme = new SecurityScheme()
 			.type(SecurityScheme.Type.HTTP).scheme("bearer").bearerFormat("JWT")
 			.in(SecurityScheme.In.HEADER).name("Authorization");

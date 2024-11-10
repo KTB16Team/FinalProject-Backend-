@@ -2,6 +2,7 @@ package aimo.backend.common.mapper;
 
 import org.springframework.stereotype.Component;
 
+import aimo.backend.common.util.memberLoader.MemberLoader;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.post.entity.Post;
 import aimo.backend.domains.vote.dto.SaveVotePostParameter;
@@ -19,7 +20,8 @@ public class VoteMapper {
 			.build();
 	}
 
-	public static SaveVotePostParameter toSavePostParameter(Long memberId, Long postId, Side side) {
+	public static SaveVotePostParameter toSavePostParameter(Long postId, Side side) {
+		Long memberId = MemberLoader.getMemberId();
 		return new SaveVotePostParameter(memberId, postId, side);
 	}
 }

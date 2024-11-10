@@ -2,8 +2,9 @@ package aimo.backend.common.mapper;
 
 import org.springframework.stereotype.Component;
 
+import aimo.backend.common.util.memberLoader.MemberLoader;
 import aimo.backend.domains.comment.entity.ChildComment;
-import aimo.backend.domains.like.dto.LikeChildCommentRequest;
+import aimo.backend.domains.like.dto.parameter.LikeChildCommentParameter;
 import aimo.backend.domains.like.entity.ChildCommentLike;
 import aimo.backend.domains.like.model.LikeType;
 import aimo.backend.domains.member.entity.Member;
@@ -17,10 +18,10 @@ public class ChildCommentLikeMapper {
 		return ChildCommentLike.builder().childComment(childComment).member(member).build();
 	}
 
-	public static LikeChildCommentRequest toLikeChildCommentRequest(
-		Long memberId,
+	public static LikeChildCommentParameter toLikeChildCommentParameter(
 		Long childCommentId,
 		LikeType likeType) {
-		return new LikeChildCommentRequest(memberId, childCommentId, likeType);
+		Long memberId = MemberLoader.getMemberId();
+		return new LikeChildCommentParameter(memberId, childCommentId, likeType);
 	}
 }

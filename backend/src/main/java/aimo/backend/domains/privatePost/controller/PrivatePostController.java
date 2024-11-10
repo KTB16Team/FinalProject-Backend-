@@ -19,6 +19,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import aimo.backend.common.dto.DataResponse;
 
+import aimo.backend.common.mapper.PrivatePostMapper;
+import aimo.backend.domains.privatePost.dto.parameter.DeletePrivatePostParameter;
+import aimo.backend.domains.privatePost.dto.parameter.FindPrivatePostParameter;
+import aimo.backend.domains.privatePost.dto.parameter.FindPrivatePostPreviewParameter;
+import aimo.backend.domains.privatePost.dto.request.DeletePrivatePostRequest;
+import aimo.backend.domains.privatePost.dto.request.FindPrivatePostRequest;
+import aimo.backend.domains.privatePost.dto.parameter.JudgementParameter;
+import aimo.backend.domains.privatePost.dto.parameter.JudgementToAiParameter;
 import aimo.backend.domains.privatePost.dto.request.ChatRecordRequest;
 import aimo.backend.domains.privatePost.dto.request.JudgementToAiRequest;
 import aimo.backend.domains.privatePost.dto.response.JudgementResponse;
@@ -31,7 +39,6 @@ import aimo.backend.domains.privatePost.dto.response.SavePrivatePostResponse;
 import aimo.backend.domains.privatePost.dto.response.SpeechToTextResponse;
 
 import aimo.backend.domains.privatePost.dto.request.TextRecordRequest;
-import aimo.backend.domains.privatePost.entity.PrivatePost;
 import aimo.backend.domains.privatePost.service.AudioRecordService;
 import aimo.backend.domains.privatePost.service.ChatRecordService;
 import aimo.backend.domains.privatePost.service.PrivatePostService;
@@ -60,8 +67,10 @@ public class PrivatePostController {
 	// 판결
 	@PostMapping("/judgement")
 	public ResponseEntity<DataResponse<SavePrivatePostResponse>> summaryAndJudgment(@Valid @RequestBody JudgementToAiRequest judgementToAiRequest) {
-		JudgementResponse judgementResponse = privatePostService.serveScriptToAi(judgementToAiRequest);
-		Long privatePostId = privatePostService.save(judgementResponse);
+		JudgementToAiParameter parameter = PrivatePostMapper.toJudgementToAiParameter(judgementToAiRequest);
+		JudgementResponse judgementResponse = privatePostService.serveScriptToAi(parameter);
+		JudgementParameter judgementParameter = PrivatePostMapper.toJudgementParameter(judgementResponse);
+		Long privatePostId = privatePostService.save(judgementParameter);
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(DataResponse.created(new SavePrivatePostResponse(privatePostId)));
 	}
@@ -104,9 +113,10 @@ public class PrivatePostController {
 	// 개인글 조회
 	@GetMapping("/{privatePostId}")
 	public ResponseEntity<DataResponse<PrivatePostResponse>> findPrivatePost(
-		@Valid @PathVariable Long privatePostId) {
+		@Valid @PathVariable("privatePostId") FindPrivatePostRequest request) {
+		FindPrivatePostParameter parameter = PrivatePostMapper.toFindPrivatePostParameter(request);
 		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(DataResponse.from(privatePostService.findPrivatePostResponseBy(privatePostId)));
+			.body(DataResponse.from(privatePostService.findPrivatePostResponseBy(parameter)));
 	}
 
 	@GetMapping
@@ -114,14 +124,16 @@ public class PrivatePostController {
 		@Valid @RequestParam(defaultValue = "0")  Integer page,
 		@Valid @RequestParam(defaultValue = "10") Integer size) {
 		Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+		FindPrivatePostPreviewParameter parameter = PrivatePostMapper.toFindPrivatepostPreviewParameter(pageable);
 		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(DataResponse.from(privatePostService.findPrivatePostPreviewsBy(pageable)));
+			.body(DataResponse.from(privatePostService.findPrivatePostPreviewsBy(parameter)));
 	}
 
 	@DeleteMapping("/{privatePostId}")
 	public ResponseEntity<DataResponse<Void>> deletePrivatePost(
-		@Valid @PathVariable Long privatePostId) {
-		privatePostService.deletePrivatePostBy(privatePostId);
+		@Valid @PathVariable("privatePostId") DeletePrivatePostRequest request) {
+		DeletePrivatePostParameter parameter = PrivatePostMapper.toDeletePrivatePostParameter(request);
+		privatePostService.deletePrivatePostBy(parameter);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(DataResponse.noContent());
 	}
 }

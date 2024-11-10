@@ -1,8 +1,8 @@
-package aimo.backend.domains.like.dto;
+package aimo.backend.domains.like.dto.parameter;
 
 import aimo.backend.domains.like.model.LikeType;
 
-public record LikeParentCommentRequest(
+public record LikeParentCommentParameter(
 	Long memberId,
 	Long parentCommentId,
 	LikeType likeType

@@ -2,7 +2,7 @@ package aimo.backend.common.mapper;
 
 import java.util.List;
 
-import aimo.backend.domains.comment.entity.ChildComment;
+import aimo.backend.common.util.memberLoader.MemberLoader;
 import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.post.dto.parameter.DeletePostParameter;
@@ -112,34 +112,6 @@ public class PostMapper {
 		);
 	}
 
-	public static FindCommentedPostsByIdRequest toFindCommentedPostsByIdRequest(ChildComment childComment) {
-		final Post post = childComment.getPost();
-		final Float plaintiffVotesCount = (float)post.getPlaintiffVotesCount();
-		final Float defendantVotesCount = (float)post.getDefendantVotesCount();
-		final Float votesCount = (float)post.getVotesCount();
-
-		// 투표율 계산
-		float voteRatePlaintiff = 0f;
-		float voteRateDefendant = 0f;
-		if (votesCount != 0) {
-			voteRatePlaintiff = plaintiffVotesCount / votesCount;
-			voteRateDefendant = defendantVotesCount / votesCount;
-		}
-
-		return new FindCommentedPostsByIdRequest(
-			post.getId(),
-			post.getTitle(),
-			getPreview(post.getSummaryAi()),
-			post.getPostLikesCount(),
-			post.getPostViewsCount(),
-			post.getCommentsCount(),
-			voteRatePlaintiff,
-			voteRateDefendant,
-			post.getCreatedAt(),
-			childComment.getCreatedAt()
-		);
-	}
-
 	public static FindPostsByPostTypeResponse toFindPostsByPostTypeResponse(FindCommentedPostsByIdRequest findCommentedPostsByIdRequest){
 		return new FindPostsByPostTypeResponse(
 			findCommentedPostsByIdRequest.id(),
@@ -184,7 +156,8 @@ public class PostMapper {
 		);
 	}
 
-	public static SavePostParameter toSavePostParameter(SavePostRequest request, Long memberId) {
+	public static SavePostParameter toSavePostParameter(SavePostRequest request) {
+		Long memberId = MemberLoader.getMemberId();
 		return new SavePostParameter(
 			memberId,
 			request.privatePostId(),
@@ -204,15 +177,17 @@ public class PostMapper {
 		return new SavePostResponse(postId);
 	}
 
-	public static FindPostAndCommentsByIdParameter toFindPostAndCommentsByIdParameter(Long memberId, Long postId) {
-		return new FindPostAndCommentsByIdParameter(memberId, postId);
+	public static FindPostAndCommentsByIdParameter toFindPostAndCommentsByIdParameter(Long postId) {
+		return new FindPostAndCommentsByIdParameter(MemberLoader.getMemberId(), postId);
 	}
 
-	public static FindPostByPostTypeParameter toFindPostByPostTypeParameter(Long memberId, PostType postType, Integer page, Integer size) {
+	public static FindPostByPostTypeParameter toFindPostByPostTypeParameter(PostType postType, Integer page, Integer size) {
+		Long memberId = MemberLoader.getMemberId();
 		return new FindPostByPostTypeParameter(memberId, postType, page, size);
 	}
 
-	public static DeletePostParameter toDeletePostParameter(Long memberId, Long postId) {
+	public static DeletePostParameter toDeletePostParameter(Long postId) {
+		Long memberId = MemberLoader.getMemberId();
 		return new DeletePostParameter(memberId, postId);
 	}
 }

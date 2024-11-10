@@ -15,10 +15,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.mapper.PostMapper;
+import aimo.backend.common.mapper.PrivatePostMapper;
 import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.comment.service.PostCommentService;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.member.service.MemberService;
+import aimo.backend.domains.post.dto.SoftDeletePostParameter;
 import aimo.backend.domains.post.dto.parameter.DeletePostParameter;
 import aimo.backend.domains.post.dto.parameter.FindPostAndCommentsByIdParameter;
 import aimo.backend.domains.post.dto.parameter.FindPostByPostTypeParameter;
@@ -30,7 +32,10 @@ import aimo.backend.domains.post.dto.response.FindPostsByPostTypeResponse;
 import aimo.backend.domains.post.entity.Post;
 import aimo.backend.domains.post.model.PostType;
 import aimo.backend.domains.post.repository.PostRepository;
+import aimo.backend.domains.privatePost.dto.parameter.DeletePrivatePostParameter;
+import aimo.backend.domains.privatePost.dto.request.DeletePrivatePostRequest;
 import aimo.backend.domains.privatePost.service.PrivatePostService;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,14 +48,14 @@ public class PostService {
 	private final PrivatePostService privatePostService;
 	private final PostRepository postRepository;
 	private final PostCommentService postCommentService;
-	private final MemberService memberService;
+	private final EntityManager em;
 
 	// 글 저장
 	@Transactional
 	public Long save(SavePostParameter savePostParameter) {
-		Member member = memberService.findBy(savePostParameter.memberId());
+		Member memberReference = em.getReference(Member.class, savePostParameter.memberId());
 		privatePostService.publishPrivatePost(savePostParameter.privatePostId());
-		Post post = PostMapper.toEntity(savePostParameter, member);
+		Post post = PostMapper.toEntity(savePostParameter, memberReference);
 		return postRepository.save(post).getId();
 	}
 
@@ -68,27 +73,24 @@ public class PostService {
 	// 글 조회, dto로 응답
 	public FindPostAndCommentsByIdResponse findPostAndCommentsDtoById(FindPostAndCommentsByIdParameter parameter) {
 		Post post = findById(parameter.postId());
-		Member member = memberService.findBy(parameter.memberId());
-		// 부모 댓글 조회
+		Member memberReference = em.getReference(Member.class, parameter.memberId());
 		List<ParentComment> parentComments = postCommentService.findParentCommentsByPostId(post.getId());
-		// dto로 변환
-		return PostMapper.toFindPostAndCommentsByIdResponse(member, post, parentComments);
+		return PostMapper.toFindPostAndCommentsByIdResponse(memberReference, post, parentComments);
 	}
 
 	// PostType으로 글 조회
 	public Page<FindPostsByPostTypeResponse> findPostDtosByPostType(FindPostByPostTypeParameter parameter) {
 		Page<FindPostsByPostTypeResponse> posts = null;
 		PostType postType = parameter.postType();
-		Member member = memberService.findBy(parameter.memberId());
 		Pageable pageable = PageRequest.of(
 			parameter.page(),
 			parameter.size(),
 			Sort.by(Sort.Direction.DESC, "id"));
 
-		if (postType == PostType.MY) 		posts = findMyPosts(member.getId(), pageable);
+		if (postType == PostType.MY) 		posts = findMyPosts(parameter.memberId(), pageable);
 		if (postType == PostType.ANY) 		posts = findAnyPosts(pageable);
 		if (postType == PostType.POPULAR) 	posts = findPopularPosts(pageable);
-		if (postType == PostType.COMMENTED) posts = findCommentedPosts(member.getId(), pageable);
+		if (postType == PostType.COMMENTED) posts = findCommentedPosts(parameter.memberId(), pageable);
 
 		if(posts == null) throw ApiException.from(POST_TYPE_NOT_FOUND);
 
@@ -174,9 +176,11 @@ public class PostService {
 		}
 	}
 
-	public void softDeleteBy(Long postId) {
-		Post post = findById(postId);
-		privatePostService.deletePrivatePostBy(post.getPrivatePostId());
+	public void softDeleteBy(SoftDeletePostParameter parameter) {
+		Post post = findById(parameter.postId());
+		DeletePrivatePostParameter deletePrivatePostParameter
+			= PrivatePostMapper.toDeletePrivatePostParameter(post.getPrivatePostId());
+		privatePostService.deletePrivatePostBy(deletePrivatePostParameter);
 		post.softDelete();
 	}
 }

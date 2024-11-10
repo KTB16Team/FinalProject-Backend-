@@ -10,6 +10,7 @@ import aimo.backend.domains.post.service.PostService;
 import aimo.backend.domains.view.dto.IncreasePostViewParameter;
 import aimo.backend.domains.view.entity.PostView;
 import aimo.backend.domains.view.repository.PostViewRepository;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -19,7 +20,7 @@ public class PostViewService {
 
 	private final PostViewRepository postViewRepository;
 	private final PostService postService;
-	private final MemberService memberService;
+	private final EntityManager em;
 
 	// 조회수 증가
 	@Transactional(rollbackFor = Exception.class)
@@ -27,7 +28,7 @@ public class PostViewService {
 		Long memberId = increasePostViewParameter.memberId();
 		Long postId = increasePostViewParameter.postId();
 		Post post = postService.findById(postId);
-		Member member = memberService.findBy(memberId);
+		Member member = em.getReference(Member.class, memberId);
 
 		postViewRepository.findByMemberIdAndPostId(memberId, postId)
 			.ifPresentOrElse(
