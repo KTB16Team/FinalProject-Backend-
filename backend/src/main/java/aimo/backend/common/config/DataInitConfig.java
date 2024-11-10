@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
+import aimo.backend.common.mapper.PostMapper;
 import aimo.backend.domains.comment.entity.ChildComment;
 import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.comment.repository.ChildCommentRepository;
@@ -20,6 +21,7 @@ import aimo.backend.domains.member.model.MemberRole;
 import aimo.backend.domains.member.model.Provider;
 import aimo.backend.domains.member.repository.MemberRepository;
 
+import aimo.backend.domains.post.dto.parameter.SavePostParameter;
 import aimo.backend.domains.post.entity.Post;
 import aimo.backend.domains.post.model.Category;
 import aimo.backend.domains.post.repository.PostRepository;
@@ -104,8 +106,8 @@ public class DataInitConfig {
 		for (int i = 1; i <= 10; i++) {
 			Member member = members.get(i % 3);
 			PrivatePost privatePost = privatePosts.get(i - 1);
-			Post post = new Post(privatePost.getId(), member, "Public Post Title " + i, "Summary AI " + i,
-				"Plaintiff Stance " + i, "Defendant Stance " + i, privatePost.getFaultRatePlaintiff(), privatePost.getFaultRateDefendant(), "Judgement " + i, OriginType.TEXT, Category.COMMON);
+			SavePostParameter parameter = new SavePostParameter(member.getId(), privatePost.getId(), "Public Post Title " + i, "Plaintiff Stance " + i, "Defendant Stance " + i, "Summary AI " + i, "Judgement " + i, 50, 50, OriginType.TEXT, Category.COMMON);
+			Post post = PostMapper.toEntity(parameter, member);
 			posts.add(postRepo.save(post));
 		}
 

@@ -17,6 +17,7 @@ import aimo.backend.domains.comment.dto.request.ValidAndUpdateChildCommentParame
 import aimo.backend.domains.comment.mapper.ChildCommentMapper;
 import aimo.backend.domains.comment.service.ChildCommentService;
 import aimo.backend.common.util.memberLoader.MemberLoader;
+import aimo.backend.domains.member.entity.Member;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -26,14 +27,13 @@ import lombok.RequiredArgsConstructor;
 public class ChildCommentController {
 
 	private final ChildCommentService childCommentService;
-	private final MemberLoader memberLoader;
 
 	@PostMapping("/{postId}/comments/{parentCommentId}/child")
 	public ResponseEntity<DataResponse<Void>> saveChildComment(
 		@Valid @PathVariable("postId") Long postId,
 		@Valid @PathVariable("parentCommentId") Long parentCommentId,
 		@Valid @RequestBody SaveChildCommentRequest request) {
-		Long memberId = memberLoader.getMemberId();
+		Long memberId = MemberLoader.getMemberId();
 		SaveChildCommentParameter saveChildCommentParameter =
 			ChildCommentMapper.toSaveChildCommentParameter(memberId, postId, parentCommentId, request.content());
 		childCommentService.saveChildComment(saveChildCommentParameter);
@@ -44,7 +44,7 @@ public class ChildCommentController {
 	public ResponseEntity<DataResponse<Void>> updateChildComment(
 		@Valid @PathVariable Long childCommentId,
 		@Valid @RequestBody SaveChildCommentRequest request) {
-		Long memberId = memberLoader.getMemberId();
+		Long memberId = MemberLoader.getMemberId();
 		ValidAndUpdateChildCommentParameter validAndUpdateChildCommentParameter =
 			ChildCommentMapper.toValidAndUpdateChildCommentParameter(memberId, childCommentId, request.content());
 		childCommentService.validateAndUpdateChildComment(validAndUpdateChildCommentParameter);
@@ -53,7 +53,7 @@ public class ChildCommentController {
 
 	@DeleteMapping("comments/child/{childCommentId}")
 	public ResponseEntity<DataResponse<Void>> deleteParentComment(@Valid @PathVariable Long childCommentId) {
-		Long memberId = memberLoader.getMemberId();
+		Long memberId = MemberLoader.getMemberId();
 		ValidAndDeleteParentCommentParameter validateAndDeleteChildCommentParameter =
 			ChildCommentMapper.toValidAndDeleteParentCommentParameter(memberId, childCommentId);
 		childCommentService.validateAndDeleteChildComment(validateAndDeleteChildCommentParameter);

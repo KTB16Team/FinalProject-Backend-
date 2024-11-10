@@ -10,6 +10,7 @@ import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.exception.ErrorCode;
 import aimo.backend.common.mapper.AudioRecordMapper;
 import aimo.backend.common.properties.AiServerProperties;
+import aimo.backend.common.util.webclient.ReactiveHttpService;
 import aimo.backend.domains.privatePost.dto.request.SaveAudioSuccessRequest;
 import aimo.backend.domains.privatePost.dto.response.SaveAudioSuccessResponse;
 import aimo.backend.domains.privatePost.dto.request.SpeechToTextRequest;
@@ -27,23 +28,12 @@ import lombok.RequiredArgsConstructor;
 public class AudioRecordService {
 
 	private final AudioRecordRepository audioRecordRepository;
-	private final WebClient	webClient;
+	private final ReactiveHttpService reactiveHttpService;
 	private final AiServerProperties aiServerProperties;
 
 	public SpeechToTextResponse speechToText(SpeechToTextRequest speechToTextRequest) {
-		return webClient.post()
-			.uri(aiServerProperties.getDomainUrl() + aiServerProperties.getSpeechToTextApi())
-			.bodyValue(speechToTextRequest)
-			.retrieve()
-			.onStatus(HttpStatusCode::is4xxClientError, clientResponse -> {
-				throw ApiException.from(ErrorCode.AI_BAD_GATEWAY);
-			})
-			.onStatus(HttpStatusCode::is5xxServerError, clientResponse -> {
-				throw ApiException.from(ErrorCode.AI_SEVER_ERROR);
-			})
-			.bodyToMono(new ParameterizedTypeReference<SpeechToTextResponse>() {
-			})
-			.block();
+		String url = aiServerProperties.getDomainUrl() + aiServerProperties.getSpeechToTextApi();
+		return reactiveHttpService.<SpeechToTextRequest, SpeechToTextResponse>post(url, speechToTextRequest).block();
 	}
 
 	@Transactional(rollbackFor = ApiException.class)
