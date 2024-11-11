@@ -6,4 +6,13 @@ public record SaveProfileImageMetaDataParameter(
 	String extension,
 	Long size
 ) {
+
+	public static SaveProfileImageMetaDataParameter of(
+		Long memberId,
+		String filename,
+		String extension,
+		Long size
+	) {
+		return new SaveProfileImageMetaDataParameter(memberId, filename, extension, size);
+	}
 }

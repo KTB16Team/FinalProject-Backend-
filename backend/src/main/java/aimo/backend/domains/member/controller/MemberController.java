@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import aimo.backend.common.mapper.MemberMapper;
 import aimo.backend.common.mapper.S3Mapper;
+import aimo.backend.domains.member.dto.parameter.SignUpParameter;
 import aimo.backend.domains.member.dto.parameter.UpdateNicknameParameter;
 import aimo.backend.domains.member.dto.parameter.DeleteMemberParameter;
 import aimo.backend.domains.member.dto.parameter.FindMyInfoParameter;
@@ -55,14 +56,13 @@ public class MemberController {
 	@PostMapping("/logout")
 	public ResponseEntity<DataResponse<Void>> logoutMember(HttpServletRequest request) {
 		String accessToken = jwtTokenProvider.extractAccessToken(request).orElse(null);
-		String refreshToken = jwtTokenProvider.extractRefreshToken(request).orElse(null);
 		memberService.logoutMember(new LogoutRequest(accessToken));
 		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
 
 	@PostMapping("/signup")
-	public ResponseEntity<DataResponse<Void>> signupMember(@RequestBody @Valid SignUpRequest signUpRequest) {
-		memberService.signUp(signUpRequest);
+	public ResponseEntity<DataResponse<Void>> signupMember(@RequestBody @Valid SignUpParameter parameter) {
+		memberService.signUp(parameter);
 		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
 

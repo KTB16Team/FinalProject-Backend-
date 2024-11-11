@@ -1,4 +1,4 @@
-package aimo.backend.domains.comment.dto.request;
+package aimo.backend.domains.comment.dto.parameter;
 
 public record ValidAndUpdateChildCommentParameter(
 	Long memberId,

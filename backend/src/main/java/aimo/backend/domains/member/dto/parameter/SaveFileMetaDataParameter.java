@@ -6,4 +6,8 @@ public record SaveFileMetaDataParameter(
 	String extension,
 	Long size
 ) {
+
+	public static SaveFileMetaDataParameter of(Long memberId, String filename, String extension, Long size) {
+		return new SaveFileMetaDataParameter(memberId, filename, extension, size);
+	}
 }

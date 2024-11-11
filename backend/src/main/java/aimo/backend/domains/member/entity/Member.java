@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import aimo.backend.domains.comment.entity.ChildComment;
+import aimo.backend.domains.member.dto.parameter.SignUpParameter;
 import aimo.backend.domains.privatePost.entity.PrivatePost;
 import aimo.backend.domains.member.model.Gender;
 import aimo.backend.domains.member.model.MemberRole;
@@ -63,7 +64,7 @@ public class Member extends BaseEntity {
 	@Column(nullable = false)
 	private Provider provider;
 
-	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToOne(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
 	@JoinColumn(name = "profile_image_id", referencedColumnName = "profile_id")
 	private ProfileImage profileImage;
 
@@ -71,7 +72,7 @@ public class Member extends BaseEntity {
 	private LocalDate birthDate;
 
 	@OneToMany(mappedBy = "member")
-	private List<PrivatePost> privatePosts;
+	private List<PrivatePost> privatePosts = new ArrayList<>();
 
 	@OneToMany(mappedBy = "member")
 	private List<Post> posts = new ArrayList<>();
@@ -95,6 +96,19 @@ public class Member extends BaseEntity {
 	}
 
 
+	public static Member of(SignUpParameter signUpParameter, String encodedPassword) {
+		return Member.builder()
+			.nickname(signUpParameter.nickname())
+			.email(signUpParameter.email())
+			.password(encodedPassword)
+			.memberRole(MemberRole.USER)
+			.gender(signUpParameter.gender())
+			.provider(Provider.AIMO)
+			.birthDate(signUpParameter.birth())
+			.profileImage(null)
+			.build();
+	}
+
 
 	@Builder
 	private Member(
@@ -104,14 +118,24 @@ public class Member extends BaseEntity {
 		MemberRole memberRole,
 		Gender gender,
 		Provider provider,
-		LocalDate birthDate) {
-
+		LocalDate birthDate,
+		ProfileImage profileImage,
+		List<PrivatePost> privatePosts,
+		List<Post> posts,
+		List<ParentComment> parentComments,
+		List<ChildComment> childComments
+	) {
 		this.nickname = nickname;
 		this.email = email;
 		this.password = password;
 		this.role = memberRole;
-		this.birthDate = birthDate;
 		this.gender = gender;
 		this.provider = provider;
+		this.birthDate = birthDate;
+		this.profileImage = profileImage;
+		this.privatePosts = privatePosts;
+		this.posts = posts;
+		this.parentComments = parentComments;
+		this.childComments = childComments;
 	}
 }

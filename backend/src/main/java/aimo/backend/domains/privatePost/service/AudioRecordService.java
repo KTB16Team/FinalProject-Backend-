@@ -11,6 +11,7 @@ import aimo.backend.common.exception.ErrorCode;
 import aimo.backend.common.mapper.AudioRecordMapper;
 import aimo.backend.common.properties.AiServerProperties;
 import aimo.backend.common.util.webclient.ReactiveHttpService;
+import aimo.backend.domains.privatePost.dto.parameter.SpeechToTextParameter;
 import aimo.backend.domains.privatePost.dto.request.SaveAudioSuccessRequest;
 import aimo.backend.domains.privatePost.dto.response.SaveAudioSuccessResponse;
 import aimo.backend.domains.privatePost.dto.request.SpeechToTextRequest;
@@ -31,15 +32,15 @@ public class AudioRecordService {
 	private final ReactiveHttpService reactiveHttpService;
 	private final AiServerProperties aiServerProperties;
 
-	public SpeechToTextResponse speechToText(SpeechToTextRequest speechToTextRequest) {
+	public SpeechToTextResponse speechToText(SpeechToTextParameter speechToTextParameter) {
 		String url = aiServerProperties.getDomainUrl() + aiServerProperties.getSpeechToTextApi();
-		return reactiveHttpService.<SpeechToTextRequest, SpeechToTextResponse>post(url, speechToTextRequest).block();
+		return reactiveHttpService.<SpeechToTextParameter, SpeechToTextResponse>post(url, speechToTextParameter).block();
 	}
 
 	@Transactional(rollbackFor = ApiException.class)
-	public SaveAudioSuccessResponse save(SaveAudioSuccessRequest saveAudioSuccessRequest) {
-		AudioRecord audioRecord = audioRecordRepository.save(AudioRecordMapper.toEntity(saveAudioSuccessRequest));
-		return AudioRecordMapper.toSaveAudioSuccessResponse(audioRecord);
+	public SaveAudioSuccessResponse save(SaveAudioSuccessParameter parameter) {
+		AudioRecord audioRecord = audioRecordRepository.save(AudioRecord.from(parameter));
+		return SaveAudioSuccessResponse.from(audioRecord);
 	}
 
 	private boolean isAudioFile(String extension) {

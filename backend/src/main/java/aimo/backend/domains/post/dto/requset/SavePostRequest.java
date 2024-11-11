@@ -36,4 +36,30 @@ public record SavePostRequest(
 			category = Category.COMMON;
 	}
 
+	public static SavePostRequest of(
+		Long privatePostId,
+		String title,
+		String stancePlaintiff,
+		String stanceDefendant,
+		String summaryAi,
+		String judgement,
+		Integer faultRatePlaintiff,
+		Integer faultRateDefendant,
+		OriginType originType,
+		Category category
+	) {
+		if (category == null) category = Category.COMMON;
+
+		return new SavePostRequest(
+			privatePostId,
+			title,
+			stancePlaintiff,
+			stanceDefendant,
+			summaryAi,
+			judgement,
+			faultRatePlaintiff,
+			faultRateDefendant,
+			originType,
+			category);
+	}
 }

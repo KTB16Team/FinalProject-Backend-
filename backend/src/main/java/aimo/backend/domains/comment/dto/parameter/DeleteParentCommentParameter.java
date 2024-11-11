@@ -4,4 +4,8 @@ public record DeleteParentCommentParameter(
 	Long memberId,
 	Long parentCommentId
 ) {
+
+	public static DeleteParentCommentParameter of(Long memberId, Long parentCommentId) {
+		return new DeleteParentCommentParameter(memberId, parentCommentId);
+	}
 }

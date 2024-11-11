@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import aimo.backend.common.dto.DataResponse;
 import aimo.backend.common.mapper.VoteMapper;
+import aimo.backend.common.util.memberLoader.MemberLoader;
 import aimo.backend.domains.vote.dto.SaveVotePostParameter;
 import aimo.backend.domains.vote.model.Side;
 import aimo.backend.domains.vote.service.VoteService;
-import aimo.backend.common.util.memberLoader.MemberLoader;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -22,14 +22,15 @@ import lombok.RequiredArgsConstructor;
 public class VoteController {
 
 	private final VoteService voteService;
-	private final MemberLoader memberLoader;
 
 	@PostMapping("/{postId}/votes")
-	public ResponseEntity<DataResponse<Void>> saveVotePost(@PathVariable Long postId, @RequestParam("side") Side side) {
-		SaveVotePostParameter saveVotePostParameter = VoteMapper.toSavePostParameter(postId, side);
+	public ResponseEntity<DataResponse<Void>> saveVotePost(
+		@PathVariable Long postId,
+		@RequestParam("side") Side side
+	) {
+		Long memberId = MemberLoader.getMemberId();
+		SaveVotePostParameter saveVotePostParameter = VoteMapper.toSavePostParameter(memberId, postId, side);
 		voteService.votePost(saveVotePostParameter);
-		return ResponseEntity
-			.status(HttpStatus.CREATED)
-			.body(DataResponse.created());
+		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
 }

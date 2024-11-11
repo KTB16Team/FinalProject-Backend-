@@ -10,4 +10,8 @@ public record SaveFileMetaDataRequest(
 	@NotNull(message = "파일 크기는 필수입니다.")
 	Long size
 ) {
+
+	public static SaveFileMetaDataRequest of(String filename, String extension, Long size) {
+		return new SaveFileMetaDataRequest(filename, extension, size);
+	}
 }

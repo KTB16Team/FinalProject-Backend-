@@ -10,14 +10,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import aimo.backend.common.dto.DataResponse;
-import aimo.backend.domains.comment.dto.request.SaveChildCommentParameter;
+import aimo.backend.domains.comment.dto.parameter.SaveChildCommentParameter;
 import aimo.backend.domains.comment.dto.request.SaveChildCommentRequest;
-import aimo.backend.domains.comment.dto.request.ValidAndDeleteParentCommentParameter;
-import aimo.backend.domains.comment.dto.request.ValidAndUpdateChildCommentParameter;
+import aimo.backend.domains.comment.dto.parameter.ValidAndDeleteParentCommentParameter;
+import aimo.backend.domains.comment.dto.parameter.ValidAndUpdateChildCommentParameter;
 import aimo.backend.domains.comment.mapper.ChildCommentMapper;
 import aimo.backend.domains.comment.service.ChildCommentService;
 import aimo.backend.common.util.memberLoader.MemberLoader;
-import aimo.backend.domains.member.entity.Member;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 

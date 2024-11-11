@@ -17,4 +17,14 @@ public record SummaryAndJudgementRequest(
 	@JsonFormat(pattern = "yyyy-MM-dd")
 	@NotNull(message = "생년월일이 비었습니다.")
 	LocalDate birth
-) { }
+) {
+
+	public static SummaryAndJudgementRequest of(
+		String content,
+		String nickname,
+		Gender gender,
+		LocalDate birth
+	) {
+		return new SummaryAndJudgementRequest(content, nickname, gender, birth);
+	}
+}

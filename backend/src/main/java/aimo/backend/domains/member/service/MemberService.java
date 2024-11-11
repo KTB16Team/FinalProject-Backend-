@@ -17,7 +17,6 @@ import aimo.backend.domains.member.dto.parameter.UpdatePasswordParameter;
 import aimo.backend.domains.member.dto.response.FindMyInfoResponse;
 import aimo.backend.domains.member.dto.request.LogoutRequest;
 import aimo.backend.domains.member.dto.request.SendTemporaryPasswordRequest;
-import aimo.backend.domains.member.dto.request.SignUpRequest;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.member.entity.ProfileImage;
 import aimo.backend.common.mapper.MemberMapper;
@@ -61,15 +60,12 @@ public class MemberService {
 
 	// 회원 가입
 	@Transactional(rollbackFor = ApiException.class)
-	public void signUp(SignUpRequest signUpRequest) {
-		// 중복 이메일 검사
-		validateDuplicateEmail(signUpRequest.email());
-		// 중복 닉네임 검사
-		validateDuplicateNickname(signUpRequest.nickname());
-		String encodedPassword = passwordEncoder.encode(signUpRequest.password());
-		SignUpParameter signUpParameter = MemberMapper.toSignUpParameter(signUpRequest, encodedPassword);
-		Member member = MemberMapper.signUpMemberEntity(signUpParameter);
+	public void signUp(SignUpParameter parameter) {
+		validateDuplicateEmail(parameter.email());
+		validateDuplicateNickname(parameter.nickname());
 
+		String encodedPassword = passwordEncoder.encode(parameter.password());
+		Member member = Member.of(parameter, encodedPassword);
 		memberRepository.save(member);
 	}
 
@@ -85,11 +81,10 @@ public class MemberService {
 	public void deleteMember(DeleteMemberParameter deleteMemberParameter) {
 		Member member = findBy(deleteMemberParameter.memberId());
 
-		if (!isValid(deleteMemberParameter.password(), member.getPassword())) {
+		if (!isValid(deleteMemberParameter.password(), member.getPassword()))
 			throw ApiException.from(ErrorCode.INVALID_PASSWORD);
-		}
 
-		deleteMemberContents(new DeleteMemberContentsParameter(member.getId()));
+		deleteMemberContents(DeleteMemberContentsParameter.of(member.getId()));
 		memberRepository.delete(member);
 	}
 
@@ -99,10 +94,9 @@ public class MemberService {
 		Member member = findBy(memberId);
 		DeleteProfileImageParameter deleteProfileImageParameter = new DeleteProfileImageParameter(memberId);
 
-		if (member.getProfileImage() != null) {
+		if (member.getProfileImage() != null)
 			deleteProfileImage(deleteProfileImageParameter);
-		}
-
+		
 		CreateResourceUrlParameter createResourceUrlParameter =
 			S3Mapper.toCreateResourceUrlParameter(PresignedUrlPrefix.IMAGE, parameter);
 		String url = s3Service.getResourceUrl(createResourceUrlParameter);

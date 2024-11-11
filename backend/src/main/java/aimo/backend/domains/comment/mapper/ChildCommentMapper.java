@@ -2,10 +2,9 @@ package aimo.backend.domains.comment.mapper;
 
 import org.springframework.stereotype.Component;
 
-import aimo.backend.domains.comment.dto.request.SaveChildCommentParameter;
-import aimo.backend.domains.comment.dto.request.SaveChildCommentRequest;
-import aimo.backend.domains.comment.dto.request.ValidAndDeleteParentCommentParameter;
-import aimo.backend.domains.comment.dto.request.ValidAndUpdateChildCommentParameter;
+import aimo.backend.domains.comment.dto.parameter.SaveChildCommentParameter;
+import aimo.backend.domains.comment.dto.parameter.ValidAndDeleteParentCommentParameter;
+import aimo.backend.domains.comment.dto.parameter.ValidAndUpdateChildCommentParameter;
 import aimo.backend.domains.comment.entity.ChildComment;
 import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.member.entity.Member;

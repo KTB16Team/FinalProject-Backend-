@@ -16,7 +16,10 @@ public class S3Mapper {
 		return new SaveFileMetaDataParameter(memberId, request.filename(), request.extension(), request.size());
 	}
 
-	public static CreateResourceUrlParameter toCreateResourceUrlParameter(PresignedUrlPrefix prefix, SaveFileMetaDataParameter parameter) {
+	public static CreateResourceUrlParameter toCreateResourceUrlParameter(
+		PresignedUrlPrefix prefix,
+		SaveFileMetaDataParameter parameter
+	) {
 		return new CreateResourceUrlParameter(prefix.getValue(), parameter.filename(), parameter.extension());
 	}
 

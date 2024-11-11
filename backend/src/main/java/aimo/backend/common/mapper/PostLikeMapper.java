@@ -9,11 +9,7 @@ import aimo.backend.domains.post.entity.Post;
 
 public class PostLikeMapper {
 	public static PostLike toEntity(Member member, Post post) {
-		return PostLike
-			.builder()
-			.member(member)
-			.post(post)
-			.build();
+		return PostLike.builder().member(member).post(post).build();
 	}
 
 	public static LikePostParameter toLikePostParameter(Long postId, LikeType likeType) {

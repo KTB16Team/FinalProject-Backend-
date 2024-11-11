@@ -6,9 +6,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import aimo.backend.common.exception.ApiException;
-import aimo.backend.domains.comment.dto.request.SaveChildCommentParameter;
-import aimo.backend.domains.comment.dto.request.ValidAndDeleteParentCommentParameter;
-import aimo.backend.domains.comment.dto.request.ValidAndUpdateChildCommentParameter;
+import aimo.backend.domains.comment.dto.parameter.SaveChildCommentParameter;
+import aimo.backend.domains.comment.dto.parameter.ValidAndDeleteParentCommentParameter;
+import aimo.backend.domains.comment.dto.parameter.ValidAndUpdateChildCommentParameter;
 import aimo.backend.domains.comment.entity.ChildComment;
 import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.comment.mapper.ChildCommentMapper;
@@ -70,8 +70,10 @@ public class ChildCommentService {
 	//자식 댓글 삭제
 	@Transactional(rollbackFor = ApiException.class)
 	public void validateAndDeleteChildComment(
-		ValidAndDeleteParentCommentParameter validAndDeleteChildCommentParameter) {
+		ValidAndDeleteParentCommentParameter validAndDeleteChildCommentParameter
+	) {
 		Long childCommentId = validAndDeleteChildCommentParameter.childCommentId();
+
 		Member member = memberService.findBy(validAndDeleteChildCommentParameter.memberId());
 		validateChildCommentAuthority(member, childCommentId);
 

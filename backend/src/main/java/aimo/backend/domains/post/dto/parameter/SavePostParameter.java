@@ -15,4 +15,32 @@ public record SavePostParameter(
 	Integer faultRatePlaintiff,
 	OriginType originType,
 	Category category
-) { }
+) {
+
+	public static SavePostParameter of(
+		Long memberId,
+		Long privatePostId,
+		String title,
+		String stancePlaintiff,
+		String stanceDefendant,
+		String summaryAi,
+		String judgement,
+		Integer faultRateDefendant,
+		Integer faultRatePlaintiff,
+		OriginType originType,
+		Category category
+	) {
+		return new SavePostParameter(
+			memberId,
+			privatePostId,
+			title,
+			stancePlaintiff,
+			stanceDefendant,
+			summaryAi,
+			judgement,
+			faultRateDefendant,
+			faultRatePlaintiff,
+			originType,
+			category);
+	}
+}

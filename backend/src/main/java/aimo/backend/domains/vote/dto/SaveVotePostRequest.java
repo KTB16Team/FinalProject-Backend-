@@ -5,5 +5,10 @@ import aimo.backend.domains.vote.model.Side;
 public record SaveVotePostRequest(
 	Long postId,
 	Long memberId,
-	Side side) {
+	Side side
+) {
+
+	public static SaveVotePostRequest of(Long postId, Long memberId, Side side) {
+		return new SaveVotePostRequest(postId, memberId, side);
+	}
 }

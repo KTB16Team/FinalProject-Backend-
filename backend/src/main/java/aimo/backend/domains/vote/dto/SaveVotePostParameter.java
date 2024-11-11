@@ -7,4 +7,8 @@ public record SaveVotePostParameter(
 	Long postId,
 	Side side
 ) {
+
+	public static SaveVotePostParameter of(Long memberId, Long postId, Side side) {
+		return new SaveVotePostParameter(memberId, postId, side);
+	}
 }

@@ -38,3 +38,6 @@ backend/src/main/resources/application.yml
 
 ### VS Code ###
 .vscode/
+
+### log ###
+!/backend/src/main/resources/logback-spring.xml
