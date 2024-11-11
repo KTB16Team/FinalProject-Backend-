@@ -25,7 +25,6 @@ bin/
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
-!**/src/main/resource/logback-spring.xml
 
 application*
 backend/src/main/resources/application.yml
@@ -41,4 +40,3 @@ backend/src/main/resources/application.yml
 .vscode/
 
 ### log ###
-!backend/src/main/resources/logback-spring.xml

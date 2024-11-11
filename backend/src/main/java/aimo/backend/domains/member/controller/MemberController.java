@@ -15,12 +15,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import aimo.backend.common.mapper.MemberMapper;
 import aimo.backend.common.mapper.S3Mapper;
+import aimo.backend.common.util.memberLoader.MemberLoader;
+import aimo.backend.domains.member.dto.parameter.DeleteProfileImageParameter;
 import aimo.backend.domains.member.dto.parameter.SignUpParameter;
 import aimo.backend.domains.member.dto.parameter.UpdateNicknameParameter;
 import aimo.backend.domains.member.dto.parameter.DeleteMemberParameter;
 import aimo.backend.domains.member.dto.parameter.FindMyInfoParameter;
 import aimo.backend.domains.member.dto.parameter.SaveFileMetaDataParameter;
 import aimo.backend.domains.member.dto.parameter.UpdatePasswordParameter;
+import aimo.backend.domains.member.dto.request.CheckNicknameExistsRequest;
 import aimo.backend.domains.member.dto.request.DeleteMemberRequest;
 import aimo.backend.domains.member.dto.request.LogoutRequest;
 import aimo.backend.domains.member.dto.response.FindMyInfoResponse;
@@ -68,7 +71,9 @@ public class MemberController {
 
 	@PostMapping
 	public ResponseEntity<DataResponse<Void>> deleteMember(@RequestBody DeleteMemberRequest deleteMemberRequest) {
-		DeleteMemberParameter deleteMemberParameter = MemberMapper.toDeleteMemberParameter(deleteMemberRequest);
+		Long memberId = MemberLoader.getMemberId();
+		DeleteMemberParameter deleteMemberParameter =
+			DeleteMemberParameter.of(memberId, deleteMemberRequest.password());
 		memberService.deleteMember(deleteMemberParameter);
 		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
@@ -82,14 +87,17 @@ public class MemberController {
 
 	@PostMapping("/profile/success")
 	public ResponseEntity<DataResponse<Void>> saveProfileImageMetaData(@RequestBody SaveFileMetaDataRequest request) {
-		SaveFileMetaDataParameter parameter = S3Mapper.toSaveFileMetaDataParameter(request);
+		Long memberId = MemberLoader.getMemberId();
+		SaveFileMetaDataParameter parameter = SaveFileMetaDataParameter.from(memberId, request);
 		memberService.saveProfileImageMetaData(parameter);
 		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
 
 	@DeleteMapping("/profile")
 	public ResponseEntity<DataResponse<Void>> deleteProfileImage() {
-		memberService.deleteProfileImage(S3Mapper.toDeleteProfileImageParameter());
+		Long memberId = MemberLoader.getMemberId();
+		DeleteProfileImageParameter parameter = DeleteProfileImageParameter.of(memberId);
+		memberService.deleteProfileImage(parameter);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(DataResponse.noContent());
 	}
 
@@ -103,7 +111,8 @@ public class MemberController {
 	// 내 정보 조회 (프로필 이미지 포함)
 	@GetMapping
 	public ResponseEntity<DataResponse<FindMyInfoResponse>> findMyInfo() {
-		FindMyInfoParameter parameter = MemberMapper.toFindMyInfoParameter();
+		Long memberId = MemberLoader.getMemberId();
+		FindMyInfoParameter parameter = FindMyInfoParameter.of(memberId);
 		return ResponseEntity.status(HttpStatus.OK).body(DataResponse.from(memberService.findMyInfo(parameter)));
 	}
 
@@ -111,7 +120,8 @@ public class MemberController {
 	@PutMapping("/password")
 	public ResponseEntity<DataResponse<Void>> updatePassword(
 		@Valid @RequestBody UpdatePasswordRequest updatePasswordRequest) {
-		UpdatePasswordParameter parameter = MemberMapper.toUpdatePasswordParameter(updatePasswordRequest);
+		Long memberId = MemberLoader.getMemberId();
+		UpdatePasswordParameter parameter = UpdatePasswordParameter.from(memberId, updatePasswordRequest);
 		memberService.updatePassword(parameter);
 		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
@@ -126,14 +136,15 @@ public class MemberController {
 
 	@GetMapping("/nickname/{nickname}/exists")
 	public ResponseEntity<DataResponse<NicknameExistsResponse>> checkNicknameExists(
-		@PathVariable("nickname") String nickname) {
-		NicknameExistsResponse exist = MemberMapper.toNicknameExistsResponse(memberService.checkNicknameExists(nickname));
+		@PathVariable("nickname")CheckNicknameExistsRequest request) {
+		NicknameExistsResponse exist = NicknameExistsResponse.of(memberService.checkNicknameExists(request));
 		return ResponseEntity.status(HttpStatus.OK).body(DataResponse.from(exist));
 	}
 
 	@PutMapping("/nickname")
 	public ResponseEntity<DataResponse<Void>> updateNickname(@RequestBody UpdateNicknameRequest updateNicknameRequest) {
-		UpdateNicknameParameter parameter = MemberMapper.toUpdateNicknameParameter(updateNicknameRequest);
+		Long memberId = MemberLoader.getMemberId();
+		UpdateNicknameParameter parameter = UpdateNicknameParameter.from(memberId, updateNicknameRequest);
 		memberService.updateNickname(parameter);
 		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}

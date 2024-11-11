@@ -73,10 +73,9 @@ public class DataInitConfig {
 
 		for(int i=1; i<=10; i++){
 			TextRecord textRecord = TextRecord.builder()
-				.title("Text Record Title " + i)
-				.script("This is a text record " + i)
+				.content("This is a text record " + i)
 				.build();
-			textRecords.add(textRecordRepo.save(textRecord));
+			textRecords.add(textRecord);
 		}
 
 		// PrivatePosts 생성

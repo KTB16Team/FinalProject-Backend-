@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import aimo.backend.common.dto.DataResponse;
 import aimo.backend.common.mapper.PostMapper;
+import aimo.backend.common.util.memberLoader.MemberLoader;
 import aimo.backend.domains.post.dto.parameter.DeletePostParameter;
 import aimo.backend.domains.post.dto.parameter.FindPostAndCommentsByIdParameter;
 import aimo.backend.domains.post.dto.parameter.FindPostByPostTypeParameter;
@@ -45,7 +46,8 @@ public class PostController {
 
 	@PostMapping
 	public ResponseEntity<DataResponse<SavePostResponse>> savePost(@RequestBody @Valid SavePostRequest request) {
-		SavePostParameter parameter = PostMapper.toSavePostParameter(request);
+		Long memberId = MemberLoader.getMemberId();
+		SavePostParameter parameter = SavePostParameter.from(memberId, request);
 		Long postId = postMemberService.save(parameter);
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(DataResponse.created(PostMapper.toSavePostResponse(postId)));
@@ -56,14 +58,16 @@ public class PostController {
 		@RequestParam("type") @NotNull PostType postType,
 		@RequestParam("page") @NotNull Integer page,
 		@RequestParam("size") @NotNull Integer size) {
-		FindPostByPostTypeParameter parameter = PostMapper.toFindPostByPostTypeParameter(postType, page, size);
+		Long memberId = MemberLoader.getMemberId();
+		FindPostByPostTypeParameter parameter = FindPostByPostTypeParameter.of(memberId, postType, page, size);
 		return ResponseEntity.ok(DataResponse.from(postService.findPostDtosByPostType(parameter)));
 	}
 
 	@GetMapping("/{postId}")
 	public ResponseEntity<DataResponse<FindPostAndCommentsByIdResponse>> findPostAndComments(
 		@PathVariable("postId") FindPostAndCommentsRequest request) {
-		FindPostAndCommentsByIdParameter parameter = PostMapper.toFindPostAndCommentsByIdParameter(request.postId());
+		Long memberId = MemberLoader.getMemberId();
+		FindPostAndCommentsByIdParameter parameter = FindPostAndCommentsByIdParameter.of(memberId, request.postId());
 		return ResponseEntity.ok(DataResponse.from(postMemberService.findPostAndCommentsDtoById(parameter)));
 	}
 
@@ -75,7 +79,8 @@ public class PostController {
 
 	@DeleteMapping("/{postId}")
 	public ResponseEntity<DataResponse<Void>> deletePost(@PathVariable("postId") DeletePostRequest request) {
-		DeletePostParameter parameter = PostMapper.toDeletePostParameter(request.postId());
+		Long memberId = MemberLoader.getMemberId();
+		DeletePostParameter parameter = DeletePostParameter.of(memberId, request.postId());
 		postService.deletePostBy(parameter);
 		return ResponseEntity.ok(DataResponse.noContent());
 	}

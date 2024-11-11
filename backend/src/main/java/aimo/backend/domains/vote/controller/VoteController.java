@@ -12,6 +12,7 @@ import aimo.backend.common.dto.DataResponse;
 import aimo.backend.common.mapper.VoteMapper;
 import aimo.backend.common.util.memberLoader.MemberLoader;
 import aimo.backend.domains.vote.dto.SaveVotePostParameter;
+import aimo.backend.domains.vote.dto.SaveVotePostRequest;
 import aimo.backend.domains.vote.model.Side;
 import aimo.backend.domains.vote.service.VoteService;
 import lombok.RequiredArgsConstructor;
@@ -25,11 +26,12 @@ public class VoteController {
 
 	@PostMapping("/{postId}/votes")
 	public ResponseEntity<DataResponse<Void>> saveVotePost(
-		@PathVariable Long postId,
+		@PathVariable SaveVotePostRequest request,
 		@RequestParam("side") Side side
 	) {
 		Long memberId = MemberLoader.getMemberId();
-		SaveVotePostParameter saveVotePostParameter = VoteMapper.toSavePostParameter(memberId, postId, side);
+		SaveVotePostParameter saveVotePostParameter =
+			SaveVotePostParameter.of(memberId, request.postId(), side);
 		voteService.votePost(saveVotePostParameter);
 		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}

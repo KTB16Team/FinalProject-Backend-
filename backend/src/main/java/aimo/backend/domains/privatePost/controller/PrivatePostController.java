@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.w3c.dom.Text;
 
 import aimo.backend.common.dto.DataResponse;
 
@@ -42,17 +43,17 @@ import aimo.backend.domains.privatePost.dto.response.SavePrivatePostResponse;
 import aimo.backend.domains.privatePost.dto.response.SpeechToTextResponse;
 
 import aimo.backend.domains.privatePost.dto.request.TextRecordRequest;
+import aimo.backend.domains.privatePost.entity.ChatRecord;
+import aimo.backend.domains.privatePost.model.OriginType;
 import aimo.backend.domains.privatePost.service.AudioRecordService;
 import aimo.backend.domains.privatePost.service.ChatRecordService;
-import aimo.backend.domains.privatePost.service.PrivatePostService;
+import aimo.backend.domains.privatePost.service.PrivatePostMemberService;
 
 import aimo.backend.domains.privatePost.service.SaveAudioSuccessParameter;
 import aimo.backend.infrastructure.s3.S3Service;
 import aimo.backend.infrastructure.s3.dto.request.CreatePresignedUrlRequest;
 import aimo.backend.infrastructure.s3.dto.response.CreatePresignedUrlResponse;
 import jakarta.validation.Valid;
-
-import aimo.backend.domains.privatePost.service.TextRecordService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -63,44 +64,33 @@ import lombok.extern.slf4j.Slf4j;
 public class PrivatePostController {
 
 	private final AudioRecordService audioRecordService;
-	private final PrivatePostService privatePostService;
-	private final TextRecordService textRecordService;
-	private final ChatRecordService chatRecordService;
+	private final PrivatePostMemberService privatePostMemberService;
 	private final S3Service s3Service;
-	private final MemberLoader memberLoader;
 
-	// 판결
-	@PostMapping("/judgement")
-	public ResponseEntity<DataResponse<SavePrivatePostResponse>> summaryAndJudgment(
-		@Valid @RequestBody JudgementToAiRequest judgementToAiRequest
-	) {
-		Long memberId = MemberLoader.getMemberId();
-		JudgementToAiParameter parameter = JudgementToAiParameter.from(memberId, judgementToAiRequest);
-		JudgementResponse judgementResponse = privatePostService.serveScriptToAi(parameter);
-		JudgementParameter judgementParameter = JudgementParameter.from(memberId, judgementResponse);
-		Long privatePostId = privatePostService.save(judgementParameter);
-		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(DataResponse.created(new SavePrivatePostResponse(privatePostId)));
-	}
-
-	// 대화록 업로드
+	// 대화록 업로드 + 판결
 	@PostMapping("/text")
-	public ResponseEntity<DataResponse<Void>> uploadTextRecord(
+	public ResponseEntity<DataResponse<SavePrivatePostResponse>> uploadTextRecordAndJudgement(
 		@Valid @RequestBody TextRecordRequest textRecordRequest
 	) {
-		TextRecordParameter parameter = TextRecordParameter.from(textRecordRequest);
-		textRecordService.save(parameter);
-		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
+		Long memberId = MemberLoader.getMemberId();
+		JudgementToAiParameter judgementToAiParameter = JudgementToAiParameter
+			.of(memberId, textRecordRequest.content(), OriginType.TEXT);
+
+		Long privatePostId = privatePostMemberService.serveTextRecordToAi(judgementToAiParameter);
+
+		return ResponseEntity.status(HttpStatus.CREATED)
+			.body(DataResponse.created(SavePrivatePostResponse.of(privatePostId)));
 	}
 
-	@PostMapping("/chat")
-	public ResponseEntity<DataResponse<Void>> uploadChatRecord(
-		@Valid @RequestParam("chat_record") ChatRecordRequest chatRecordRequest
-	) throws IOException {
-		ChatRecordParameter parameter = ChatRecordParameter.from(chatRecordRequest);
-		chatRecordService.save(parameter);
-		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
-	}
+	// @PostMapping("/chat")
+	// public ResponseEntity<DataResponse<SavePrivatePostResponse>> uploadChatRecord(
+	// 	@Valid @RequestParam("chat_record") ChatRecordRequest chatRecordRequest
+	// ) throws IOException {
+	//
+	//
+	// 	return ResponseEntity.status(HttpStatus.CREATED)
+	// 		.body(DataResponse.created(new SavePrivatePostResponse(privatePostId)));
+	// }
 
 	@PostMapping("/speech-to-text")
 	public ResponseEntity<DataResponse<SpeechToTextResponse>> speechToText(
@@ -113,8 +103,9 @@ public class PrivatePostController {
 
 	@GetMapping("/audio/presigned/{filename}")
 	public ResponseEntity<DataResponse<CreatePresignedUrlResponse>> getPresignedUrlTo(
-		@Valid @PathVariable("filename") CreatePresignedUrlRequest createPresignedUrlRequest
+		@Valid @PathVariable("filename") String filename
 	) {
+		CreatePresignedUrlRequest createPresignedUrlRequest = CreatePresignedUrlRequest.of(filename);
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(DataResponse.created(s3Service.createAudioPreSignedUrl(createPresignedUrlRequest)));
 	}
@@ -131,12 +122,12 @@ public class PrivatePostController {
 	// 개인글 조회
 	@GetMapping("/{privatePostId}")
 	public ResponseEntity<DataResponse<PrivatePostResponse>> findPrivatePost(
-		@Valid @PathVariable("privatePostId") FindPrivatePostRequest request
+		@Valid @PathVariable Long privatePostId
 	) {
 		Long memberId = MemberLoader.getMemberId();
-		FindPrivatePostParameter parameter = FindPrivatePostParameter.from(memberId, request);
+		FindPrivatePostParameter parameter = FindPrivatePostParameter.of(memberId, privatePostId);
 		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(DataResponse.from(privatePostService.findPrivatePostResponseBy(parameter)));
+			.body(DataResponse.from(privatePostMemberService.findPrivatePostResponseBy(parameter)));
 	}
 
 	@GetMapping
@@ -148,16 +139,16 @@ public class PrivatePostController {
 		Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
 		FindPrivatePostPreviewParameter parameter = FindPrivatePostPreviewParameter.of(memberId, pageable);
 		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(DataResponse.from(privatePostService.findPrivatePostPreviewsBy(parameter)));
+			.body(DataResponse.from(privatePostMemberService.findPrivatePostPreviewsBy(parameter)));
 	}
 
 	@DeleteMapping("/{privatePostId}")
 	public ResponseEntity<DataResponse<Void>> deletePrivatePost(
-		@Valid @PathVariable("privatePostId") DeletePrivatePostRequest request
+		@Valid @PathVariable("privatePostId") Long privatePostId
 	) {
 		Long memberId = MemberLoader.getMemberId();
-		DeletePrivatePostParameter parameter = DeletePrivatePostParameter.from(memberId, request);
-		privatePostService.deletePrivatePostBy(parameter);
+		DeletePrivatePostParameter parameter = DeletePrivatePostParameter.of(memberId, privatePostId);
+		privatePostMemberService.deletePrivatePostBy(parameter);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(DataResponse.noContent());
 	}
 }

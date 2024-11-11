@@ -7,4 +7,8 @@ public record LikeChildCommentParameter(
 	Long childCommentId,
 	LikeType likeType
 ) {
+
+	public static LikeChildCommentParameter of(Long memberId, Long childCommentId, LikeType likeType) {
+		return new LikeChildCommentParameter(memberId, childCommentId, likeType);
+	}
 }

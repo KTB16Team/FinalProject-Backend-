@@ -2,21 +2,20 @@ package aimo.backend.domains.privatePost.service;
 
 import static aimo.backend.common.exception.ErrorCode.*;
 
-import javax.swing.text.html.parser.Entity;
-
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.w3c.dom.Text;
 
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.exception.ErrorCode;
 import aimo.backend.common.mapper.PrivatePostMapper;
 import aimo.backend.common.properties.AiServerProperties;
+import aimo.backend.common.service.ExternalApiService;
 import aimo.backend.domains.member.entity.Member;
-import aimo.backend.domains.member.service.MemberService;
+import aimo.backend.domains.member.repository.MemberRepository;
 import aimo.backend.domains.privatePost.dto.parameter.DeletePrivatePostParameter;
 import aimo.backend.domains.privatePost.dto.parameter.FindPrivatePostParameter;
 import aimo.backend.domains.privatePost.dto.parameter.FindPrivatePostPreviewParameter;
@@ -28,8 +27,8 @@ import aimo.backend.domains.privatePost.dto.response.PrivatePostResponse;
 import aimo.backend.domains.privatePost.dto.request.SummaryAndJudgementRequest;
 import aimo.backend.domains.privatePost.dto.response.JudgementFromAiResponse;
 import aimo.backend.domains.privatePost.entity.PrivatePost;
+import aimo.backend.domains.privatePost.entity.TextRecord;
 import aimo.backend.domains.privatePost.repository.PrivatePostRepository;
-import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -37,49 +36,44 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class PrivatePostService {
+public class PrivatePostMemberService {
 
 	private final PrivatePostRepository privatePostRepository;
-	private final WebClient webClient;
+	private final MemberRepository memberRepository;
 	private final AiServerProperties aiServerProperties;
-	private final EntityManager em;
+	private final ExternalApiService externalApiService;
+
+	@Transactional
+	public Long serveTextRecordToAi(JudgementToAiParameter parameter) {
+		Long memberId = parameter.memberId();
+		Member member = memberRepository.findById(memberId)
+			.orElseThrow(() -> ApiException.from(ErrorCode.MEMBER_NOT_FOUND));
+
+		JudgementResponse judgementResponse = serveContentToAi(parameter, member);
+		JudgementParameter judgementParameter = JudgementParameter.from(memberId, judgementResponse);
+		TextRecord textRecord = TextRecord.of(parameter.content());
+		PrivatePost privatePost = PrivatePost.toEntity(judgementParameter, member, textRecord);
+
+		return privatePostRepository.save(privatePost).getId();
+	}
 
 	// AI 서버에 판단 요청
-	@Transactional(rollbackFor = ApiException.class)
-	public JudgementResponse serveScriptToAi(JudgementToAiParameter parameter) {
-		Member member = em.getReference(Member.class, parameter.memberId());
+	public JudgementResponse serveContentToAi(JudgementToAiParameter parameter, Member member) {
 		String url = aiServerProperties.getDomainUrl() + aiServerProperties.getJudgementApi();
 
 		SummaryAndJudgementRequest summaryAndJudgementRequest =
-			PrivatePostMapper.toSummaryAndJudgementRequest(parameter, member);
+			SummaryAndJudgementRequest.from(parameter, member);
 
-		return webClient.post()
-			.uri(url)
-			.bodyValue(summaryAndJudgementRequest)
-			.retrieve()
-			.onStatus(HttpStatusCode::is4xxClientError, clientResponse -> {
-				throw ApiException.from(ErrorCode.AI_BAD_GATEWAY);
-			})
-			.onStatus(HttpStatusCode::is5xxServerError, clientResponse -> {
-				throw ApiException.from(ErrorCode.AI_SEVER_ERROR);
-			})
-			.bodyToMono(JudgementFromAiResponse.class)
-			.map(judgementFromAi -> {
-				int faultRateDefendant = judgementFromAi.faultRate().intValue(), faultRatePlaintiff = 100 - faultRateDefendant;
-				return PrivatePostMapper.toJudgementResponse(judgementFromAi, faultRatePlaintiff, faultRateDefendant, parameter);
-			})
+		return externalApiService
+			.post(url, summaryAndJudgementRequest, JudgementFromAiResponse.class)
+			.map(judgementFromAi -> mapToJudgementResponse(judgementFromAi, parameter))
 			.block();
 	}
 
-	// 개인글 저장
-	@Transactional(rollbackFor = ApiException.class)
-	public Long save(JudgementParameter judgementParameter) {
-		Long memberId = judgementParameter.memberId();
-		Member member = em.getReference(Member.class, memberId);
-
-		PrivatePost privatePost = PrivatePostMapper.toEntity(judgementParameter, member);
-
-		return privatePostRepository.save(privatePost).getId();
+	private JudgementResponse mapToJudgementResponse(JudgementFromAiResponse judgementFromAi, JudgementToAiParameter parameter) {
+		int faultRateDefendant = judgementFromAi.faultRate().intValue(),
+			faultRatePlaintiff = 100 - faultRateDefendant;
+		return JudgementResponse.from(judgementFromAi, faultRatePlaintiff, faultRateDefendant, parameter);
 	}
 
 	// 개인글 삭제
@@ -87,7 +81,8 @@ public class PrivatePostService {
 	public void deletePrivatePostBy(DeletePrivatePostParameter parameter) {
 		Long memberId = parameter.memberId();
 		Long privatePostId = parameter.privatePostId();
-		Member member = em.getReference(Member.class, memberId);
+		Member member = memberRepository.findById(memberId)
+			.orElseThrow(() -> ApiException.from(ErrorCode.MEMBER_NOT_FOUND));
 
 		PrivatePost privatePost = privatePostRepository.findById(privatePostId)
 			.orElseThrow(() -> ApiException.from(ErrorCode.PRIVATE_POST_NOT_FOUND));
@@ -144,4 +139,6 @@ public class PrivatePostService {
 	private boolean validationPrivatePost(Long memberId, PrivatePost privatePost) {
 		return privatePost.getMember().getId().equals(memberId);
 	}
+
+
 }

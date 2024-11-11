@@ -9,27 +9,24 @@ import aimo.backend.common.exception.ApiException;
 import aimo.backend.domains.comment.dto.parameter.DeleteParentCommentParameter;
 import aimo.backend.domains.comment.dto.parameter.SaveParentCommentParameter;
 import aimo.backend.domains.comment.dto.parameter.UpdateParentCommentParameter;
-import aimo.backend.domains.comment.dto.request.SaveParentCommentRequest;
-import aimo.backend.domains.comment.dto.request.UpdateParentCommentRequest;
 import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.comment.mapper.ParentCommentMapper;
 import aimo.backend.domains.comment.repository.ParentCommentRepository;
 import aimo.backend.domains.member.entity.Member;
-import aimo.backend.domains.member.service.MemberService;
+import aimo.backend.domains.member.repository.MemberRepository;
 import aimo.backend.domains.post.entity.Post;
 import aimo.backend.domains.post.service.PostService;
-import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class ParentCommentService {
+public class ParentCommentMemberService {
 
 	private final ParentCommentMapper parentCommentMapper;
 	private final PostService postService;
 	private final ParentCommentRepository parentCommentRepository;
-	private final EntityManager em;
+	private final MemberRepository memberRepository;
 
 	// 부모 댓글 권한 확인
 	private void validateParentCommentAuthority(Member member, Long commentId) {
@@ -45,7 +42,8 @@ public class ParentCommentService {
 	public void saveParentComment(SaveParentCommentParameter parameter) {
 		Long memberId = parameter.memberId();
 		Long postId = parameter.postId();
-		Member member = em.getReference(Member.class, memberId);
+		Member member = memberRepository.findById(memberId)
+			.orElseThrow(() -> ApiException.from(MEMBER_NOT_FOUND));
 		Post post = postService.findById(postId);
 		ParentComment parentComment = parentCommentMapper.toEntity(member, post, parameter.content());
 
@@ -55,7 +53,8 @@ public class ParentCommentService {
 	// 부모 댓글 수정
 	@Transactional(rollbackFor = ApiException.class)
 	public void validateAndUpdateParentComment(UpdateParentCommentParameter parameter) {
-		Member member = em.getReference(Member.class, parameter.memberId());
+		Member member = memberRepository.findById(parameter.memberId())
+			.orElseThrow(() -> ApiException.from(MEMBER_NOT_FOUND));
 		validateParentCommentAuthority(member, parameter.parentCommentId());
 
 		ParentComment parentComment = parentCommentRepository.findById(parameter.parentCommentId())
@@ -67,7 +66,8 @@ public class ParentCommentService {
 	// 부모 댓글 삭제
 	@Transactional(rollbackFor = ApiException.class)
 	public void validateAndDeleteParentComment(DeleteParentCommentParameter parameter) {
-		Member member = em.getReference(Member.class, parameter.memberId());
+		Member member = memberRepository.findById(parameter.memberId())
+			.orElseThrow(() -> ApiException.from(MEMBER_NOT_FOUND));
 		Long commentId = parameter.parentCommentId();
 		validateParentCommentAuthority(member, commentId);
 

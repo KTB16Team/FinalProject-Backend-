@@ -25,25 +25,26 @@ public class TextRecord extends BaseEntity {
 	private Long id;
 
 	@Column(nullable = false, length = 10000)
-	private String script;
-
-	@Column(nullable = false)
-	private String title;
+	private String content;
 
 	@OneToOne(mappedBy = "textRecord")
 	private PrivatePost privatePost;
 
 	@Builder
-	private TextRecord(String script, String title, PrivatePost privatePost) {
-		this.title = title;
-		this.script = script;
+	private TextRecord(String content, PrivatePost privatePost) {
+		this.content = content;
 		this.privatePost = privatePost;
 	}
 
 	public static TextRecord from(TextRecordParameter parameter) {
 		return TextRecord.builder()
-			.script(parameter.script())
-			.title(parameter.title())
+			.content(parameter.content())
+			.build();
+	}
+
+	public static TextRecord of(String content) {
+		return TextRecord.builder()
+			.content(content)
 			.build();
 	}
 }
