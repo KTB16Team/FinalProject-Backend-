@@ -44,6 +44,7 @@ jobs:
           echo "${{ secrets.APPLICATION_DEFAULT }}" > backend/src/main/resources/application.yml
           echo "${{ secrets.APPLICATION_DEV }}" > backend/src/main/resources/application-dev.yml
           echo "${{ secrets.APPLICATION_LOCAL }}" > backend/src/main/resources/application-local.yml
+          echo "${{ secrets.APPLICATION_PROD }}" > backend/src/main/resources/application-prod.yml
 
       # Gradle 실행 권한 설정
       - name: Grant execute permission to gradlew
@@ -107,4 +108,4 @@ jobs:
             if screen -list | grep -q "\bbe\b"; then screen -S be -X quit; fi
             
             # 새로운 screen 세션으로 애플리케이션 실행
-            screen -dmS be java -jar /home/ubuntu/backend/build/libs/backend-server.jar --spring.profiles.active=dev
+            screen -dmS be java -jar /home/ubuntu/backend/build/libs/backend-server.jar --spring.profiles.active=prod
