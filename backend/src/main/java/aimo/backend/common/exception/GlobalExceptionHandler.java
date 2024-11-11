@@ -37,6 +37,22 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		return makeErrorResponseEntity(errorCode);
 	}
 
+	@ExceptionHandler({Exception.class})
+	public ResponseEntity<Object> handleAllException(Exception e) {
+		log.warn("handleAllException", e);
+
+		ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
+		return makeErrorResponseEntity(errorCode);
+	}
+
+	@ExceptionHandler({MessagingException.class})
+	public ResponseEntity<Object> handleMessagingException(MessagingException e) {
+		log.warn("handleMessagingException", e);
+
+		ErrorCode errorCode = ErrorCode.EMAIL_BAD_GATEWAY;
+		return makeErrorResponseEntity(errorCode);
+	}
+
 	@Override
 	public ResponseEntity<Object> handleMethodArgumentNotValid(
 		MethodArgumentNotValidException e,
@@ -60,22 +76,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		log.warn("handleHttpMessageNotReadableException", ex);
 
 		ErrorCode errorCode = ErrorCode.BAD_REQUEST;
-		return makeErrorResponseEntity(errorCode);
-	}
-
-	@ExceptionHandler({Exception.class})
-	public ResponseEntity<Object> handleAllException(Exception e) {
-		log.warn("handleAllException", e);
-
-		ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
-		return makeErrorResponseEntity(errorCode);
-	}
-
-	@ExceptionHandler({MessagingException.class})
-	public ResponseEntity<Object> handleMessagingException(MessagingException e) {
-		log.warn("handleMessagingException", e);
-
-		ErrorCode errorCode = ErrorCode.EMAIL_BAD_GATEWAY;
 		return makeErrorResponseEntity(errorCode);
 	}
 

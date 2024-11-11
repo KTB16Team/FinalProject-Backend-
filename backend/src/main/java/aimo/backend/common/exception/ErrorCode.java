@@ -23,6 +23,8 @@ public enum ErrorCode {
 	REISSUE_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "액세스 토큰 재발급이 필요합니다.", "AUTH-003"),
 	EMAIL_AUTHENTICATION_FAIL(HttpStatus.BAD_REQUEST, "이메일 인증에 실패하였습니다.", "AUTH-004"),
 	UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "인증에 실패하였습니다.", "AUTH-005"),
+	ACCESS_TOKEN_IS_NULL(HttpStatus.BAD_REQUEST, "엑세스 토큰이 누락되었습니다.", "AUTH-006"),
+	REFRESH_TOKEN_IS_NULL(HttpStatus.BAD_REQUEST, "리프레쉬 토큰이 누락되었습니다.", "AUTH-007"),
 
 	//Member
 	INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호가 잘못 되었습니다.", "MEMBER-001"),
@@ -59,6 +61,7 @@ public enum ErrorCode {
 	POST_CREATE_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "게시글 작성 권한이 없습니다.", "POST-009"),
 	POST_VOTE_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "게시글 투표 권한이 없습니다.", "POST-010"),
 	POST_LIKE_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "게시글 좋아요 권한이 없습니다.", "POST-011"),
+	POST_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당하는 게시글 타입을 찾을 수 없습니다.", "POST-012"),
 
 	//ParentComment
 	PARENT_COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당하는 부모 댓글을 찾을 수 없습니다.", "PARENT_COMMENT-001"),

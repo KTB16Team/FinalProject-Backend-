@@ -13,7 +13,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import aimo.backend.domains.member.dto.request.CreateProfileImageUrlRequest;
+import aimo.backend.common.mapper.MemberMapper;
+import aimo.backend.common.mapper.S3Mapper;
+import aimo.backend.domains.member.dto.parameter.SignUpParameter;
+import aimo.backend.domains.member.dto.parameter.UpdateNicknameParameter;
+import aimo.backend.domains.member.dto.parameter.DeleteMemberParameter;
+import aimo.backend.domains.member.dto.parameter.FindMyInfoParameter;
+import aimo.backend.domains.member.dto.parameter.SaveFileMetaDataParameter;
+import aimo.backend.domains.member.dto.parameter.UpdatePasswordParameter;
 import aimo.backend.domains.member.dto.request.DeleteMemberRequest;
 import aimo.backend.domains.member.dto.request.LogoutRequest;
 import aimo.backend.domains.member.dto.response.FindMyInfoResponse;
@@ -25,8 +32,9 @@ import aimo.backend.domains.auth.security.jwtFilter.JwtTokenProvider;
 import aimo.backend.domains.member.dto.request.UpdateNicknameRequest;
 import aimo.backend.domains.member.dto.request.UpdatePasswordRequest;
 import aimo.backend.infrastructure.s3.S3Service;
-import aimo.backend.infrastructure.s3.dto.CreatePresignedUrlResponse;
-import aimo.backend.infrastructure.s3.dto.SaveFileMetaDataRequest;
+import aimo.backend.infrastructure.s3.dto.request.CreatePresignedUrlRequest;
+import aimo.backend.infrastructure.s3.dto.response.CreatePresignedUrlResponse;
+import aimo.backend.infrastructure.s3.dto.request.SaveFileMetaDataRequest;
 
 import aimo.backend.domains.member.service.MemberService;
 import jakarta.mail.MessagingException;
@@ -48,44 +56,40 @@ public class MemberController {
 	@PostMapping("/logout")
 	public ResponseEntity<DataResponse<Void>> logoutMember(HttpServletRequest request) {
 		String accessToken = jwtTokenProvider.extractAccessToken(request).orElse(null);
-		String refreshToken = jwtTokenProvider.extractRefreshToken(request).orElse(null);
-		log.info("logout member access token: {} refresh token: {}", accessToken, refreshToken);
-		memberService.logoutMember(new LogoutRequest(accessToken, refreshToken));
-
+		memberService.logoutMember(new LogoutRequest(accessToken));
 		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
 
 	@PostMapping("/signup")
-	public ResponseEntity<DataResponse<Void>> signupMember(@RequestBody @Valid SignUpRequest signUpRequest) {
-		memberService.signUp(signUpRequest);
-
+	public ResponseEntity<DataResponse<Void>> signupMember(@RequestBody @Valid SignUpParameter parameter) {
+		memberService.signUp(parameter);
 		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
 
-	@DeleteMapping
+	@PostMapping
 	public ResponseEntity<DataResponse<Void>> deleteMember(@RequestBody DeleteMemberRequest deleteMemberRequest) {
-		memberService.deleteMember(deleteMemberRequest);
-
-		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(DataResponse.noContent());
+		DeleteMemberParameter deleteMemberParameter = MemberMapper.toDeleteMemberParameter(deleteMemberRequest);
+		memberService.deleteMember(deleteMemberParameter);
+		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
 
-	@PostMapping("/profile/presigned")
+	@GetMapping("/profile/presigned/{filename}")
 	public ResponseEntity<DataResponse<CreatePresignedUrlResponse>> createProfileImagePreSignedUrl(
-		@RequestBody CreateProfileImageUrlRequest request) {
+		@Valid @PathVariable("filename") CreatePresignedUrlRequest createPresignedUrlRequest) {
 		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(DataResponse.created(s3Service.createProfilePresignedUrl(request)));
+			.body(DataResponse.created(s3Service.createProfilePresignedUrl(createPresignedUrlRequest)));
 	}
 
 	@PostMapping("/profile/success")
 	public ResponseEntity<DataResponse<Void>> saveProfileImageMetaData(@RequestBody SaveFileMetaDataRequest request) {
-		memberService.saveProfileImageMetaData(request);
-
+		SaveFileMetaDataParameter parameter = S3Mapper.toSaveFileMetaDataParameter(request);
+		memberService.saveProfileImageMetaData(parameter);
 		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
 
 	@DeleteMapping("/profile")
 	public ResponseEntity<DataResponse<Void>> deleteProfileImage() {
-		memberService.deleteProfileImage();
+		memberService.deleteProfileImage(S3Mapper.toDeleteProfileImageParameter());
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(DataResponse.noContent());
 	}
 
@@ -99,14 +103,16 @@ public class MemberController {
 	// 내 정보 조회 (프로필 이미지 포함)
 	@GetMapping
 	public ResponseEntity<DataResponse<FindMyInfoResponse>> findMyInfo() {
-		return ResponseEntity.status(HttpStatus.OK).body(DataResponse.from(memberService.findMyInfo()));
+		FindMyInfoParameter parameter = MemberMapper.toFindMyInfoParameter();
+		return ResponseEntity.status(HttpStatus.OK).body(DataResponse.from(memberService.findMyInfo(parameter)));
 	}
 
 	// 비밀번호 수정(현재 비밀번호 확인)
 	@PutMapping("/password")
 	public ResponseEntity<DataResponse<Void>> updatePassword(
 		@Valid @RequestBody UpdatePasswordRequest updatePasswordRequest) {
-		memberService.updatePassword(updatePasswordRequest);
+		UpdatePasswordParameter parameter = MemberMapper.toUpdatePasswordParameter(updatePasswordRequest);
+		memberService.updatePassword(parameter);
 		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
 
@@ -121,13 +127,14 @@ public class MemberController {
 	@GetMapping("/nickname/{nickname}/exists")
 	public ResponseEntity<DataResponse<NicknameExistsResponse>> checkNicknameExists(
 		@PathVariable("nickname") String nickname) {
-		NicknameExistsResponse exist = new NicknameExistsResponse(memberService.checkNicknameExists(nickname));
+		NicknameExistsResponse exist = MemberMapper.toNicknameExistsResponse(memberService.checkNicknameExists(nickname));
 		return ResponseEntity.status(HttpStatus.OK).body(DataResponse.from(exist));
 	}
 
 	@PutMapping("/nickname")
 	public ResponseEntity<DataResponse<Void>> updateNickname(@RequestBody UpdateNicknameRequest updateNicknameRequest) {
-		memberService.updateNickname(updateNicknameRequest);
+		UpdateNicknameParameter parameter = MemberMapper.toUpdateNicknameParameter(updateNicknameRequest);
+		memberService.updateNickname(parameter);
 		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
 }

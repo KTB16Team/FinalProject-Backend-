@@ -1,4 +1,5 @@
 package aimo.backend.domains.privatePost.dto.response;
+
 import jakarta.validation.constraints.NotNull;
 
 public record JudgementFromAiResponse(
@@ -14,4 +15,16 @@ public record JudgementFromAiResponse(
 	String judgement,
 	@NotNull(message = "과실 비율이 비었습니다.")
 	Double faultRate
-) { }
+) {
+
+	public static JudgementFromAiResponse of(
+		String title,
+		String stancePlaintiff,
+		String stanceDefendant,
+		String summaryAi,
+		String judgement,
+		Double faultRate
+	) {
+		return new JudgementFromAiResponse(title, stancePlaintiff, stanceDefendant, summaryAi, judgement, faultRate);
+	}
+}

@@ -11,4 +11,9 @@ public record SaveAudioSuccessRequest(
 	String filename,
 	@NotNull(message = "파일 확장자가 필요합니다.")
 	String extension
-) { }
+) {
+
+	public static SaveAudioSuccessRequest of(String url, Long size, String filename, String extension) {
+		return new SaveAudioSuccessRequest(url, size, filename, extension);
+	}
+}

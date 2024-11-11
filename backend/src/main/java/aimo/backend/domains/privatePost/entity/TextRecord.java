@@ -3,6 +3,7 @@ package aimo.backend.domains.privatePost.entity;
 import static jakarta.persistence.GenerationType.*;
 
 import aimo.backend.common.entity.BaseEntity;
+import aimo.backend.domains.privatePost.dto.parameter.TextRecordParameter;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -33,8 +34,16 @@ public class TextRecord extends BaseEntity {
 	private PrivatePost privatePost;
 
 	@Builder
-	private TextRecord(String script, String title) {
+	private TextRecord(String script, String title, PrivatePost privatePost) {
 		this.title = title;
 		this.script = script;
+		this.privatePost = privatePost;
+	}
+
+	public static TextRecord from(TextRecordParameter parameter) {
+		return TextRecord.builder()
+			.script(parameter.script())
+			.title(parameter.title())
+			.build();
 	}
 }

@@ -1,6 +1,5 @@
 package aimo.backend.infrastructure.s3;
 
-import java.net.URL;
 import java.util.Date;
 import java.util.UUID;
 
@@ -8,15 +7,12 @@ import org.springframework.stereotype.Service;
 
 import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.Headers;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 
 import aimo.backend.common.properties.S3Properties;
-import aimo.backend.domains.member.dto.request.CreateProfileImageUrlRequest;
-import aimo.backend.domains.privatePost.dto.request.CreateResourceUrlRequest;
-import aimo.backend.infrastructure.s3.dto.CreatePresignedUrlRequest;
-import aimo.backend.infrastructure.s3.dto.CreatePresignedUrlResponse;
+import aimo.backend.infrastructure.s3.dto.parameter.CreateResourceUrlParameter;
+import aimo.backend.infrastructure.s3.dto.request.CreatePresignedUrlRequest;
+import aimo.backend.infrastructure.s3.dto.response.CreatePresignedUrlResponse;
 import aimo.backend.infrastructure.s3.model.PresignedUrlPrefix;
 import lombok.RequiredArgsConstructor;
 
@@ -27,16 +23,16 @@ public class S3Service {
 	private final AmazonS3 amazonS3Client;
 	private final S3Properties s3Properties;
 
-	public String createAudioPreSignedUrl(CreatePresignedUrlRequest request) {
+	public CreatePresignedUrlResponse createAudioPreSignedUrl(CreatePresignedUrlRequest request) {
 		String path = createPath(PresignedUrlPrefix.AUDIO.getValue(), request.filename());
-		return createGeneratePresignedUrlRequest(path);
+		String url = createGeneratePresignedUrlRequest(path);
+		return new CreatePresignedUrlResponse(url, request.filename());
 	}
 
-	public CreatePresignedUrlResponse createProfilePresignedUrl(CreateProfileImageUrlRequest request) {
-		String path = createPath(PresignedUrlPrefix.IMAGE.getValue(), request.nickname() + "." + request.extension());
+	public CreatePresignedUrlResponse createProfilePresignedUrl(CreatePresignedUrlRequest request) {
+		String path = createPath(PresignedUrlPrefix.IMAGE.getValue(), request.filename());
 		String url = createGeneratePresignedUrlRequest(path);
-		String filename = request.nickname() + "." + request.extension();
-		return new CreatePresignedUrlResponse(url, filename);
+		return new CreatePresignedUrlResponse(url, request.filename());
 	}
 
 	private String createGeneratePresignedUrlRequest(String path) {
@@ -44,18 +40,11 @@ public class S3Service {
 			s3Properties.getBucketName(), path)
 			.withMethod(HttpMethod.PUT)
 			.withExpiration(getPreSignedUrlExpiration());
-
-		generatePresignedUrlRequest.addRequestParameter(Headers.S3_CANNED_ACL,
-			CannedAccessControlList.PublicRead.toString());
-
-		URL url = amazonS3Client.generatePresignedUrl(generatePresignedUrlRequest);
-
-		return url.toString();
+		return amazonS3Client.generatePresignedUrl(generatePresignedUrlRequest).toString();
 	}
 
-	public String getResourceUrl(CreateResourceUrlRequest createResourceUrlRequest) {
-		String key = createResourceUrlRequest.prefix() + "/" + createResourceUrlRequest.filename() + "." + createResourceUrlRequest.extension();
-
+	public String getResourceUrl(CreateResourceUrlParameter createResourceUrlParameter) {
+		String key = createResourceUrlParameter.prefix() + "/" + createResourceUrlParameter.filename() + "." + createResourceUrlParameter.extension();
 		return amazonS3Client.getUrl(s3Properties.getBucketName(), key).toString();
 	}
 

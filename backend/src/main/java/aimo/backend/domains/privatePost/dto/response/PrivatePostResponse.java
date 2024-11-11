@@ -3,21 +3,38 @@ package aimo.backend.domains.privatePost.dto.response;
 import jakarta.validation.constraints.NotNull;
 
 public record PrivatePostResponse(
-	@NotNull(message = "제목이 비었습니다.")
+	Long postId,
 	String title,
-	@NotNull(message = "요약이 비었습니다.")
 	String summaryAi,
-	@NotNull(message = "원고가 비었습니다.")
 	String stancePlaintiff,
-	@NotNull(message = "피고가 비었습니다.")
 	String stanceDefendant,
-	@NotNull(message = "판단이 비었습니다.")
-	String judgement,
-	@NotNull(message = "원고 측 판결이 비었습니다.")
 	Integer faultRatePlaintiff,
-	@NotNull(message = "피고 측 판결이 비었습니다.")
 	Integer faultRateDefendant,
-	@NotNull(message = "발행이 비었습니다.")
+	String judgement,
 	Boolean published
 ) {
+
+	public static PrivatePostResponse of(
+		Long postId,
+		String title,
+		String summaryAi,
+		String stancePlaintiff,
+		String stanceDefendant,
+		Integer faultRatePlaintiff,
+		Integer faultRateDefendant,
+		String judgement,
+		Boolean published
+	) {
+		return new PrivatePostResponse(
+			postId,
+			title,
+			summaryAi,
+			stancePlaintiff,
+			stanceDefendant,
+			faultRatePlaintiff,
+			faultRateDefendant,
+			judgement,
+			published
+		);
+	}
 }

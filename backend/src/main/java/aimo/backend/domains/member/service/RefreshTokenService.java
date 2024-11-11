@@ -15,24 +15,11 @@ import lombok.RequiredArgsConstructor;
 public class RefreshTokenService {
 
 	private final RefreshTokenRepository refreshTokenRepository;
-
-	public Optional<RefreshToken> findByAccessToken(String accessToken) {
-		return refreshTokenRepository.findByAccessToken(accessToken);
-	}
-
 	public void save(RefreshToken refreshToken) {
 		refreshTokenRepository.save(refreshToken);
 	}
 
-	public Optional<RefreshToken> findByToken(String token) {
-		return refreshTokenRepository.findById(token);
-	}
-
-	public void deleteByAccessToken(String accessToken) {
-		refreshTokenRepository.deleteByAccessToken(accessToken);
-	}
-
-	public boolean existsByAccessToken(String accessToken) {
-		return refreshTokenRepository.existsByAccessToken(accessToken);
+	public void deleteBy(Long memberId) {
+		refreshTokenRepository.deleteById(memberId);
 	}
 }

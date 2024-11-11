@@ -14,4 +14,8 @@ public record TextRecordRequest(
 	@NotNull(message = "원본 타입을 입력하세요. (TEXT, CHAT, VOICE)")
 	OriginType originalType
 ) {
+
+	public static TextRecordRequest of(String title, String script, OriginType originalType) {
+		return new TextRecordRequest(title, script, originalType);
+	}
 }

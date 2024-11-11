@@ -5,9 +5,6 @@ import java.util.List;
 
 import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.member.entity.Member;
-import aimo.backend.domains.post.model.Side;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,6 +12,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class FindPostAndCommentsByIdResponse {
+
 	private final Boolean isMine;
 	private final Boolean isLiked;
 	private final String side;
@@ -78,5 +76,18 @@ public class FindPostAndCommentsByIdResponse {
 		private final String nickname;
 		private final Integer likesCount;
 		private final LocalDateTime createdAt;
+
+		public static ChildCommentDto of(Member member, ParentComment parentComment) {
+			return new ChildCommentDto(
+				parentComment.getMember() == member,
+				parentComment.getParentCommentLikes().stream()
+					.anyMatch(like -> like.getMember() == member),
+				parentComment.getId(),
+				parentComment.getContent(),
+				parentComment.getNickname(),
+				parentComment.getLikesCount(),
+				parentComment.getCreatedAt()
+			);
+		}
 	}
 }

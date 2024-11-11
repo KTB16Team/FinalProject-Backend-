@@ -6,12 +6,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import aimo.backend.common.exception.ApiException;
-import aimo.backend.domains.comment.dto.request.SaveChildCommentRequest;
+import aimo.backend.domains.comment.dto.parameter.SaveChildCommentParameter;
+import aimo.backend.domains.comment.dto.parameter.ValidAndDeleteParentCommentParameter;
+import aimo.backend.domains.comment.dto.parameter.ValidAndUpdateChildCommentParameter;
 import aimo.backend.domains.comment.entity.ChildComment;
 import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.comment.mapper.ChildCommentMapper;
 import aimo.backend.domains.comment.repository.ChildCommentRepository;
 import aimo.backend.domains.member.entity.Member;
+import aimo.backend.domains.member.service.MemberService;
 import aimo.backend.domains.post.entity.Post;
 import aimo.backend.domains.post.service.PostService;
 import lombok.RequiredArgsConstructor;
@@ -22,9 +25,9 @@ import lombok.RequiredArgsConstructor;
 public class ChildCommentService {
 
 	private final ChildCommentRepository childCommentRepository;
-	private final ChildCommentMapper childCommentMapper;
 	private final PostService postService;
 	private final ParentCommentService parentCommentService;
+	private final MemberService memberService;
 
 	//자식 댓글 권한 확인
 	private void validateChildCommentAuthority(Member member, Long childCommentId) throws ApiException {
@@ -37,29 +40,41 @@ public class ChildCommentService {
 
 	//자식 댓글 저장
 	@Transactional(rollbackFor = ApiException.class)
-	public void saveChildComment(Member member, Long postId, Long parentCommentId, SaveChildCommentRequest request) {
+	public void saveChildComment(SaveChildCommentParameter saveChildCommentParameter) {
+		Long postId = saveChildCommentParameter.postId();
+		Long parentCommentId = saveChildCommentParameter.parentCommentId();
+		String content = saveChildCommentParameter.content();
+		Member member = memberService.findBy(saveChildCommentParameter.memberId());
 		Post post = postService.findById(postId);
+
 		ParentComment parentComment = parentCommentService.findById(parentCommentId);
-
-		ChildComment childComment = childCommentMapper.from(request, member, parentComment, post);
-
+		ChildComment childComment = ChildCommentMapper.toEntity(content, member, parentComment, post);
 		childCommentRepository.save(childComment);
 	}
 
 	//자식 댓글 수정
 	@Transactional(rollbackFor = ApiException.class)
-	public void validateAndUpdateChildComment(Member member, Long childCommentId, SaveChildCommentRequest request) {
-		validateChildCommentAuthority(member, childCommentId);
+	public void validateAndUpdateChildComment(
+		ValidAndUpdateChildCommentParameter validAndUpdateChildCommentParameter) {
+		Member member = memberService.findBy(validAndUpdateChildCommentParameter.memberId());
+		Long childCommentId = validAndUpdateChildCommentParameter.childCommentId();
+		String content = validAndUpdateChildCommentParameter.content();
 
+		validateChildCommentAuthority(member, childCommentId);
 		ChildComment childComment = childCommentRepository.findById(childCommentId)
 			.orElseThrow(() -> ApiException.from(UNAUTHORIZED_CHILD_COMMENT));
 
-		childComment.updateChildComment(request.content());
+		childComment.updateChildComment(content);
 	}
 
 	//자식 댓글 삭제
 	@Transactional(rollbackFor = ApiException.class)
-	public void validateAndDeleteChildComment(Member member, Long childCommentId) {
+	public void validateAndDeleteChildComment(
+		ValidAndDeleteParentCommentParameter validAndDeleteChildCommentParameter
+	) {
+		Long childCommentId = validAndDeleteChildCommentParameter.childCommentId();
+
+		Member member = memberService.findBy(validAndDeleteChildCommentParameter.memberId());
 		validateChildCommentAuthority(member, childCommentId);
 
 		ParentComment parentComment = childCommentRepository.findById(childCommentId)

@@ -3,7 +3,7 @@ package aimo.backend.domains.auth.security.exceptionHandlingFilter;
 import aimo.backend.common.dto.ErrorResponse;
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.exception.ErrorCode;
-import aimo.backend.util.responseWriter.ResponseWriter;
+import aimo.backend.common.util.responseWriter.ResponseWriter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

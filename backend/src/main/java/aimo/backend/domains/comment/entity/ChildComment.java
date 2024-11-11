@@ -4,6 +4,7 @@ import static jakarta.persistence.CascadeType.*;
 import static jakarta.persistence.GenerationType.*;
 import static lombok.AccessLevel.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import aimo.backend.common.entity.BaseEntity;
@@ -57,8 +58,8 @@ public class ChildComment extends BaseEntity {
 	@JoinColumn(name = "post_id")
 	private Post post;
 
-	@OneToMany(mappedBy = "childComment", fetch = FetchType.LAZY)
-	private List<ChildCommentLike> childCommentLikes;
+	@OneToMany(mappedBy = "childComment", fetch = FetchType.LAZY, orphanRemoval = true, cascade = {REMOVE})
+	private List<ChildCommentLike> childCommentLikes = new ArrayList<>();
 
 	@Builder
 	private ChildComment(
@@ -67,7 +68,8 @@ public class ChildComment extends BaseEntity {
 		ParentComment parentComment,
 		Boolean isDeleted,
 		Member member,
-		Post post
+		Post post,
+		List<ChildCommentLike> childCommentLikes
 	) {
 		this.nickname = nickname;
 		this.content = content;
@@ -75,6 +77,7 @@ public class ChildComment extends BaseEntity {
 		this.isDeleted = isDeleted;
 		this.member = member;
 		this.post = post;
+		this.childCommentLikes = childCommentLikes;
 	}
 
 	public Integer getLikesCount() {

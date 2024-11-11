@@ -1,5 +1,7 @@
 package aimo.backend.domains.post.repository;
 
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,6 +17,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
 	@Query("SELECT p From Post p LEFT JOIN p.postViews pv GROUP BY p ORDER BY COUNT(pv) DESC")
 	Page<Post> findByViewsCount(Pageable pageable);
+
+	Optional<Post> findById(Long postId);
 
 	Boolean existsByIdAndMember_Id(Long postId, Long memberId);
 }

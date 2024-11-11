@@ -8,6 +8,7 @@ import aimo.backend.common.mapper.VoteMapper;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.member.service.MemberService;
 import aimo.backend.domains.post.entity.Post;
+import aimo.backend.domains.vote.dto.SaveVotePostParameter;
 import aimo.backend.domains.vote.dto.SaveVotePostRequest;
 import aimo.backend.domains.vote.entity.Vote;
 import aimo.backend.domains.post.service.PostService;
@@ -26,11 +27,11 @@ public class VoteService {
 
 	// 투표하기
 	@Transactional(rollbackFor = ApiException.class)
-	public void votePost(SaveVotePostRequest saveVotePostRequest) {
-		Long postId = saveVotePostRequest.postId();
-		Member member = memberService.findBy(saveVotePostRequest.memberId());
+	public void votePost(SaveVotePostParameter saveVotePostParameter) {
+		Long postId = saveVotePostParameter.postId();
+		Member member = memberService.findBy(saveVotePostParameter.memberId());
 		Post post = postService.findById(postId);
-		Side side = saveVotePostRequest.side();
+		Side side = saveVotePostParameter.side();
 
 		voteRepository.findByPostIdAndMemberId(postId, member.getId())
 			.ifPresentOrElse(

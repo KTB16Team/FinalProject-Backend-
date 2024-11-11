@@ -4,6 +4,7 @@ import static jakarta.persistence.CascadeType.*;
 import static jakarta.persistence.GenerationType.*;
 import static lombok.AccessLevel.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -66,6 +67,12 @@ public class Post extends BaseEntity {
 	private String stanceDefendant;
 
 	@Column(nullable = false)
+	private Integer faultRatePlaintiff;
+
+	@Column(nullable = false)
+	private Integer faultRateDefendant;
+
+	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
 	private OriginType originType;
 
@@ -77,13 +84,13 @@ public class Post extends BaseEntity {
 	private Category category;
 
 	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY, orphanRemoval = true, cascade = {CascadeType.REMOVE})
-	private List<PostLike> postLikes;
+	private List<PostLike> postLikes = new ArrayList<>();
 
 	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY, orphanRemoval = true, cascade = {CascadeType.REMOVE})
-	private List<PostView> postViews;
+	private List<PostView> postViews = new ArrayList<>();
 
 	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY, orphanRemoval = true, cascade = {CascadeType.REMOVE})
-	private List<Vote> votes;
+	private List<Vote> votes = new ArrayList<>();
 
 	public void setMember(Member member) {
 		this.member = member;
@@ -101,7 +108,7 @@ public class Post extends BaseEntity {
 	public Integer getCommentsCount() {
 		return parentComments
 			.stream()
-			.map(ParentComment::getCommentsCount)
+			.map(ParentComment::getChildCommentsCount)
 			.reduce(1, Integer::sum);
 	}
 
@@ -141,9 +148,15 @@ public class Post extends BaseEntity {
 		String summaryAi,
 		String stancePlaintiff,
 		String stanceDefendant,
+		Integer faultRatePlaintiff,
+		Integer faultRateDefendant,
 		String judgement,
 		OriginType originType,
-		Category category) {
+		Category category,
+		List<ParentComment> parentComments,
+		List<PostLike> postLikes,
+		List<PostView> postViews,
+		List<Vote> votes) {
 
 		this.privatePostId = privatePostId;
 		this.member = member;
@@ -152,8 +165,14 @@ public class Post extends BaseEntity {
 		this.judgement = judgement;
 		this.stancePlaintiff = stancePlaintiff;
 		this.stanceDefendant = stanceDefendant;
+		this.faultRatePlaintiff = faultRatePlaintiff;
+		this.faultRateDefendant = faultRateDefendant;
 		this.originType = originType;
 		this.category = category;
+		this.parentComments = parentComments;
+		this.postLikes = postLikes;
+		this.postViews = postViews;
+		this.votes = votes;
 	}
 
 	@Override

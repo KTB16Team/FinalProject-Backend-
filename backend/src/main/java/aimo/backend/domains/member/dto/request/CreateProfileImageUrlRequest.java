@@ -4,4 +4,8 @@ public record CreateProfileImageUrlRequest(
 	String nickname,
 	String extension
 ) {
+
+	public static CreateProfileImageUrlRequest of(String nickname, String extension) {
+		return new CreateProfileImageUrlRequest(nickname, extension);
+	}
 }

@@ -8,4 +8,8 @@ public record ChatRecordRequest(
 	@NotNull(message = "대화 목록 파일이 전달되지 않았습니다.")
 	MultipartFile file
 ) {
+
+	public static ChatRecordRequest of(MultipartFile file) {
+		return new ChatRecordRequest(file);
+	}
 }

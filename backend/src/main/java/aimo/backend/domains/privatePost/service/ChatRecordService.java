@@ -12,6 +12,8 @@ import org.springframework.util.StreamUtils;
 
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.exception.ErrorCode;
+import aimo.backend.common.mapper.ChatRecordMapper;
+import aimo.backend.domains.privatePost.dto.parameter.ChatRecordParameter;
 import aimo.backend.domains.privatePost.dto.request.ChatRecordRequest;
 import aimo.backend.domains.privatePost.entity.ChatRecord;
 import aimo.backend.domains.privatePost.repository.ChatRecordRepository;
@@ -25,8 +27,8 @@ public class ChatRecordService {
 	private final ChatRecordRepository chatRecordRepository;
 
 	@Transactional(rollbackFor = ApiException.class)
-	public void save(ChatRecordRequest chatRecordRequest) throws IOException {
-		String originalFilename = chatRecordRequest.file().getOriginalFilename();
+	public void save(ChatRecordParameter chatRecordParameter) throws IOException {
+		String originalFilename = chatRecordParameter.file().getOriginalFilename();
 		if (originalFilename == null)
 			throw ApiException.from(ErrorCode.INVALID_FILE_NAME);
 
@@ -34,24 +36,16 @@ public class ChatRecordService {
 			.stream(originalFilename.split("\\."))
 			.toList();
 
-		if (parts.size() <= 1)
-			throw ApiException.from(ErrorCode.INVALID_FILE_NAME);
+		if (parts.size() <= 1) throw ApiException.from(ErrorCode.INVALID_FILE_NAME);
 
 		String filename = String.join(".", parts.subList(0, parts.size() - 1));
 		String extension = parts.get(parts.size() - 1);
 
-		if (!Objects.equals(extension, "txt"))
-			throw ApiException.from(ErrorCode.INVALID_FILE_EXTENSION);
+		if (!Objects.equals(extension, "txt")) throw ApiException.from(ErrorCode.INVALID_FILE_EXTENSION);
 
 		String script = StreamUtils
-			.copyToString(chatRecordRequest.file().getInputStream(), StandardCharsets.UTF_8);
-
-		ChatRecord chatRecord = ChatRecord
-			.builder()
-			.filename(filename)
-			.extension(extension)
-			.script(script)
-			.build();
+			.copyToString(chatRecordParameter.file().getInputStream(), StandardCharsets.UTF_8);
+		ChatRecord chatRecord = ChatRecordMapper.toEntity(filename, extension, script);
 
 		chatRecordRepository.save(chatRecord);
 	}

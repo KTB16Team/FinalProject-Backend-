@@ -12,4 +12,8 @@ public record JudgementToAiRequest(
 	@NotNull(message = "원본 타입이 비었습니다.")
 	OriginType originType
 ) {
+
+	public static JudgementToAiRequest of(String content, OriginType originType) {
+		return new JudgementToAiRequest(content, originType);
+	}
 }

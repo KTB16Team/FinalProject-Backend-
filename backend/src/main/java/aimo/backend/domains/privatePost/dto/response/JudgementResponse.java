@@ -15,4 +15,26 @@ public record JudgementResponse(
 	@Enumerated(EnumType.STRING)
 	OriginType originType
 ) {
+
+	public static JudgementResponse of(
+		String title,
+		String summary,
+		String stancePlaintiff,
+		String stanceDefendant,
+		String judgement,
+		Integer faultRatePlaintiff,
+		Integer faultRateDefendant,
+		OriginType originType
+	) {
+		return new JudgementResponse(
+			title,
+			summary,
+			stancePlaintiff,
+			stanceDefendant,
+			judgement,
+			faultRatePlaintiff,
+			faultRateDefendant,
+			originType
+		);
+	}
 }
