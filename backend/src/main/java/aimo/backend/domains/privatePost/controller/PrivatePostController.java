@@ -68,7 +68,7 @@ public class PrivatePostController {
 	private final S3Service s3Service;
 
 	// 대화록 업로드 + 판결
-	@PostMapping("/text")
+	@PostMapping("/judgement/text")
 	public ResponseEntity<DataResponse<SavePrivatePostResponse>> uploadTextRecordAndJudgement(
 		@Valid @RequestBody TextRecordRequest textRecordRequest
 	) {
