@@ -1,5 +1,6 @@
 package aimo.backend.domains.privatePost.dto.response;
 
+import aimo.backend.domains.privatePost.dto.parameter.JudgementToAiParameter;
 import aimo.backend.domains.privatePost.model.OriginType;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -36,5 +37,18 @@ public record JudgementResponse(
 			faultRateDefendant,
 			originType
 		);
+	}
+
+	public static JudgementResponse from (JudgementFromAiResponse judgementFromAi,
+		Integer faultRatePlaintiff, Integer faultRateDefendant, JudgementToAiParameter parameter) {
+		return new JudgementResponse(
+			judgementFromAi.title(),
+			judgementFromAi.summaryAi(),
+			judgementFromAi.stancePlaintiff(),
+			judgementFromAi.stanceDefendant(),
+			judgementFromAi.judgement(),
+			100 - faultRatePlaintiff,
+			100 - faultRateDefendant,
+			parameter.originType());
 	}
 }

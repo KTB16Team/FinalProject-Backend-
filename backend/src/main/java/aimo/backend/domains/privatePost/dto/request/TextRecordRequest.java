@@ -6,16 +6,11 @@ import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotNull;
 
 public record TextRecordRequest(
-	@NotNull(message = "제목을 입력하세요.")
-	String title,
 	@NotNull(message = "내용을 입력하세요.")
-	String script,
-	@Enumerated(EnumType.STRING)
-	@NotNull(message = "원본 타입을 입력하세요. (TEXT, CHAT, VOICE)")
-	OriginType originalType
+	String content
 ) {
 
-	public static TextRecordRequest of(String title, String script, OriginType originalType) {
-		return new TextRecordRequest(title, script, originalType);
+	public static TextRecordRequest of(String content) {
+		return new TextRecordRequest(content);
 	}
 }

@@ -1,26 +1,17 @@
 package aimo.backend.domains.privatePost.service;
 
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import aimo.backend.common.exception.ApiException;
-import aimo.backend.common.exception.ErrorCode;
-import aimo.backend.common.mapper.AudioRecordMapper;
 import aimo.backend.common.properties.AiServerProperties;
 import aimo.backend.common.util.webclient.ReactiveHttpService;
 import aimo.backend.domains.privatePost.dto.parameter.SpeechToTextParameter;
-import aimo.backend.domains.privatePost.dto.request.SaveAudioSuccessRequest;
 import aimo.backend.domains.privatePost.dto.response.SaveAudioSuccessResponse;
-import aimo.backend.domains.privatePost.dto.request.SpeechToTextRequest;
 import aimo.backend.domains.privatePost.dto.response.SpeechToTextResponse;
 import aimo.backend.domains.privatePost.entity.AudioRecord;
 import aimo.backend.domains.privatePost.repository.AudioRecordRepository;
-import aimo.backend.infrastructure.s3.S3Service;
-import aimo.backend.infrastructure.s3.dto.request.CreatePresignedUrlRequest;
-import aimo.backend.infrastructure.s3.dto.response.CreatePresignedUrlResponse;
+
 import lombok.RequiredArgsConstructor;
 
 @Service

@@ -82,6 +82,11 @@ public enum ErrorCode {
 	INVALID_FILE_NAME(HttpStatus.BAD_REQUEST, "파일 이름이 잘못 되었습니다.", "FILE-003"),
 	INVALID_FILE_EXTENSION(HttpStatus.BAD_REQUEST, "파일 확장자가 잘못 되었습니다.", "FILE-004"),
 
+	// TEXT
+	TEXT_RECORD_NOT_FOUND(HttpStatus.NOT_FOUND, "해당하는 텍스트 레코드를 찾을 수 없습니다.", "TEXT-001"),
+
+	// CHAT
+	CHAT_RECORD_NOT_FOUND(HttpStatus.NOT_FOUND, "해당하는 채팅 레코드를 찾을 수 없습니다.", "CHAT-001"),
 	;
 	private final HttpStatus httpStatus;
 	private final String message;

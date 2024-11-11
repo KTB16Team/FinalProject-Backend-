@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import aimo.backend.common.dto.DataResponse;
+import aimo.backend.common.util.memberLoader.MemberLoader;
 import aimo.backend.domains.comment.dto.parameter.DeleteParentCommentParameter;
 import aimo.backend.domains.comment.dto.parameter.SaveParentCommentParameter;
 import aimo.backend.domains.comment.dto.parameter.UpdateParentCommentParameter;
@@ -17,9 +18,7 @@ import aimo.backend.domains.comment.dto.request.DeleteParentCommentRequest;
 import aimo.backend.domains.comment.dto.request.SaveParentCommentRequest;
 import aimo.backend.domains.comment.dto.request.UpdateParentCommentRequest;
 import aimo.backend.domains.comment.mapper.ParentCommentMapper;
-import aimo.backend.domains.comment.service.ParentCommentService;
-import aimo.backend.domains.member.entity.Member;
-import aimo.backend.common.util.memberLoader.MemberLoader;
+import aimo.backend.domains.comment.service.ParentCommentMemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -28,14 +27,14 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ParentCommentController {
 
-	private final ParentCommentService parentCommentService;
+	private final ParentCommentMemberService parentCommentMemberService;
 
 	@PostMapping("/{postId}/comments")
 	public ResponseEntity<DataResponse<Void>> saveParentComment(
 		@Valid @PathVariable Long postId,
 		@Valid @RequestBody SaveParentCommentRequest request) {
 		SaveParentCommentParameter parameter = ParentCommentMapper.toSaveParentCommentParameter(postId, request.content());
-		parentCommentService.saveParentComment(parameter);
+		parentCommentMemberService.saveParentComment(parameter);
 
 		return ResponseEntity.ok(DataResponse.ok());
 	}
@@ -45,16 +44,17 @@ public class ParentCommentController {
 		@Valid @PathVariable Long commentId,
 		@Valid @RequestBody UpdateParentCommentRequest request) {
 		UpdateParentCommentParameter parameter = ParentCommentMapper.toUpdateParentCommentParameter(commentId, request.content());
-		parentCommentService.validateAndUpdateParentComment(parameter);
+		parentCommentMemberService.validateAndUpdateParentComment(parameter);
 
 		return ResponseEntity.ok(DataResponse.ok());
 	}
 
 	@DeleteMapping("comments/{commentId}")
 	public ResponseEntity<DataResponse<Void>> deleteParentComment(
-		@Valid @PathVariable("commentId") DeleteParentCommentRequest deleteParentCommentRequest) {
-		DeleteParentCommentParameter parameter = ParentCommentMapper.toDeleteParentCommentParameter(deleteParentCommentRequest.commentId());
-		parentCommentService.validateAndDeleteParentComment(parameter);
+		@Valid @PathVariable("commentId") Long commentId) {
+		Long memberId = MemberLoader.getMemberId();
+		DeleteParentCommentParameter parameter = DeleteParentCommentParameter.of(memberId, commentId);
+		parentCommentMemberService.validateAndDeleteParentComment(parameter);
 
 		return ResponseEntity.ok(DataResponse.ok());
 	}

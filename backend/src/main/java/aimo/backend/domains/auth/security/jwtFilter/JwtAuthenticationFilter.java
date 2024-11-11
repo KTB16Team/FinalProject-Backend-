@@ -69,16 +69,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		if (accessToken == null) throw ApiException.from(ACCESS_TOKEN_IS_NULL);
 
 		if (jwtTokenProvider.isLogout(accessToken)) {
-			log.info("access토큰 만료(BlackList)");
+			log.info("access 토큰 만료(BlackList)");
 			throw ApiException.from(INVALID_ACCESS_TOKEN);
-		}
-
-		if (jwtTokenProvider.isTokenValid(accessToken)) {
-			checkLogoutToken(accessToken);
-			log.info("access 토큰 인증 성공");
-			Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
-			saveAuthentication(authentication);
-			filterChain.doFilter(request, response);
 		}
 
 		if (!jwtTokenProvider.isTokenValid(accessToken)) {
@@ -86,8 +78,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			throw ApiException.from(REISSUE_ACCESS_TOKEN);
 		}
 
-		log.info("인증 실패");
-		throw ApiException.from(ErrorCode.UNAUTHORIZED);
+		checkLogoutToken(accessToken);
+		log.info("access 토큰 인증 성공");
+		Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
+		saveAuthentication(authentication);
+		filterChain.doFilter(request, response);
 	}
 
 	// contextHolder에 인증정보 저장

@@ -4,7 +4,9 @@ import java.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.member.model.Gender;
+import aimo.backend.domains.privatePost.dto.parameter.JudgementToAiParameter;
 import jakarta.validation.constraints.NotNull;
 
 public record SummaryAndJudgementRequest(
@@ -26,5 +28,17 @@ public record SummaryAndJudgementRequest(
 		LocalDate birth
 	) {
 		return new SummaryAndJudgementRequest(content, nickname, gender, birth);
+	}
+
+	public static SummaryAndJudgementRequest from(
+		JudgementToAiParameter 	parameter,
+		Member member
+	) {
+		return new SummaryAndJudgementRequest(
+			parameter.content(),
+			member.getNickname(),
+			member.getGender(),
+			member.getBirthDate()
+		);
 	}
 }

@@ -24,7 +24,7 @@ public class ChatRecord extends BaseEntity {
 	private Long id;
 
 	@Column(nullable = false)
-	private String script;
+	private String content;
 
 	@Column(nullable = false)
 	private String extension;
@@ -33,9 +33,9 @@ public class ChatRecord extends BaseEntity {
 	private String filename;
 
 	@Builder
-	public ChatRecord(String filename, String extension, String script) {
+	public ChatRecord(String filename, String extension, String content) {
 		this.filename = filename;
 		this.extension = extension;
-		this.script = script;
+		this.content = content;
 	}
 }

@@ -27,7 +27,7 @@ public class ChatRecordService {
 	private final ChatRecordRepository chatRecordRepository;
 
 	@Transactional(rollbackFor = ApiException.class)
-	public void save(ChatRecordParameter chatRecordParameter) throws IOException {
+	public Long save(ChatRecordParameter chatRecordParameter) throws IOException {
 		String originalFilename = chatRecordParameter.file().getOriginalFilename();
 		if (originalFilename == null)
 			throw ApiException.from(ErrorCode.INVALID_FILE_NAME);
@@ -43,10 +43,15 @@ public class ChatRecordService {
 
 		if (!Objects.equals(extension, "txt")) throw ApiException.from(ErrorCode.INVALID_FILE_EXTENSION);
 
-		String script = StreamUtils
+		String record = StreamUtils
 			.copyToString(chatRecordParameter.file().getInputStream(), StandardCharsets.UTF_8);
-		ChatRecord chatRecord = ChatRecordMapper.toEntity(filename, extension, script);
+		ChatRecord chatRecord = ChatRecordMapper.toEntity(filename, extension, record);
 
-		chatRecordRepository.save(chatRecord);
+		return chatRecordRepository.save(chatRecord).getId();
+	}
+
+	public ChatRecord findById(Long chatRecordId) {
+		return chatRecordRepository.findById(chatRecordId)
+			.orElseThrow(() -> ApiException.from(ErrorCode.CHAT_RECORD_NOT_FOUND));
 	}
 }

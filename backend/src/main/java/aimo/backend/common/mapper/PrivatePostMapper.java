@@ -17,11 +17,14 @@ import aimo.backend.domains.privatePost.dto.response.JudgementFromAiResponse;
 import aimo.backend.domains.privatePost.dto.response.JudgementResponse;
 import aimo.backend.domains.privatePost.dto.response.PrivatePostPreviewResponse;
 import aimo.backend.domains.privatePost.dto.response.PrivatePostResponse;
+import aimo.backend.domains.privatePost.entity.ChatRecord;
 import aimo.backend.domains.privatePost.entity.PrivatePost;
+import aimo.backend.domains.privatePost.entity.TextRecord;
+import aimo.backend.domains.privatePost.model.OriginType;
 
 public class PrivatePostMapper {
 
-	public static PrivatePost toEntity(JudgementParameter parameter, Member member) {
+	public static PrivatePost toEntity(JudgementParameter parameter, Member member, TextRecord textRecord) {
 		return PrivatePost.builder()
 			.title(parameter.title())
 			.member(member)
@@ -31,7 +34,24 @@ public class PrivatePostMapper {
 			.judgement(parameter.judgement())
 			.faultRatePlaintiff(parameter.faultRatePlaintiff())
 			.faultRateDefendant(parameter.faultRateDefendant())
-			.originType(parameter.originType())
+			.textRecord(textRecord)
+			.originType(OriginType.TEXT)
+			.published(false)
+			.build();
+	}
+
+	public static PrivatePost toEntity(JudgementParameter parameter, Member member, ChatRecord chatRecord) {
+		return PrivatePost.builder()
+			.title(parameter.title())
+			.member(member)
+			.stancePlaintiff(parameter.stancePlaintiff())
+			.stanceDefendant(parameter.stanceDefendant())
+			.summaryAi(parameter.summary())
+			.judgement(parameter.judgement())
+			.faultRatePlaintiff(parameter.faultRatePlaintiff())
+			.faultRateDefendant(parameter.faultRateDefendant())
+			.chatRecord(chatRecord)
+			.originType(OriginType.CHAT)
 			.published(false)
 			.build();
 	}

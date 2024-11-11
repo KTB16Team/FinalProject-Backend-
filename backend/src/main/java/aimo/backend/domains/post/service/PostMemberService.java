@@ -17,7 +17,7 @@ import aimo.backend.domains.post.dto.parameter.SavePostParameter;
 import aimo.backend.domains.post.dto.response.FindPostAndCommentsByIdResponse;
 import aimo.backend.domains.post.entity.Post;
 import aimo.backend.domains.post.repository.PostRepository;
-import aimo.backend.domains.privatePost.service.PrivatePostService;
+import aimo.backend.domains.privatePost.service.PrivatePostMemberService;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -27,14 +27,14 @@ public class PostMemberService {
 
 	private final PostRepository postRepository;
 	private final MemberRepository memberRepository;
-	private final PrivatePostService privatePostService;
+	private final PrivatePostMemberService privatePostMemberService;
 
 	@Transactional
 	public Long save(SavePostParameter savePostParameter) {
 		Member member = memberRepository.findById(savePostParameter.memberId())
 			.orElseThrow(() -> ApiException.from(MEMBER_NOT_FOUND));
 
-		privatePostService.publishPrivatePost(savePostParameter.privatePostId());
+		privatePostMemberService.publishPrivatePost(savePostParameter.privatePostId());
 		Post post = PostMapper.toEntity(savePostParameter, member);
 		return postRepository.save(post).getId();
 	}

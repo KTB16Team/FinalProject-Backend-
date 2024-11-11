@@ -3,8 +3,10 @@ package aimo.backend.domains.privatePost.entity;
 import static lombok.AccessLevel.*;
 
 import aimo.backend.common.entity.BaseEntity;
+import aimo.backend.domains.privatePost.dto.parameter.JudgementParameter;
 import aimo.backend.domains.privatePost.model.OriginType;
 import aimo.backend.domains.member.entity.Member;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -16,6 +18,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.Persistence;
 import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
@@ -55,9 +58,14 @@ public class PrivatePost extends BaseEntity {
 	@JoinColumn(name = "audio_record_id", referencedColumnName = "audio_record_id")
 	private AudioRecord audioRecord;
 
-	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "text_record_id", referencedColumnName = "text_record_id", nullable = false)
+	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinColumn(name = "text_record_id", referencedColumnName = "text_record_id")
 	private TextRecord textRecord;
+
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "chat_record_id", referencedColumnName = "chat_record_id")
+	private ChatRecord chatRecord;
+
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
@@ -80,6 +88,22 @@ public class PrivatePost extends BaseEntity {
 		this.published = false;
 	}
 
+	public static PrivatePost toEntity(JudgementParameter parameter, Member member, TextRecord textRecord) {
+		return PrivatePost.builder()
+			.title(parameter.title())
+			.member(member)
+			.stancePlaintiff(parameter.stancePlaintiff())
+			.stanceDefendant(parameter.stanceDefendant())
+			.summaryAi(parameter.summary())
+			.judgement(parameter.judgement())
+			.originType(parameter.originType())
+			.faultRatePlaintiff(parameter.faultRatePlaintiff())
+			.faultRateDefendant(parameter.faultRateDefendant())
+			.textRecord(textRecord)
+			.published(false)
+			.build();
+	}
+
 	@Builder
 	private PrivatePost(
 		String title,
@@ -90,6 +114,7 @@ public class PrivatePost extends BaseEntity {
 		String judgement,
 		AudioRecord audioRecord,
 		TextRecord textRecord,
+		ChatRecord chatRecord,
 		OriginType originType,
 		Integer faultRatePlaintiff,
 		Integer faultRateDefendant,
@@ -103,6 +128,7 @@ public class PrivatePost extends BaseEntity {
 		this.judgement = judgement;
 		this.audioRecord = audioRecord;
 		this.textRecord = textRecord;
+		this.chatRecord = chatRecord;
 		this.originType = originType;
 		this.faultRatePlaintiff = faultRatePlaintiff;
 		this.faultRateDefendant = faultRateDefendant;

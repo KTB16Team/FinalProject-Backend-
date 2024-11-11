@@ -18,22 +18,17 @@ import aimo.backend.common.mapper.PostMapper;
 import aimo.backend.common.mapper.PrivatePostMapper;
 import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.comment.service.PostCommentService;
-import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.post.dto.parameter.SoftDeletePostParameter;
 import aimo.backend.domains.post.dto.parameter.DeletePostParameter;
-import aimo.backend.domains.post.dto.parameter.FindPostAndCommentsByIdParameter;
 import aimo.backend.domains.post.dto.parameter.FindPostByPostTypeParameter;
-import aimo.backend.domains.post.dto.parameter.SavePostParameter;
 import aimo.backend.domains.post.dto.requset.FindCommentedPostsByIdRequest;
 import aimo.backend.domains.post.dto.response.FindJudgementResponse;
-import aimo.backend.domains.post.dto.response.FindPostAndCommentsByIdResponse;
 import aimo.backend.domains.post.dto.response.FindPostsByPostTypeResponse;
 import aimo.backend.domains.post.entity.Post;
 import aimo.backend.domains.post.model.PostType;
 import aimo.backend.domains.post.repository.PostRepository;
 import aimo.backend.domains.privatePost.dto.parameter.DeletePrivatePostParameter;
-import aimo.backend.domains.privatePost.service.PrivatePostService;
-import jakarta.persistence.EntityManager;
+import aimo.backend.domains.privatePost.service.PrivatePostMemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,7 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional(readOnly = true)
 public class PostService {
 
-	private final PrivatePostService privatePostService;
+	private final PrivatePostMemberService privatePostMemberService;
 	private final PostRepository postRepository;
 	private final PostCommentService postCommentService;
 
@@ -143,7 +138,7 @@ public class PostService {
 			.orElseThrow(() -> ApiException.from(POST_NOT_FOUND))
 			.getPrivatePostId();
 
-		privatePostService.unpublishPrivatePost(privatePostId);
+		privatePostMemberService.unpublishPrivatePost(privatePostId);
 		postRepository.deleteById(postId);
 	}
 
@@ -160,7 +155,7 @@ public class PostService {
 		Post post = findById(parameter.postId());
 		DeletePrivatePostParameter deletePrivatePostParameter
 			= PrivatePostMapper.toDeletePrivatePostParameter(post.getPrivatePostId());
-		privatePostService.deletePrivatePostBy(deletePrivatePostParameter);
+		privatePostMemberService.deletePrivatePostBy(deletePrivatePostParameter);
 		post.softDelete();
 	}
 }

@@ -16,9 +16,9 @@ import aimo.backend.domains.like.dto.parameter.LikeChildCommentParameter;
 import aimo.backend.domains.like.dto.parameter.LikeParentCommentParameter;
 import aimo.backend.domains.like.dto.parameter.LikePostParameter;
 import aimo.backend.domains.like.model.LikeType;
-import aimo.backend.domains.like.service.ChildCommentLikeService;
-import aimo.backend.domains.like.service.ParentCommentLikeService;
-import aimo.backend.domains.like.service.PostLikeService;
+import aimo.backend.domains.like.service.ChildCommentLikeMemberService;
+import aimo.backend.domains.like.service.ParentCommentLikeMemberService;
+import aimo.backend.domains.like.service.PostLikeMemberService;
 import aimo.backend.common.util.memberLoader.MemberLoader;
 import lombok.RequiredArgsConstructor;
 
@@ -27,16 +27,15 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class LikeController {
 
-	private final PostLikeService postLikeService;
-	private final MemberLoader memberLoader;
-	private final ChildCommentLikeService childCommentLikeService;
-	private final ParentCommentLikeService parentCommentLikeService;
+	private final PostLikeMemberService postLikeMemberService;
+	private final ChildCommentLikeMemberService childCommentLikeMemberService;
+	private final ParentCommentLikeMemberService parentCommentLikeMemberService;
 
 	@PostMapping("/posts/{postId}/likes")
 	public ResponseEntity<DataResponse<Void>> likePost(@PathVariable Long postId,
 		@RequestParam("likeType") LikeType likeType) {
 		LikePostParameter parameter = PostLikeMapper.toLikePostParameter(postId, likeType);
-		postLikeService.likePost(parameter);
+		postLikeMemberService.likePost(parameter);
 
 		return ResponseEntity
 			.status(HttpStatus.CREATED)
@@ -47,9 +46,10 @@ public class LikeController {
 	public ResponseEntity<DataResponse<Void>> likeChildComment(
 		@PathVariable Long childCommentId,
 		@RequestParam("likeType") LikeType likeType) {
-		LikeChildCommentParameter parameter = ChildCommentLikeMapper
-			.toLikeChildCommentParameter(childCommentId, likeType);
-		childCommentLikeService.likeChildComment(parameter);
+		Long memberId = MemberLoader.getMemberId();
+		LikeChildCommentParameter parameter = LikeChildCommentParameter
+			.of(memberId, childCommentId, likeType);
+		childCommentLikeMemberService.likeChildComment(parameter);
 		return ResponseEntity
 			.status(HttpStatus.CREATED)
 			.body(DataResponse.created());
@@ -59,9 +59,9 @@ public class LikeController {
 	public ResponseEntity<DataResponse<Void>> likeParentComment(
 		@PathVariable Long parentCommentId,
 		@RequestParam("likeType") LikeType likeType) {
-		LikeParentCommentParameter parameter = ParentCommentLikeMapper
-			.toLikeParentCommentParameter(parentCommentId, likeType);
-		parentCommentLikeService.likeParentComment(parameter);
+		Long memberId = MemberLoader.getMemberId();
+		LikeParentCommentParameter parameter = LikeParentCommentParameter.of(memberId, parentCommentId, likeType);
+		parentCommentLikeMemberService.likeParentComment(parameter);
 
 		return ResponseEntity.ok(DataResponse.ok());
 	}

@@ -5,4 +5,8 @@ public record ValidAndUpdateChildCommentParameter(
 	Long childCommentId,
 	String content
 ) {
+
+	public static ValidAndUpdateChildCommentParameter of(Long memberId, Long childCommentId, String content) {
+		return new ValidAndUpdateChildCommentParameter(memberId, childCommentId, content);
+	}
 }

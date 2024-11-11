@@ -14,6 +14,7 @@ import aimo.backend.domains.member.dto.parameter.FindMyInfoParameter;
 import aimo.backend.domains.member.dto.parameter.SaveFileMetaDataParameter;
 import aimo.backend.domains.member.dto.parameter.SignUpParameter;
 import aimo.backend.domains.member.dto.parameter.UpdatePasswordParameter;
+import aimo.backend.domains.member.dto.request.CheckNicknameExistsRequest;
 import aimo.backend.domains.member.dto.response.FindMyInfoResponse;
 import aimo.backend.domains.member.dto.request.LogoutRequest;
 import aimo.backend.domains.member.dto.request.SendTemporaryPasswordRequest;
@@ -138,8 +139,8 @@ public class MemberService {
 		return memberRepository.findById(memberId).orElseThrow(() -> ApiException.from(ErrorCode.MEMBER_NOT_FOUND));
 	}
 
-	public boolean checkNicknameExists(String nickname) {
-		return memberRepository.existsByNickname(nickname);
+	public boolean checkNicknameExists(CheckNicknameExistsRequest request) {
+		return memberRepository.existsByNickname(request.nickname());
 	}
 
 	protected boolean isValid(String password, String encodedPassword) {

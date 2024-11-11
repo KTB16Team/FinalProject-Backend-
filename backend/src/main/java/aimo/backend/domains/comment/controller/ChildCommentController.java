@@ -34,7 +34,7 @@ public class ChildCommentController {
 		@Valid @RequestBody SaveChildCommentRequest request) {
 		Long memberId = MemberLoader.getMemberId();
 		SaveChildCommentParameter saveChildCommentParameter =
-			ChildCommentMapper.toSaveChildCommentParameter(memberId, postId, parentCommentId, request.content());
+			SaveChildCommentParameter.of(memberId, postId, parentCommentId, request.content());
 		childCommentService.saveChildComment(saveChildCommentParameter);
 		return ResponseEntity.ok(DataResponse.ok());
 	}
@@ -45,7 +45,7 @@ public class ChildCommentController {
 		@Valid @RequestBody SaveChildCommentRequest request) {
 		Long memberId = MemberLoader.getMemberId();
 		ValidAndUpdateChildCommentParameter validAndUpdateChildCommentParameter =
-			ChildCommentMapper.toValidAndUpdateChildCommentParameter(memberId, childCommentId, request.content());
+			ValidAndUpdateChildCommentParameter.of(memberId, childCommentId, request.content());
 		childCommentService.validateAndUpdateChildComment(validAndUpdateChildCommentParameter);
 		return ResponseEntity.ok(DataResponse.ok());
 	}
@@ -54,7 +54,7 @@ public class ChildCommentController {
 	public ResponseEntity<DataResponse<Void>> deleteParentComment(@Valid @PathVariable Long childCommentId) {
 		Long memberId = MemberLoader.getMemberId();
 		ValidAndDeleteParentCommentParameter validateAndDeleteChildCommentParameter =
-			ChildCommentMapper.toValidAndDeleteParentCommentParameter(memberId, childCommentId);
+			ValidAndDeleteParentCommentParameter.of(memberId, childCommentId);
 		childCommentService.validateAndDeleteChildComment(validateAndDeleteChildCommentParameter);
 		return ResponseEntity.ok(DataResponse.ok());
 	}

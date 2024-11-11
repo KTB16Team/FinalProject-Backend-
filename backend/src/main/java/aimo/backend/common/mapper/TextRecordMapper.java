@@ -7,8 +7,7 @@ public class TextRecordMapper {
 	public static TextRecord toEntity(TextRecordRequest request) {
 		return TextRecord
 			.builder()
-			.title(request.title())
-			.script(request.script())
+			.content(request.content())
 			.build();
 	}
 }

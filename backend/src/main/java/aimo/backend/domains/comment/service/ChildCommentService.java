@@ -26,7 +26,7 @@ public class ChildCommentService {
 
 	private final ChildCommentRepository childCommentRepository;
 	private final PostService postService;
-	private final ParentCommentService parentCommentService;
+	private final ParentCommentMemberService parentCommentMemberService;
 	private final MemberService memberService;
 
 	//자식 댓글 권한 확인
@@ -47,7 +47,7 @@ public class ChildCommentService {
 		Member member = memberService.findBy(saveChildCommentParameter.memberId());
 		Post post = postService.findById(postId);
 
-		ParentComment parentComment = parentCommentService.findById(parentCommentId);
+		ParentComment parentComment = parentCommentMemberService.findById(parentCommentId);
 		ChildComment childComment = ChildCommentMapper.toEntity(content, member, parentComment, post);
 		childCommentRepository.save(childComment);
 	}
@@ -83,7 +83,7 @@ public class ChildCommentService {
 
 		parentComment.deleteChildComment(childCommentId);
 		childCommentRepository.deleteById(childCommentId);
-		parentCommentService.deleteIfChildrenIsEmpty(parentComment);
+		parentCommentMemberService.deleteIfChildrenIsEmpty(parentComment);
 	}
 
 	// id로 자식 댓글 조회
