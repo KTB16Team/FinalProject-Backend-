@@ -29,6 +29,7 @@ out/
 
 application*
 backend/src/main/resources/application.yml
+!backend/src/main/resources/logback-spring.xml
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
