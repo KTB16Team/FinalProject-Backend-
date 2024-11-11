@@ -46,16 +46,6 @@ public class PostService {
 	private final PrivatePostService privatePostService;
 	private final PostRepository postRepository;
 	private final PostCommentService postCommentService;
-	private final EntityManager em;
-
-	// 글 저장
-	@Transactional
-	public Long save(SavePostParameter savePostParameter) {
-		Member memberReference = em.getReference(Member.class, savePostParameter.memberId());
-		privatePostService.publishPrivatePost(savePostParameter.privatePostId());
-		Post post = PostMapper.toEntity(savePostParameter, memberReference);
-		return postRepository.save(post).getId();
-	}
 
 	// 글 조회
 	public Post findById(Long postId) {
@@ -66,14 +56,6 @@ public class PostService {
 	public FindJudgementResponse findJudgementBy(Long postId) {
 		Post post = findById(postId);
 		return PostMapper.toJudgement(post);
-	}
-
-	// 글 조회, dto로 응답
-	public FindPostAndCommentsByIdResponse findPostAndCommentsDtoById(FindPostAndCommentsByIdParameter parameter) {
-		Post post = findById(parameter.postId());
-		Member memberReference = em.getReference(Member.class, parameter.memberId());
-		List<ParentComment> parentComments = postCommentService.findParentCommentsByPostId(post.getId());
-		return PostMapper.toFindPostAndCommentsByIdResponse(memberReference, post, parentComments);
 	}
 
 	// PostType으로 글 조회

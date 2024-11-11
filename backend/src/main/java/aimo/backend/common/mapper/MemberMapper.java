@@ -26,28 +26,6 @@ public class MemberMapper {
 
 	private final PasswordEncoder passwordEncoder;
 
-	public static Member signUpMemberEntity(SignUpParameter signUpParameter) {
-		return Member
-			.builder()
-			.nickname(signUpParameter.nickname())
-			.password(signUpParameter.encodedPassword())
-			.email(signUpParameter.email())
-			.memberRole(MemberRole.USER)
-			.gender(signUpParameter.gender())
-			.provider(Provider.AIMO)
-			.birthDate(signUpParameter.birth())
-			.build();
-	}
-
-	public static SignUpParameter toSignUpParameter(SignUpRequest signUpRequest, String encodedPassword) {
-		return new SignUpParameter(
-			signUpRequest.nickname(),
-			signUpRequest.email(),
-			encodedPassword,
-			signUpRequest.gender(),
-			signUpRequest.birth()
-		);
-	}
 
 	public static FindMyInfoResponse toFindMyInfoResponse(Member member) {
 		return new FindMyInfoResponse(

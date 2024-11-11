@@ -8,11 +8,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import aimo.backend.common.dto.DataResponse;
-import aimo.backend.common.mapper.ViewMapper;
 import aimo.backend.domains.view.dto.IncreasePostViewParameter;
 import aimo.backend.domains.view.dto.IncreasePostViewRequest;
-import aimo.backend.domains.view.service.PostViewService;
 import aimo.backend.common.util.memberLoader.MemberLoader;
+import aimo.backend.domains.view.service.PostViewMemberService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -20,15 +19,14 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ViewController {
 
-	private final PostViewService postViewService;
-	private final MemberLoader memberLoader;
+	private final PostViewMemberService postViewMemberService;
 
 	@PostMapping("/{postId}/views")
 	public ResponseEntity<DataResponse<Void>> increasePostView(
 		@PathVariable("postId") IncreasePostViewRequest increasePostViewRequest) {
-		Long memberId = memberLoader.getMemberId();
-		IncreasePostViewParameter increasePostViewParameter = ViewMapper.toIncreasePostViewParameter(memberId, increasePostViewRequest.postId());
-		postViewService.increasePostViewBy(increasePostViewParameter);
+		Long memberId = MemberLoader.getMemberId();
+		IncreasePostViewParameter increasePostViewParameter = IncreasePostViewParameter.of(memberId, increasePostViewRequest.postId());
+		postViewMemberService.increasePostViewBy(increasePostViewParameter);
 		return ResponseEntity
 			.status(HttpStatus.CREATED)
 			.body(DataResponse.created());

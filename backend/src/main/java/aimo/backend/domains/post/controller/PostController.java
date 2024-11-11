@@ -27,8 +27,8 @@ import aimo.backend.domains.post.dto.response.FindPostAndCommentsByIdResponse;
 import aimo.backend.domains.post.dto.response.FindPostsByPostTypeResponse;
 import aimo.backend.domains.post.dto.response.SavePostResponse;
 import aimo.backend.domains.post.model.PostType;
+import aimo.backend.domains.post.service.PostMemberService;
 import aimo.backend.domains.post.service.PostService;
-import aimo.backend.common.util.memberLoader.MemberLoader;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -41,12 +41,12 @@ import lombok.extern.slf4j.Slf4j;
 public class PostController {
 
 	private final PostService postService;
-	private final MemberLoader memberLoader;
+	private final PostMemberService postMemberService;
 
 	@PostMapping
 	public ResponseEntity<DataResponse<SavePostResponse>> savePost(@RequestBody @Valid SavePostRequest request) {
 		SavePostParameter parameter = PostMapper.toSavePostParameter(request);
-		Long postId = postService.save(parameter);
+		Long postId = postMemberService.save(parameter);
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(DataResponse.created(PostMapper.toSavePostResponse(postId)));
 	}
@@ -64,7 +64,7 @@ public class PostController {
 	public ResponseEntity<DataResponse<FindPostAndCommentsByIdResponse>> findPostAndComments(
 		@PathVariable("postId") FindPostAndCommentsRequest request) {
 		FindPostAndCommentsByIdParameter parameter = PostMapper.toFindPostAndCommentsByIdParameter(request.postId());
-		return ResponseEntity.ok(DataResponse.from(postService.findPostAndCommentsDtoById(parameter)));
+		return ResponseEntity.ok(DataResponse.from(postMemberService.findPostAndCommentsDtoById(parameter)));
 	}
 
 	@GetMapping("/{postId}/judgement")
