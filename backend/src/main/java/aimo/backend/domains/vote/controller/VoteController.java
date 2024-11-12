@@ -25,12 +25,12 @@ public class VoteController {
 
 	@PostMapping("/{postId}/votes")
 	public ResponseEntity<DataResponse<Void>> saveVotePost(
-		@PathVariable SaveVotePostRequest request,
+		@PathVariable Long postId,
 		@RequestParam("side") Side side
 	) {
 		Long memberId = MemberLoader.getMemberId();
 		SaveVotePostParameter saveVotePostParameter =
-			SaveVotePostParameter.of(memberId, request.postId(), side);
+			SaveVotePostParameter.of(memberId, postId, side);
 		voteService.votePost(saveVotePostParameter);
 		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}

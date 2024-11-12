@@ -56,7 +56,8 @@ public class ParentCommentController {
 
 	@DeleteMapping("comments/{commentId}")
 	public ResponseEntity<DataResponse<Void>> deleteParentComment(
-		@Valid @PathVariable("commentId") Long commentId) {
+		@Valid @PathVariable("commentId") Long commentId
+	) {
 		Long memberId = MemberLoader.getMemberId();
 		DeleteParentCommentParameter parameter = DeleteParentCommentParameter.of(memberId, commentId);
 		parentCommentMemberService.validateAndDeleteParentComment(parameter);
