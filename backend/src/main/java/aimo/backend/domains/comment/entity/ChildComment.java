@@ -66,7 +66,6 @@ public class ChildComment extends BaseEntity {
 		String nickname,
 		String content,
 		ParentComment parentComment,
-		Boolean isDeleted,
 		Member member,
 		Post post,
 		List<ChildCommentLike> childCommentLikes
@@ -74,7 +73,7 @@ public class ChildComment extends BaseEntity {
 		this.nickname = nickname;
 		this.content = content;
 		this.parentComment = parentComment;
-		this.isDeleted = isDeleted;
+		this.isDeleted = false;
 		this.member = member;
 		this.post = post;
 		this.childCommentLikes = childCommentLikes;
@@ -90,7 +89,6 @@ public class ChildComment extends BaseEntity {
 			.nickname(member.getNickname())
 			.content(content)
 			.parentComment(parentComment)
-			.isDeleted(false)
 			.member(member)
 			.post(post)
 			.build();
@@ -104,13 +102,6 @@ public class ChildComment extends BaseEntity {
 		this.member = null;
 		this.nickname = CommentConstants.DELETED_MEMBER.getValue();
 		this.isDeleted = true;
-	}
-
-	public void deleteChildCommentSoftlyWithContent() {
-		this.member = null;
-		this.nickname = CommentConstants.DELETED_MEMBER.getValue();
-		this.isDeleted = true;
-		content = CommentConstants.DELETED_COMMENT.getValue();
 	}
 
 	public void updateChildComment(String content) {
