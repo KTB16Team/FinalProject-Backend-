@@ -47,7 +47,7 @@ jobs:
           echo "${{ secrets.APPLICATION_PROD }}" > backend/src/main/resources/application-prod.yml
           # github actions 시간대 확인
           echo ===================
-          echo date 
+          date 
           echo ===================
           
       # Gradle 실행 권한 설정
