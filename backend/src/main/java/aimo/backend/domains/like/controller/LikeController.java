@@ -29,9 +29,12 @@ public class LikeController {
 	private final ParentCommentLikeMemberService parentCommentLikeMemberService;
 
 	@PostMapping("/posts/{postId}/likes")
-	public ResponseEntity<DataResponse<Void>> likePost(@PathVariable Long postId,
-		@RequestParam("likeType") LikeType likeType) {
+	public ResponseEntity<DataResponse<Void>> likePost(
+		@PathVariable Long postId,
+		@RequestParam("likeType") LikeType likeType
+	) {
 		Long memberId = MemberLoader.getMemberId();
+
 		LikePostParameter parameter = LikePostParameter.of(memberId, postId, likeType);
 		postLikeMemberService.likePost(parameter);
 

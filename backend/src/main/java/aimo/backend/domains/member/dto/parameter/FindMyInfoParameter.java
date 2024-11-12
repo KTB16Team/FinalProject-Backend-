@@ -4,7 +4,7 @@ public record FindMyInfoParameter(
 	Long memberId
 ) {
 
-	public static FindMyInfoParameter of(Long memberId) {
+	public static FindMyInfoParameter from(Long memberId) {
 		return new FindMyInfoParameter(memberId);
 	}
 }

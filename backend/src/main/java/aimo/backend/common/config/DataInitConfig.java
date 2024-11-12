@@ -106,7 +106,7 @@ public class DataInitConfig {
 			Member member = members.get(i % 3);
 			PrivatePost privatePost = privatePosts.get(i - 1);
 			SavePostParameter parameter = new SavePostParameter(member.getId(), privatePost.getId(), "Public Post Title " + i, "Plaintiff Stance " + i, "Defendant Stance " + i, "Summary AI " + i, "Judgement " + i, 50, 50, OriginType.TEXT, Category.COMMON);
-			Post post = Post.from(parameter, member);
+			Post post = Post.of(parameter, member);
 			posts.add(postRepo.save(post));
 		}
 
@@ -137,6 +137,7 @@ public class DataInitConfig {
 					.nickname(member.getNickname())
 					.isDeleted(false)
 					.parentComment(parentComment)
+					.post(postRepo.getReferenceById(parentComment.getPost().getId()))
 					.build();
 			childCommentRepo.save(childComment);
 		}

@@ -10,12 +10,12 @@ import java.util.List;
 import java.util.Objects;
 
 import aimo.backend.common.entity.BaseEntity;
+import aimo.backend.domains.comment.entity.ChildComment;
 import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.like.entity.PostLike;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.post.dto.parameter.SavePostParameter;
 import aimo.backend.domains.post.model.Category;
-import aimo.backend.domains.privatePost.model.ContentLength;
 import aimo.backend.domains.vote.entity.Vote;
 import aimo.backend.domains.vote.model.Side;
 import aimo.backend.domains.privatePost.model.OriginType;
@@ -52,7 +52,10 @@ public class Post extends BaseEntity {
 	private Member member;
 
 	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY, orphanRemoval = true, cascade = ALL)
-	private List<ParentComment> parentComments;
+	private List<ParentComment> parentComments = new ArrayList<>();
+
+	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY, orphanRemoval = true, cascade = ALL)
+	private List<ChildComment> childComments = new ArrayList<>();
 
 	@JoinColumn(name = "origin_private_post_id")
 	private Long privatePostId;
@@ -120,11 +123,6 @@ public class Post extends BaseEntity {
 			summaryAi.substring(0, PREVIEW_LENGTH.getValue()) + "..." : summaryAi;
 	}
 
-	public void delete() {
-		this.member.getPosts().remove(this);
-		this.member = null;
-	}
-
 	public void softDelete() {
 		this.member = null;
 		this.privatePostId = null;
@@ -148,10 +146,11 @@ public class Post extends BaseEntity {
 		return votes.size();
 	}
 
-	public static Post from(SavePostParameter parameter, Member member) {
+	public static Post of(SavePostParameter parameter, Member member) {
 		return Post.builder()
 			.member(member)
 			.title(parameter.title())
+			.privatePostId(parameter.privatePostId())
 			.summaryAi(parameter.summaryAi())
 			.stancePlaintiff(parameter.stancePlaintiff())
 			.stanceDefendant(parameter.stanceDefendant())
@@ -176,7 +175,6 @@ public class Post extends BaseEntity {
 		String judgement,
 		OriginType originType,
 		Category category,
-		List<ParentComment> parentComments,
 		List<PostLike> postLikes,
 		List<PostView> postViews,
 		List<Vote> votes) {
@@ -192,7 +190,6 @@ public class Post extends BaseEntity {
 		this.faultRateDefendant = faultRateDefendant;
 		this.originType = originType;
 		this.category = category;
-		this.parentComments = parentComments;
 		this.postLikes = postLikes;
 		this.postViews = postViews;
 		this.votes = votes;
@@ -211,9 +208,5 @@ public class Post extends BaseEntity {
 	@Override
 	public int hashCode() {
 		return Objects.hashCode(id);
-	}
-
-	public void increaseViewsCount(PostView postView) {
-		this.postViews.add(postView);
 	}
 }

@@ -18,9 +18,6 @@ import aimo.backend.domains.post.dto.parameter.DeletePostParameter;
 import aimo.backend.domains.post.dto.parameter.FindPostAndCommentsByIdParameter;
 import aimo.backend.domains.post.dto.parameter.FindPostByPostTypeParameter;
 import aimo.backend.domains.post.dto.parameter.SavePostParameter;
-import aimo.backend.domains.post.dto.requset.DeletePostRequest;
-import aimo.backend.domains.post.dto.requset.FindJudgementRequest;
-import aimo.backend.domains.post.dto.requset.FindPostAndCommentsRequest;
 import aimo.backend.domains.post.dto.requset.SavePostRequest;
 import aimo.backend.domains.post.dto.response.FindJudgementResponse;
 import aimo.backend.domains.post.dto.response.FindPostAndCommentsByIdResponse;
@@ -46,8 +43,11 @@ public class PostController {
 	@PostMapping
 	public ResponseEntity<DataResponse<SavePostResponse>> savePost(@RequestBody @Valid SavePostRequest request) {
 		Long memberId = MemberLoader.getMemberId();
+
 		SavePostParameter parameter = SavePostParameter.from(memberId, request);
+
 		Long postId = postMemberService.save(parameter);
+
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(DataResponse.created(SavePostResponse.of(postId)));
 	}
@@ -56,31 +56,41 @@ public class PostController {
 	public ResponseEntity<DataResponse<Page<FindPostsByPostTypeResponse>>> findPostsByPostType(
 		@RequestParam("type") @NotNull PostType postType,
 		@RequestParam("page") @NotNull Integer page,
-		@RequestParam("size") @NotNull Integer size) {
+		@RequestParam("size") @NotNull Integer size
+	) {
 		Long memberId = MemberLoader.getMemberId();
+
 		FindPostByPostTypeParameter parameter = FindPostByPostTypeParameter.of(memberId, postType, page, size);
+
 		return ResponseEntity.ok(DataResponse.from(postService.findPostDtosByPostType(parameter)));
 	}
 
 	@GetMapping("/{postId}")
 	public ResponseEntity<DataResponse<FindPostAndCommentsByIdResponse>> findPostAndComments(
-		@PathVariable("postId") Long postId) {
+		@PathVariable("postId") Long postId
+	) {
 		Long memberId = MemberLoader.getMemberId();
+
 		FindPostAndCommentsByIdParameter parameter = FindPostAndCommentsByIdParameter.of(memberId, postId);
+
 		return ResponseEntity.ok(DataResponse.from(postMemberService.findPostAndCommentsDtoById(parameter)));
 	}
 
 	@GetMapping("/{postId}/judgement")
 	public ResponseEntity<DataResponse<FindJudgementResponse>> findJudgement(
-		@PathVariable("postId") Long postId) {
+		@PathVariable("postId") Long postId
+	) {
 		return ResponseEntity.ok(DataResponse.from(postService.findJudgementBy(postId)));
 	}
 
 	@DeleteMapping("/{postId}")
 	public ResponseEntity<DataResponse<Void>> deletePost(@PathVariable("postId") Long postId) {
 		Long memberId = MemberLoader.getMemberId();
+
 		DeletePostParameter parameter = DeletePostParameter.of(memberId, postId);
+
 		postService.deletePostBy(parameter);
+
 		return ResponseEntity.ok(DataResponse.noContent());
 	}
 }

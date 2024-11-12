@@ -78,11 +78,11 @@ public class MemberService {
 	// 회원 삭제
 	@Transactional(rollbackFor = ApiException.class)
 	public void deleteMember(DeleteMemberParameter deleteMemberParameter) {
-		Member member = findBy(deleteMemberParameter.memberId());
+		Member member = findMemberById(deleteMemberParameter.memberId());
 
-		if (!isValid(deleteMemberParameter.password(), member.getPassword()))
-			throw ApiException.from(ErrorCode.INVALID_PASSWORD);
+		checkPassword(deleteMemberParameter.password(), member.getPassword());
 
+		// 멤버 컨텐츠 삭제
 		deleteMemberContents(DeleteMemberContentsParameter.of(member.getId()));
 		memberRepository.delete(member);
 	}
@@ -90,7 +90,7 @@ public class MemberService {
 	@Transactional(rollbackFor = ApiException.class)
 	public void saveProfileImageMetaData(SaveFileMetaDataParameter parameter) {
 		Long memberId = parameter.memberId();
-		Member member = findBy(memberId);
+		Member member = findMemberById(memberId);
 		DeleteProfileImageParameter deleteProfileImageParameter = new DeleteProfileImageParameter(memberId);
 
 		if (member.getProfileImage() != null)
@@ -99,7 +99,7 @@ public class MemberService {
 		CreateResourceUrlParameter createResourceUrlParameter =
 			CreateResourceUrlParameter.from(PresignedUrlPrefix.IMAGE, parameter);
 		String url = s3Service.getResourceUrl(createResourceUrlParameter);
-		ProfileImage profileImage = ProfileImage.from(parameter, member, url);
+		ProfileImage profileImage = ProfileImage.of(parameter, member, url);
 
 		profileImageRepository.save(profileImage);
 		member.updateProfileImage(profileImage);
@@ -107,7 +107,7 @@ public class MemberService {
 
 	@Transactional(rollbackFor = ApiException.class)
 	public void deleteProfileImage(DeleteProfileImageParameter deleteProfileImageParameter) {
-		Member member = findBy(deleteProfileImageParameter.memberId());
+		Member member = findMemberById(deleteProfileImageParameter.memberId());
 		ProfileImage profileImage = member.getProfileImage();
 		profileImageRepository.delete(profileImage);
 		member.updateProfileImage(null);
@@ -115,38 +115,49 @@ public class MemberService {
 
 	@Transactional(rollbackFor = ApiException.class)
 	public void updatePassword(UpdatePasswordParameter updatePasswordParameter) {
-		Member member = findBy(updatePasswordParameter.memberId());
-		if (!isValid(updatePasswordParameter.password(), member.getPassword()))
-			throw ApiException.from(ErrorCode.INVALID_PASSWORD);
+		Member member = findMemberById(updatePasswordParameter.memberId());
+
+		checkPassword(updatePasswordParameter.password(), member.getPassword());
 
 		member.updatePassword(passwordEncoder.encode(updatePasswordParameter.newPassword()));
 	}
 
+	// 닉네임 변경
 	@Transactional(rollbackFor = ApiException.class)
 	public void updateNickname(UpdateNicknameParameter parameter) {
-		Member member = findBy(parameter.memberId());
+		Member member = findMemberById(parameter.memberId());
 		validateDuplicateNickname(parameter.newNickname());
 		member.updateNickname(parameter.newNickname());
 	}
 
+	// 내 정보 조회
 	public FindMyInfoResponse findMyInfo(FindMyInfoParameter parameter) {
-		return FindMyInfoResponse.from(findBy(parameter.memberId()));
+		return FindMyInfoResponse.from(findMemberById(parameter.memberId()));
 	}
 
-	public Member findBy(Long memberId) {
-		return memberRepository.findById(memberId).orElseThrow(() -> ApiException.from(ErrorCode.MEMBER_NOT_FOUND));
+	// id 로 멤버 조회
+	public Member findMemberById(Long memberId) {
+		return memberRepository.findById(memberId)
+			.orElseThrow(() -> ApiException.from(ErrorCode.MEMBER_NOT_FOUND));
 	}
 
-	public boolean checkNicknameExists(CheckNicknameExistsRequest request) {
+	// 닉네임 중복 검사
+	public boolean isNicknameExists(CheckNicknameExistsRequest request) {
 		return memberRepository.existsByNickname(request.nickname());
 	}
 
-	protected boolean isValid(String password, String encodedPassword) {
-		return passwordEncoder.matches(password, encodedPassword);
+	// 비밀번호 확인
+	protected void checkPassword(String password, String encodedPassword) {
+		boolean matches = passwordEncoder.matches(password, encodedPassword);
+
+		if (!matches) {
+			throw ApiException.from(ErrorCode.INVALID_PASSWORD);
+		}
 	}
 
+	// 멤버 컨텐츠 소프트 삭제
 	private void deleteMemberContents(DeleteMemberContentsParameter parameter) {
-		Member member = findBy(parameter.memberId());
+		Member member = findMemberById(parameter.memberId());
 
 		member.getPosts()
 			.forEach(post -> postService.softDeleteBy(new SoftDeletePostParameter(post.getId())));

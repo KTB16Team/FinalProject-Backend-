@@ -35,7 +35,7 @@ public class PostMemberService {
 			.orElseThrow(() -> ApiException.from(MEMBER_NOT_FOUND));
 
 		privatePostMemberService.publishPrivatePost(savePostParameter.privatePostId());
-		Post post = Post.from(savePostParameter, member);
+		Post post = Post.of(savePostParameter, member);
 		return postRepository.save(post).getId();
 	}
 
@@ -46,7 +46,8 @@ public class PostMemberService {
 			.orElseThrow(() -> ApiException.from(POST_NOT_FOUND));
 
 		Member member = memberRepository.findById(parameter.memberId())
-			.orElseThrow(() -> ApiException.from(MEMBER_NOT_FOUND));
+			.orElseThrow(() -> ApiException.
+				from(MEMBER_NOT_FOUND));
 
 		List<ParentComment> parentComments = post.getParentComments();
 		return FindPostAndCommentsByIdResponse.from(member, post, parentComments);

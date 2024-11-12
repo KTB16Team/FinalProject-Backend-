@@ -11,7 +11,6 @@ import aimo.backend.domains.comment.dto.parameter.ValidAndDeleteParentCommentPar
 import aimo.backend.domains.comment.dto.parameter.ValidAndUpdateChildCommentParameter;
 import aimo.backend.domains.comment.entity.ChildComment;
 import aimo.backend.domains.comment.entity.ParentComment;
-import aimo.backend.domains.comment.mapper.ChildCommentMapper;
 import aimo.backend.domains.comment.repository.ChildCommentRepository;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.member.service.MemberService;
@@ -44,11 +43,11 @@ public class ChildCommentService {
 		Long postId = saveChildCommentParameter.postId();
 		Long parentCommentId = saveChildCommentParameter.parentCommentId();
 		String content = saveChildCommentParameter.content();
-		Member member = memberService.findBy(saveChildCommentParameter.memberId());
+		Member member = memberService.findMemberById(saveChildCommentParameter.memberId());
 		Post post = postService.findById(postId);
 
 		ParentComment parentComment = parentCommentMemberService.findById(parentCommentId);
-		ChildComment childComment = ChildCommentMapper.toEntity(content, member, parentComment, post);
+		ChildComment childComment = ChildComment.of(content, member, parentComment, post);
 		childCommentRepository.save(childComment);
 	}
 
@@ -56,7 +55,7 @@ public class ChildCommentService {
 	@Transactional(rollbackFor = ApiException.class)
 	public void validateAndUpdateChildComment(
 		ValidAndUpdateChildCommentParameter validAndUpdateChildCommentParameter) {
-		Member member = memberService.findBy(validAndUpdateChildCommentParameter.memberId());
+		Member member = memberService.findMemberById(validAndUpdateChildCommentParameter.memberId());
 		Long childCommentId = validAndUpdateChildCommentParameter.childCommentId();
 		String content = validAndUpdateChildCommentParameter.content();
 
@@ -70,20 +69,24 @@ public class ChildCommentService {
 	//자식 댓글 삭제
 	@Transactional(rollbackFor = ApiException.class)
 	public void validateAndDeleteChildComment(
-		ValidAndDeleteParentCommentParameter validAndDeleteChildCommentParameter
+		ValidAndDeleteParentCommentParameter parameter
 	) {
-		Long childCommentId = validAndDeleteChildCommentParameter.childCommentId();
+		Long childCommentId = parameter.childCommentId();
 
-		Member member = memberService.findBy(validAndDeleteChildCommentParameter.memberId());
+		Member member = memberService.findMemberById(parameter.memberId());
+
+		// 자식 댓글 권한 확인
 		validateChildCommentAuthority(member, childCommentId);
 
 		ParentComment parentComment = childCommentRepository.findById(childCommentId)
 			.orElseThrow(() -> ApiException.from(CHILD_COMMENT_NOT_FOUND))
 			.getParentComment();
 
-		parentComment.deleteChildComment(childCommentId);
+		// 자식 댓글 삭제
 		childCommentRepository.deleteById(childCommentId);
-		parentCommentMemberService.deleteIfChildrenIsEmpty(parentComment);
+
+		// 자식 댓글이 없으며 부모 댓글이 삭제된 상태면 삭제
+		parentCommentMemberService.deleteIfParentCommentIsDeletedAndChildrenIsEmpty(parentComment);
 	}
 
 	// id로 자식 댓글 조회

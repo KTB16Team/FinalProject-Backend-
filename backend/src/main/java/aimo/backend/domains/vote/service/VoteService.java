@@ -27,7 +27,7 @@ public class VoteService {
 	@Transactional(rollbackFor = ApiException.class)
 	public void votePost(SaveVotePostParameter saveVotePostParameter) {
 		Long postId = saveVotePostParameter.postId();
-		Member member = memberService.findBy(saveVotePostParameter.memberId());
+		Member member = memberService.findMemberById(saveVotePostParameter.memberId());
 		Post post = postService.findById(postId);
 		Side side = saveVotePostParameter.side();
 

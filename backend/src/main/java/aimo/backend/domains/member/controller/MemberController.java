@@ -110,8 +110,10 @@ public class MemberController {
 	@GetMapping
 	public ResponseEntity<DataResponse<FindMyInfoResponse>> findMyInfo() {
 		Long memberId = MemberLoader.getMemberId();
-		FindMyInfoParameter parameter = FindMyInfoParameter.of(memberId);
-		return ResponseEntity.status(HttpStatus.OK).body(DataResponse.from(memberService.findMyInfo(parameter)));
+
+		FindMyInfoResponse response = memberService.findMyInfo(FindMyInfoParameter.from(memberId));
+
+		return ResponseEntity.ok(DataResponse.from(response));
 	}
 
 	// 비밀번호 수정(현재 비밀번호 확인)
@@ -127,24 +129,34 @@ public class MemberController {
 	// 비밀번호 재발급(임시 비밀번호를 이메일로 전송)
 	@PostMapping("/password/temp")
 	public ResponseEntity<DataResponse<Void>> sendTemporaryPassword(
-		@Valid @RequestBody SendTemporaryPasswordRequest sendTemporaryPasswordRequest) throws MessagingException {
+		@Valid @RequestBody SendTemporaryPasswordRequest sendTemporaryPasswordRequest
+	) throws MessagingException {
 		memberService.updateTemporaryPasswordAndSendMail(sendTemporaryPasswordRequest);
+
 		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
 
 	@GetMapping("/nickname/{nickname}/exists")
 	public ResponseEntity<DataResponse<NicknameExistsResponse>> checkNicknameExists(
-		@PathVariable("nickname") String nickname) {
+		@PathVariable("nickname") String nickname
+	) {
 		CheckNicknameExistsRequest request = CheckNicknameExistsRequest.of(nickname);
-		NicknameExistsResponse exist = NicknameExistsResponse.of(memberService.checkNicknameExists(request));
+
+		NicknameExistsResponse exist = NicknameExistsResponse.of(memberService.isNicknameExists(request));
+
 		return ResponseEntity.status(HttpStatus.OK).body(DataResponse.from(exist));
 	}
 
 	@PutMapping("/nickname")
-	public ResponseEntity<DataResponse<Void>> updateNickname(@RequestBody UpdateNicknameRequest updateNicknameRequest) {
+	public ResponseEntity<DataResponse<Void>> updateNickname(
+		@RequestBody @Valid UpdateNicknameRequest updateNicknameRequest
+	) {
 		Long memberId = MemberLoader.getMemberId();
+
 		UpdateNicknameParameter parameter = UpdateNicknameParameter.from(memberId, updateNicknameRequest);
 		memberService.updateNickname(parameter);
-		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
+
+		return ResponseEntity.status(HttpStatus.CREATED)
+			.body(DataResponse.created());
 	}
 }

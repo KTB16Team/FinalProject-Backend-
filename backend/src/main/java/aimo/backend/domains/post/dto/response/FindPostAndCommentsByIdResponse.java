@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import aimo.backend.domains.comment.entity.ChildComment;
 import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.post.entity.Post;
@@ -72,27 +73,24 @@ public class FindPostAndCommentsByIdResponse {
 		private final List<ChildCommentDto> childComments;
 
 		public static ParentCommentDto of(Member member, ParentComment parentComment) {
+			boolean isMine = parentComment.getMember() == member;
+			boolean isLiked = parentComment.getParentCommentLikes()
+				.stream()
+				.anyMatch(like -> like.getMember() == member);
+			List<ChildCommentDto> childCommentDtos = parentComment.getChildComments()
+				.stream()
+				.map(childComment -> ChildCommentDto.of(member, childComment))
+				.toList();
+
 			return new ParentCommentDto(
-				parentComment.getMember() == member,
-				parentComment.getParentCommentLikes().stream()
-					.anyMatch(like -> like.getMember() == member),
+				isMine,
+				isLiked,
 				parentComment.getId(),
 				parentComment.getContent(),
 				parentComment.getNickname(),
 				parentComment.getLikesCount(),
 				parentComment.getCreatedAt(),
-				parentComment.getChildComments().stream()
-					.map(childComment -> new ChildCommentDto(
-						childComment.getMember() == member,
-						childComment.getChildCommentLikes().stream()
-							.anyMatch(like -> like.getMember() == member),
-						childComment.getId(),
-						childComment.getContent(),
-						childComment.getNickname(),
-						childComment.getLikesCount(),
-						childComment.getCreatedAt()
-					))
-					.toList()
+				childCommentDtos
 			);
 		}
 	}
@@ -102,22 +100,26 @@ public class FindPostAndCommentsByIdResponse {
 	private static class ChildCommentDto {
 		private final Boolean isMine;
 		private final Boolean isLiked;
-		private final Long childCommentDd;
+		private final Long childCommentId;
 		private final String content;
 		private final String nickname;
 		private final Integer likesCount;
 		private final LocalDateTime createdAt;
 
-		public static ChildCommentDto of(Member member, ParentComment parentComment) {
+		public static ChildCommentDto of(Member member, ChildComment childComment) {
+			boolean isMine = childComment.getMember() == member;
+			boolean isLiked = childComment.getChildCommentLikes()
+				.stream()
+				.anyMatch(like -> like.getMember() == member);
+
 			return new ChildCommentDto(
-				parentComment.getMember() == member,
-				parentComment.getParentCommentLikes().stream()
-					.anyMatch(like -> like.getMember() == member),
-				parentComment.getId(),
-				parentComment.getContent(),
-				parentComment.getNickname(),
-				parentComment.getLikesCount(),
-				parentComment.getCreatedAt()
+				isMine,
+				isLiked,
+				childComment.getId(),
+				childComment.getContent(),
+				childComment.getNickname(),
+				childComment.getLikesCount(),
+				childComment.getCreatedAt()
 			);
 		}
 	}

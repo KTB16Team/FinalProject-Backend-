@@ -76,6 +76,20 @@ public class ParentComment extends BaseEntity {
 		this.parentCommentLikes = parentCommentLikes;
 	}
 
+	public static ParentComment of(
+		Member member,
+		Post post,
+		String content
+	) {
+		return ParentComment.builder()
+			.nickname(member.getNickname())
+			.content(content)
+			.isDeleted(false)
+			.member(member)
+			.post(post)
+			.build();
+	}
+
 	public void deleteParentCommentSoftly() {
 		this.member = null;
 		this.nickname = CommentConstants.UNKNOWN_MEMBER.getValue();

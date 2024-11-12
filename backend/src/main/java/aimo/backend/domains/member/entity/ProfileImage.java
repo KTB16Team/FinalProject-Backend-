@@ -26,7 +26,7 @@ public class ProfileImage extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(nullable = false)
+	@Column
 	private String url;
 
 	@Column(nullable = false)
@@ -50,7 +50,7 @@ public class ProfileImage extends BaseEntity {
 		this.member = member;
 	}
 
-	public static ProfileImage from(SaveFileMetaDataParameter parameter, Member member, String url) {
+	public static ProfileImage of(SaveFileMetaDataParameter parameter, Member member, String url) {
 		return ProfileImage.builder()
 			.url(url)
 			.size(parameter.size())
