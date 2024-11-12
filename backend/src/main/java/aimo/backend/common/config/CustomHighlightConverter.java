@@ -18,4 +18,5 @@ public class CustomHighlightConverter extends ForegroundCompositeConverterBase<I
 		};
 	}
 
+
 }
