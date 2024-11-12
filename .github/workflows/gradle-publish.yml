@@ -112,4 +112,4 @@ jobs:
             if screen -list | grep -q "\bbe\b"; then screen -S be -X quit; fi
             
             # 새로운 screen 세션으로 애플리케이션 실행
-            screen -dmS be java -jar /home/ubuntu/backend/build/libs/backend-server.jar --spring.profiles.active=prod
+            screen -dmS be java -jar /home/ubuntu/backend/build/libs/backend-server.jar --spring.profiles.active=dev
