@@ -80,6 +80,22 @@ public class ChildComment extends BaseEntity {
 		this.childCommentLikes = childCommentLikes;
 	}
 
+	public static ChildComment of(
+		String content,
+		Member member,
+		ParentComment parentComment,
+		Post post
+	) {
+		return ChildComment.builder()
+			.nickname(member.getNickname())
+			.content(content)
+			.parentComment(parentComment)
+			.isDeleted(false)
+			.member(member)
+			.post(post)
+			.build();
+	}
+
 	public Integer getLikesCount() {
 		return childCommentLikes.size();
 	}
