@@ -21,19 +21,11 @@ import org.w3c.dom.Text;
 import aimo.backend.common.dto.DataResponse;
 
 import aimo.backend.common.util.memberLoader.MemberLoader;
-import aimo.backend.domains.privatePost.dto.parameter.ChatRecordParameter;
 import aimo.backend.domains.privatePost.dto.parameter.DeletePrivatePostParameter;
 import aimo.backend.domains.privatePost.dto.parameter.FindPrivatePostParameter;
 import aimo.backend.domains.privatePost.dto.parameter.FindPrivatePostPreviewParameter;
 import aimo.backend.domains.privatePost.dto.parameter.SpeechToTextParameter;
-import aimo.backend.domains.privatePost.dto.parameter.TextRecordParameter;
-import aimo.backend.domains.privatePost.dto.request.DeletePrivatePostRequest;
-import aimo.backend.domains.privatePost.dto.request.FindPrivatePostRequest;
-import aimo.backend.domains.privatePost.dto.parameter.JudgementParameter;
 import aimo.backend.domains.privatePost.dto.parameter.JudgementToAiParameter;
-import aimo.backend.domains.privatePost.dto.request.ChatRecordRequest;
-import aimo.backend.domains.privatePost.dto.request.JudgementToAiRequest;
-import aimo.backend.domains.privatePost.dto.response.JudgementResponse;
 import aimo.backend.domains.privatePost.dto.response.PrivatePostPreviewResponse;
 import aimo.backend.domains.privatePost.dto.response.PrivatePostResponse;
 import aimo.backend.domains.privatePost.dto.request.SaveAudioSuccessRequest;
@@ -43,10 +35,8 @@ import aimo.backend.domains.privatePost.dto.response.SavePrivatePostResponse;
 import aimo.backend.domains.privatePost.dto.response.SpeechToTextResponse;
 
 import aimo.backend.domains.privatePost.dto.request.TextRecordRequest;
-import aimo.backend.domains.privatePost.entity.ChatRecord;
 import aimo.backend.domains.privatePost.model.OriginType;
 import aimo.backend.domains.privatePost.service.AudioRecordService;
-import aimo.backend.domains.privatePost.service.ChatRecordService;
 import aimo.backend.domains.privatePost.service.PrivatePostMemberService;
 
 import aimo.backend.domains.privatePost.service.SaveAudioSuccessParameter;

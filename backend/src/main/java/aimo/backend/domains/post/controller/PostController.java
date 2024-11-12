@@ -64,22 +64,22 @@ public class PostController {
 
 	@GetMapping("/{postId}")
 	public ResponseEntity<DataResponse<FindPostAndCommentsByIdResponse>> findPostAndComments(
-		@PathVariable("postId") FindPostAndCommentsRequest request) {
+		@PathVariable("postId") Long postId) {
 		Long memberId = MemberLoader.getMemberId();
-		FindPostAndCommentsByIdParameter parameter = FindPostAndCommentsByIdParameter.of(memberId, request.postId());
+		FindPostAndCommentsByIdParameter parameter = FindPostAndCommentsByIdParameter.of(memberId, postId);
 		return ResponseEntity.ok(DataResponse.from(postMemberService.findPostAndCommentsDtoById(parameter)));
 	}
 
 	@GetMapping("/{postId}/judgement")
 	public ResponseEntity<DataResponse<FindJudgementResponse>> findJudgement(
-		@PathVariable("postId") FindJudgementRequest request) {
-		return ResponseEntity.ok(DataResponse.from(postService.findJudgementBy(request.postId())));
+		@PathVariable("postId") Long postId) {
+		return ResponseEntity.ok(DataResponse.from(postService.findJudgementBy(postId)));
 	}
 
 	@DeleteMapping("/{postId}")
-	public ResponseEntity<DataResponse<Void>> deletePost(@PathVariable("postId") DeletePostRequest request) {
+	public ResponseEntity<DataResponse<Void>> deletePost(@PathVariable("postId") Long postId) {
 		Long memberId = MemberLoader.getMemberId();
-		DeletePostParameter parameter = DeletePostParameter.of(memberId, request.postId());
+		DeletePostParameter parameter = DeletePostParameter.of(memberId, postId);
 		postService.deletePostBy(parameter);
 		return ResponseEntity.ok(DataResponse.noContent());
 	}

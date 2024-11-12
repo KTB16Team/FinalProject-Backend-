@@ -77,7 +77,8 @@ public class MemberController {
 
 	@GetMapping("/profile/presigned/{filename}")
 	public ResponseEntity<DataResponse<CreatePresignedUrlResponse>> createProfileImagePreSignedUrl(
-		@Valid @PathVariable("filename") CreatePresignedUrlRequest createPresignedUrlRequest) {
+		@Valid @PathVariable("filename") String filename) {
+		CreatePresignedUrlRequest createPresignedUrlRequest = CreatePresignedUrlRequest.of(filename);
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(DataResponse.created(s3Service.createProfilePresignedUrl(createPresignedUrlRequest)));
 	}
@@ -133,7 +134,8 @@ public class MemberController {
 
 	@GetMapping("/nickname/{nickname}/exists")
 	public ResponseEntity<DataResponse<NicknameExistsResponse>> checkNicknameExists(
-		@PathVariable("nickname")CheckNicknameExistsRequest request) {
+		@PathVariable("nickname") String nickname) {
+		CheckNicknameExistsRequest request = CheckNicknameExistsRequest.of(nickname);
 		NicknameExistsResponse exist = NicknameExistsResponse.of(memberService.checkNicknameExists(request));
 		return ResponseEntity.status(HttpStatus.OK).body(DataResponse.from(exist));
 	}
