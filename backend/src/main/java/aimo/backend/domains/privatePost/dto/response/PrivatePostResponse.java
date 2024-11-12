@@ -1,5 +1,6 @@
 package aimo.backend.domains.privatePost.dto.response;
 
+import aimo.backend.domains.privatePost.entity.PrivatePost;
 import jakarta.validation.constraints.NotNull;
 
 public record PrivatePostResponse(
@@ -35,6 +36,20 @@ public record PrivatePostResponse(
 			faultRateDefendant,
 			judgement,
 			published
+		);
+	}
+
+	public static PrivatePostResponse from(PrivatePost privatePost) {
+		return new PrivatePostResponse(
+			privatePost.getId(),
+			privatePost.getTitle(),
+			privatePost.getSummaryAi(),
+			privatePost.getStancePlaintiff(),
+			privatePost.getStanceDefendant(),
+			privatePost.getFaultRatePlaintiff(),
+			privatePost.getFaultRateDefendant(),
+			privatePost.getJudgement(),
+			privatePost.getPublished()
 		);
 	}
 }

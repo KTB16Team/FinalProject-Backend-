@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import aimo.backend.common.exception.ApiException;
-import aimo.backend.common.mapper.PostMapper;
+
 import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.member.repository.MemberRepository;
@@ -35,7 +35,7 @@ public class PostMemberService {
 			.orElseThrow(() -> ApiException.from(MEMBER_NOT_FOUND));
 
 		privatePostMemberService.publishPrivatePost(savePostParameter.privatePostId());
-		Post post = PostMapper.toEntity(savePostParameter, member);
+		Post post = Post.from(savePostParameter, member);
 		return postRepository.save(post).getId();
 	}
 
@@ -49,7 +49,7 @@ public class PostMemberService {
 			.orElseThrow(() -> ApiException.from(MEMBER_NOT_FOUND));
 
 		List<ParentComment> parentComments = post.getParentComments();
-		return PostMapper.toFindPostAndCommentsByIdResponse(member, post, parentComments);
+		return FindPostAndCommentsByIdResponse.from(member, post, parentComments);
 	}
 
 }

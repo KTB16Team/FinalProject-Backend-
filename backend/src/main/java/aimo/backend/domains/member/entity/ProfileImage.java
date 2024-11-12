@@ -3,6 +3,7 @@ package aimo.backend.domains.member.entity;
 import static lombok.AccessLevel.*;
 
 import aimo.backend.common.entity.BaseEntity;
+import aimo.backend.domains.member.dto.parameter.SaveFileMetaDataParameter;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -47,5 +48,15 @@ public class ProfileImage extends BaseEntity {
 		this.filename = filename;
 		this.extension = extension;
 		this.member = member;
+	}
+
+	public static ProfileImage from(SaveFileMetaDataParameter parameter, Member member, String url) {
+		return ProfileImage.builder()
+			.url(url)
+			.size(parameter.size())
+			.filename(parameter.filename())
+			.extension(parameter.extension())
+			.member(member)
+			.build();
 	}
 }

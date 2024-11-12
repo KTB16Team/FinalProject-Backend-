@@ -2,7 +2,6 @@ package aimo.backend.domains.member.service;
 
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.exception.ErrorCode;
-import aimo.backend.common.mapper.S3Mapper;
 import aimo.backend.domains.auth.security.jwtFilter.JwtTokenProvider;
 import aimo.backend.domains.comment.entity.ChildComment;
 import aimo.backend.domains.comment.entity.ParentComment;
@@ -20,7 +19,6 @@ import aimo.backend.domains.member.dto.request.LogoutRequest;
 import aimo.backend.domains.member.dto.request.SendTemporaryPasswordRequest;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.member.entity.ProfileImage;
-import aimo.backend.common.mapper.MemberMapper;
 import aimo.backend.domains.member.repository.MemberRepository;
 import aimo.backend.domains.member.repository.ProfileImageRepository;
 import aimo.backend.domains.post.dto.parameter.SoftDeletePostParameter;
@@ -99,9 +97,9 @@ public class MemberService {
 			deleteProfileImage(deleteProfileImageParameter);
 		
 		CreateResourceUrlParameter createResourceUrlParameter =
-			S3Mapper.toCreateResourceUrlParameter(PresignedUrlPrefix.IMAGE, parameter);
+			CreateResourceUrlParameter.from(PresignedUrlPrefix.IMAGE, parameter);
 		String url = s3Service.getResourceUrl(createResourceUrlParameter);
-		ProfileImage profileImage = S3Mapper.toProfileImage(parameter, member, url);
+		ProfileImage profileImage = ProfileImage.from(parameter, member, url);
 
 		profileImageRepository.save(profileImage);
 		member.updateProfileImage(profileImage);
@@ -132,7 +130,7 @@ public class MemberService {
 	}
 
 	public FindMyInfoResponse findMyInfo(FindMyInfoParameter parameter) {
-		return MemberMapper.toFindMyInfoResponse(findBy(parameter.memberId()));
+		return FindMyInfoResponse.from(findBy(parameter.memberId()));
 	}
 
 	public Member findBy(Long memberId) {

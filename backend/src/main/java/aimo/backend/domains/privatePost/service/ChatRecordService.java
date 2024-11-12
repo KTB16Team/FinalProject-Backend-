@@ -12,9 +12,7 @@ import org.springframework.util.StreamUtils;
 
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.exception.ErrorCode;
-import aimo.backend.common.mapper.ChatRecordMapper;
 import aimo.backend.domains.privatePost.dto.parameter.ChatRecordParameter;
-import aimo.backend.domains.privatePost.dto.request.ChatRecordRequest;
 import aimo.backend.domains.privatePost.entity.ChatRecord;
 import aimo.backend.domains.privatePost.repository.ChatRecordRepository;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +43,7 @@ public class ChatRecordService {
 
 		String record = StreamUtils
 			.copyToString(chatRecordParameter.file().getInputStream(), StandardCharsets.UTF_8);
-		ChatRecord chatRecord = ChatRecordMapper.toEntity(filename, extension, record);
+		ChatRecord chatRecord = ChatRecord.of(filename, extension, record);
 
 		return chatRecordRepository.save(chatRecord).getId();
 	}

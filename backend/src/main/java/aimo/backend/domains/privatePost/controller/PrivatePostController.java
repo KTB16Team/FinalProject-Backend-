@@ -73,8 +73,8 @@ public class PrivatePostController {
 		@Valid @RequestBody TextRecordRequest textRecordRequest
 	) {
 		Long memberId = MemberLoader.getMemberId();
-		JudgementToAiParameter judgementToAiParameter = JudgementToAiParameter
-			.of(memberId, textRecordRequest.content(), OriginType.TEXT);
+		JudgementToAiParameter judgementToAiParameter =
+			JudgementToAiParameter.of(memberId, textRecordRequest.content(), OriginType.TEXT);
 
 		Long privatePostId = privatePostMemberService.serveTextRecordToAi(judgementToAiParameter);
 

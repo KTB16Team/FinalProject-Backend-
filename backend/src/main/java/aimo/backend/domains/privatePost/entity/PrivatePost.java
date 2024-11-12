@@ -1,5 +1,6 @@
 package aimo.backend.domains.privatePost.entity;
 
+import static aimo.backend.domains.privatePost.model.ContentLength.*;
 import static lombok.AccessLevel.*;
 
 import aimo.backend.common.entity.BaseEntity;
@@ -18,7 +19,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
-import jakarta.persistence.Persistence;
 import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
@@ -86,6 +86,11 @@ public class PrivatePost extends BaseEntity {
 
 	public void unpublish() {
 		this.published = false;
+	}
+
+	public String getPreview() {
+		return summaryAi.length() > PREVIEW_CONTENT_LENGTH.getValue() ?
+			summaryAi.substring(0, PREVIEW_CONTENT_LENGTH.getValue()) + "..." : summaryAi;
 	}
 
 	public static PrivatePost toEntity(JudgementParameter parameter, Member member, TextRecord textRecord) {

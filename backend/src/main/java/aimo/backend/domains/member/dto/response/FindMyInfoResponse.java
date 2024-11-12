@@ -1,5 +1,7 @@
 package aimo.backend.domains.member.dto.response;
 
+import aimo.backend.domains.member.entity.Member;
+
 public record FindMyInfoResponse(
 	String nickname,
 	String email,
@@ -12,5 +14,9 @@ public record FindMyInfoResponse(
 		String profileImageUrl
 	) {
 		return new FindMyInfoResponse(nickname, email, profileImageUrl);
+	}
+
+	public static FindMyInfoResponse from(Member member){
+		return new FindMyInfoResponse(member.getNickname(), member.getEmail(), member.getProfileImage().getUrl());
 	}
 }

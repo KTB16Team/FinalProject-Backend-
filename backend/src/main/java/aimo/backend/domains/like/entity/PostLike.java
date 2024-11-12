@@ -33,4 +33,8 @@ public class PostLike extends Like {
 		super(member);
 		this.post = post;
 	}
+
+	public static PostLike from(Member member, Post post) {
+		return PostLike.builder().member(member).post(post).build();
+	}
 }

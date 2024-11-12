@@ -14,8 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import aimo.backend.common.exception.ApiException;
-import aimo.backend.common.mapper.PostMapper;
-import aimo.backend.common.mapper.PrivatePostMapper;
+import aimo.backend.common.util.memberLoader.MemberLoader;
 import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.comment.service.PostCommentService;
 import aimo.backend.domains.post.dto.parameter.SoftDeletePostParameter;
@@ -50,7 +49,7 @@ public class PostService {
 
 	public FindJudgementResponse findJudgementBy(Long postId) {
 		Post post = findById(postId);
-		return PostMapper.toJudgement(post);
+		return FindJudgementResponse.from(post);
 	}
 
 	// PostType으로 글 조회
@@ -76,21 +75,22 @@ public class PostService {
 	private Page<FindPostsByPostTypeResponse> findMyPosts(Long memberId, Pageable pageable) {
 		return postRepository
 			.findAllByMember_Id(memberId, pageable)
-			.map(PostMapper::toFindPostsByPostTypeResponse);
+			.map(FindPostsByPostTypeResponse::from);
+
 	}
 
 	// 인기 글 조회
 	private Page<FindPostsByPostTypeResponse> findPopularPosts(Pageable pageable) {
 		return postRepository
 			.findByViewsCount(pageable)
-			.map(PostMapper::toFindPostsByPostTypeResponse);
+			.map(FindPostsByPostTypeResponse::from);
 	}
 
 	// 최신 글 조회
 	private Page<FindPostsByPostTypeResponse> findAnyPosts(Pageable pageable) {
 		return postRepository
 			.findAllByOrderByIdDesc(pageable)
-			.map(PostMapper::toFindPostsByPostTypeResponse);
+			.map(FindPostsByPostTypeResponse::from);
 	}
 
 	// 댓글 단 글 조회
@@ -101,7 +101,7 @@ public class PostService {
 
 		parentComments
 			.forEach((p) -> {
-				FindCommentedPostsByIdRequest commentedPost = PostMapper.toFindCommentedPostsByIdRequest(p);
+				FindCommentedPostsByIdRequest commentedPost = FindCommentedPostsByIdRequest.from(p);
 				int index = commentedPosts.indexOf(commentedPost);
 				if (index != -1 && commentedPosts.get(index).commentedAt().isAfter(p.getCreatedAt())) {
 					commentedPosts.set(index, commentedPost);
@@ -119,7 +119,7 @@ public class PostService {
 		List<FindPostsByPostTypeResponse> pagedPosts = commentedPosts
 			.subList(start, end)
 			.stream()
-			.map(PostMapper::toFindPostsByPostTypeResponse)
+			.map(FindPostsByPostTypeResponse::from)
 			.toList();
 
 		// Page 객체 생성
@@ -152,9 +152,10 @@ public class PostService {
 	}
 
 	public void softDeleteBy(SoftDeletePostParameter parameter) {
+		Long memberId = MemberLoader.getMemberId();
 		Post post = findById(parameter.postId());
-		DeletePrivatePostParameter deletePrivatePostParameter
-			= PrivatePostMapper.toDeletePrivatePostParameter(post.getPrivatePostId());
+		DeletePrivatePostParameter deletePrivatePostParameter =
+			DeletePrivatePostParameter.of(memberId, post.getPrivatePostId());
 		privatePostMemberService.deletePrivatePostBy(deletePrivatePostParameter);
 		post.softDelete();
 	}

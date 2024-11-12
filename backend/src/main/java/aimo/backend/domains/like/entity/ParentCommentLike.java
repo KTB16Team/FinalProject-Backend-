@@ -33,4 +33,8 @@ public class ParentCommentLike extends Like {
 		super(member);
 		this.parentComment = parentComment;
 	}
+
+	public static ParentCommentLike from(Member member, ParentComment parentComment) {
+		return ParentCommentLike.builder().member(member).parentComment(parentComment).build();
+	}
 }

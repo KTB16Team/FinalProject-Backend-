@@ -56,6 +56,14 @@ public class Vote extends BaseEntity {
 		this.side = side;
 	}
 
+	public static Vote from(Post post, Member member, Side side) {
+		return Vote.builder()
+			.post(post)
+			.member(member)
+			.side(side)
+			.build();
+	}
+
 	public void changeSide(Side side) {
 		this.side = side;
 	}

@@ -19,6 +19,7 @@ import aimo.backend.domains.comment.dto.request.SaveParentCommentRequest;
 import aimo.backend.domains.comment.dto.request.UpdateParentCommentRequest;
 import aimo.backend.domains.comment.mapper.ParentCommentMapper;
 import aimo.backend.domains.comment.service.ParentCommentMemberService;
+import aimo.backend.domains.member.entity.Member;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -33,7 +34,9 @@ public class ParentCommentController {
 	public ResponseEntity<DataResponse<Void>> saveParentComment(
 		@Valid @PathVariable Long postId,
 		@Valid @RequestBody SaveParentCommentRequest request) {
-		SaveParentCommentParameter parameter = ParentCommentMapper.toSaveParentCommentParameter(postId, request.content());
+		Long memberId = MemberLoader.getMemberId();
+		SaveParentCommentParameter parameter =
+			SaveParentCommentParameter.of(memberId, postId, request.content());
 		parentCommentMemberService.saveParentComment(parameter);
 
 		return ResponseEntity.ok(DataResponse.ok());
@@ -43,7 +46,9 @@ public class ParentCommentController {
 	public ResponseEntity<DataResponse<Void>> updateParentComment(
 		@Valid @PathVariable Long commentId,
 		@Valid @RequestBody UpdateParentCommentRequest request) {
-		UpdateParentCommentParameter parameter = ParentCommentMapper.toUpdateParentCommentParameter(commentId, request.content());
+		Long memberId = MemberLoader.getMemberId();
+		UpdateParentCommentParameter parameter =
+			UpdateParentCommentParameter.of(memberId, commentId, request.content());
 		parentCommentMemberService.validateAndUpdateParentComment(parameter);
 
 		return ResponseEntity.ok(DataResponse.ok());
