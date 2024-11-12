@@ -45,7 +45,11 @@ jobs:
           echo "${{ secrets.APPLICATION_DEV }}" > backend/src/main/resources/application-dev.yml
           echo "${{ secrets.APPLICATION_LOCAL }}" > backend/src/main/resources/application-local.yml
           echo "${{ secrets.APPLICATION_PROD }}" > backend/src/main/resources/application-prod.yml
-
+          # github actions 시간대 확인
+          echo ===================
+          echo date 
+          echo ===================
+          
       # Gradle 실행 권한 설정
       - name: Grant execute permission to gradlew
         run: chmod +x gradlew
