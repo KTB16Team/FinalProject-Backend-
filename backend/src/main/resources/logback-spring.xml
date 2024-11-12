@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
     <!-- Custom Highlight Converter -->
-    <conversionRule conversionWord="highlight" converterClass="com.jdh.sample.config.log.CustomHighlightConverter"/>
+    <conversionRule conversionWord="highlight" converterClass="aimo.backend.common.config.CustomHighlightConverter"/>
 
     <property name="LOG_LEVEL_PATTERN" value="%highlight(%-5level)"/>
 
@@ -14,7 +14,7 @@
     <!-- 로그 파일에 로그를 출력하는 설정 -->
     <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>build/libs/backend-server-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>~/build/libs/backend-server-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <maxFileSize>10MB</maxFileSize>
             <maxHistory>30</maxHistory>
             <totalSizeCap>1GB</totalSizeCap>
