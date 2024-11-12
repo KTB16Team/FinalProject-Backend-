@@ -31,7 +31,8 @@ public class ChildCommentController {
 	public ResponseEntity<DataResponse<Void>> saveChildComment(
 		@Valid @PathVariable("postId") Long postId,
 		@Valid @PathVariable("parentCommentId") Long parentCommentId,
-		@Valid @RequestBody SaveChildCommentRequest request) {
+		@Valid @RequestBody SaveChildCommentRequest request
+	) {
 		Long memberId = MemberLoader.getMemberId();
 		SaveChildCommentParameter saveChildCommentParameter =
 			SaveChildCommentParameter.of(memberId, postId, parentCommentId, request.content());
@@ -42,7 +43,8 @@ public class ChildCommentController {
 	@PutMapping("comments/child/{childCommentId}")
 	public ResponseEntity<DataResponse<Void>> updateChildComment(
 		@Valid @PathVariable Long childCommentId,
-		@Valid @RequestBody SaveChildCommentRequest request) {
+		@Valid @RequestBody SaveChildCommentRequest request
+	) {
 		Long memberId = MemberLoader.getMemberId();
 		ValidAndUpdateChildCommentParameter validAndUpdateChildCommentParameter =
 			ValidAndUpdateChildCommentParameter.of(memberId, childCommentId, request.content());

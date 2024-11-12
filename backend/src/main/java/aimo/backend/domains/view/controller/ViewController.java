@@ -23,7 +23,7 @@ public class ViewController {
 
 	@PostMapping("/{postId}/views")
 	public ResponseEntity<DataResponse<Void>> increasePostView(
-		@PathVariable("postId")Long postId) {
+		@PathVariable("postId") Long postId) {
 		Long memberId = MemberLoader.getMemberId();
 		IncreasePostViewParameter increasePostViewParameter =
 			IncreasePostViewParameter.of(memberId, postId);

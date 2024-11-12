@@ -4,11 +4,11 @@ import lombok.Getter;
 
 @Getter
 public enum ContentLength {
-	PREVIEW_CONTENT_LENGTH(90),
+
+	PREVIEW_LENGTH(90),
 	;
-
-
 	private final int value;
+
 	ContentLength(int value) {
 		this.value = value;
 	}

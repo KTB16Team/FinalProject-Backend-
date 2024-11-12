@@ -1,10 +1,10 @@
 package aimo.backend.domains.privatePost.entity;
 
-import static aimo.backend.domains.privatePost.model.ContentLength.*;
 import static lombok.AccessLevel.*;
 
 import aimo.backend.common.entity.BaseEntity;
 import aimo.backend.domains.privatePost.dto.parameter.JudgementParameter;
+import aimo.backend.domains.privatePost.model.ContentLength;
 import aimo.backend.domains.privatePost.model.OriginType;
 import aimo.backend.domains.member.entity.Member;
 import jakarta.persistence.CascadeType;
@@ -89,11 +89,11 @@ public class PrivatePost extends BaseEntity {
 	}
 
 	public String getPreview() {
-		return summaryAi.length() > PREVIEW_CONTENT_LENGTH.getValue() ?
-			summaryAi.substring(0, PREVIEW_CONTENT_LENGTH.getValue()) + "..." : summaryAi;
+		return summaryAi.length() > ContentLength.PREVIEW_LENGTH.getValue() ?
+			summaryAi.substring(0, ContentLength.PREVIEW_LENGTH.getValue()) + "..." : summaryAi;
 	}
 
-	public static PrivatePost toEntity(JudgementParameter parameter, Member member, TextRecord textRecord) {
+	public static PrivatePost from(JudgementParameter parameter, Member member, TextRecord textRecord) {
 		return PrivatePost.builder()
 			.title(parameter.title())
 			.member(member)

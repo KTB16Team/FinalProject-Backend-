@@ -31,6 +31,6 @@
     </root>
 
     <!-- 특정 패키지 또는 클래스의 로깅 레벨 설정 -->
-    <logger name="jex" level="debug"/>
-    <logger name="com" level="debug"/>
+    <logger name="jex" level="info"/>
+    <logger name="com" level="info"/>
 </configuration>

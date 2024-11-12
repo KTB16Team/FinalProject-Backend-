@@ -15,6 +15,7 @@ import aimo.backend.domains.like.entity.PostLike;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.post.dto.parameter.SavePostParameter;
 import aimo.backend.domains.post.model.Category;
+import aimo.backend.domains.privatePost.model.ContentLength;
 import aimo.backend.domains.vote.entity.Vote;
 import aimo.backend.domains.vote.model.Side;
 import aimo.backend.domains.privatePost.model.OriginType;
@@ -115,8 +116,8 @@ public class Post extends BaseEntity {
 	}
 
 	public String getPreview(){
-		return summaryAi.length() > PREVIEW_CONTENT_LENGTH.getValue() ?
-			summaryAi.substring(0, PREVIEW_CONTENT_LENGTH.getValue()) + "..." : summaryAi;
+		return summaryAi.length() > PREVIEW_LENGTH.getValue() ?
+			summaryAi.substring(0, PREVIEW_LENGTH.getValue()) + "..." : summaryAi;
 	}
 
 	public void delete() {
