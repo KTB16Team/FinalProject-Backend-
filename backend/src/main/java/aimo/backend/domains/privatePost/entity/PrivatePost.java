@@ -1,6 +1,5 @@
 package aimo.backend.domains.privatePost.entity;
 
-import static aimo.backend.domains.privatePost.model.ContentLength.*;
 import static lombok.AccessLevel.*;
 
 import aimo.backend.common.entity.BaseEntity;

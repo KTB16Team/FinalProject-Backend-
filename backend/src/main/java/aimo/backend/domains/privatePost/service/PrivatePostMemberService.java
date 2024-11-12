@@ -49,7 +49,7 @@ public class PrivatePostMemberService {
 		JudgementResponse judgementResponse = serveContentToAi(parameter, member);
 		JudgementParameter judgementParameter = JudgementParameter.from(memberId, judgementResponse);
 		TextRecord textRecord = TextRecord.of(parameter.content());
-		PrivatePost privatePost = PrivatePost.toEntity(judgementParameter, member, textRecord);
+		PrivatePost privatePost = PrivatePost.from(judgementParameter, member, textRecord);
 
 		return privatePostRepository.save(privatePost).getId();
 	}
