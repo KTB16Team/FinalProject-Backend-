@@ -3,8 +3,12 @@ package aimo.backend.domains.post.dto.response;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.member.entity.Member;
+import aimo.backend.domains.post.entity.Post;
+import aimo.backend.domains.vote.model.Side;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,8 +29,35 @@ public class FindPostAndCommentsByIdResponse {
 	private final Integer votesCount;
 	private final Integer votesPlaintiff;
 	private final Integer votesDefendant;
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private final LocalDateTime createdAt;
 	private final List<ParentCommentDto> comments;
+
+	public static FindPostAndCommentsByIdResponse from(Member member, Post post, List<ParentComment> parentComments) {
+		return new FindPostAndCommentsByIdResponse(
+			post.getMember() == member,
+			post.getPostLikes().stream()
+				.anyMatch(postLike -> postLike.getMember() == member),
+			post.getVotes().stream()
+				.filter(vote -> vote.getMember() == member)
+				.findFirst()
+				.map(vote -> vote.getSide().getValue())
+				.orElse(Side.NONE.getValue()),
+			post.getTitle(),
+			post.getMember().getNickname(),
+			post.getSummaryAi(),
+			post.getPostLikesCount(),
+			post.getPostViewsCount(),
+			post.getCommentsCount(),
+			post.getVotesCount(),
+			post.getPlaintiffVotesCount(),
+			post.getDefendantVotesCount(),
+			post.getCreatedAt(),
+			parentComments.stream()
+				.map(parentComment -> ParentCommentDto.of(member, parentComment))
+				.toList()
+		);
+	}
 
 	@Data
 	@AllArgsConstructor(access = AccessLevel.PRIVATE)

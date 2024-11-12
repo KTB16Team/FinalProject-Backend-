@@ -4,12 +4,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import aimo.backend.common.exception.ApiException;
-import aimo.backend.common.mapper.VoteMapper;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.member.service.MemberService;
 import aimo.backend.domains.post.entity.Post;
 import aimo.backend.domains.vote.dto.SaveVotePostParameter;
-import aimo.backend.domains.vote.dto.SaveVotePostRequest;
 import aimo.backend.domains.vote.entity.Vote;
 import aimo.backend.domains.post.service.PostService;
 import aimo.backend.domains.vote.model.Side;
@@ -38,7 +36,7 @@ public class VoteService {
 
 				(vote) -> vote.changeSide(side),
 				() -> {
-					Vote newVote = VoteMapper.toEntity(post, member, side);
+					Vote newVote = Vote.from(post, member, side);
 					voteRepository.save(newVote);
 				}
 			);

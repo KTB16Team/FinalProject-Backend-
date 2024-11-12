@@ -1,5 +1,6 @@
 package aimo.backend.domains.post.entity;
 
+import static aimo.backend.domains.privatePost.model.ContentLength.*;
 import static jakarta.persistence.CascadeType.*;
 import static jakarta.persistence.GenerationType.*;
 import static lombok.AccessLevel.*;
@@ -12,6 +13,7 @@ import aimo.backend.common.entity.BaseEntity;
 import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.like.entity.PostLike;
 import aimo.backend.domains.member.entity.Member;
+import aimo.backend.domains.post.dto.parameter.SavePostParameter;
 import aimo.backend.domains.post.model.Category;
 import aimo.backend.domains.vote.entity.Vote;
 import aimo.backend.domains.vote.model.Side;
@@ -112,6 +114,11 @@ public class Post extends BaseEntity {
 			.reduce(1, Integer::sum);
 	}
 
+	public String getPreview(){
+		return summaryAi.length() > PREVIEW_CONTENT_LENGTH.getValue() ?
+			summaryAi.substring(0, PREVIEW_CONTENT_LENGTH.getValue()) + "..." : summaryAi;
+	}
+
 	public void delete() {
 		this.member.getPosts().remove(this);
 		this.member = null;
@@ -138,6 +145,21 @@ public class Post extends BaseEntity {
 
 	public Integer getVotesCount() {
 		return votes.size();
+	}
+
+	public static Post from(SavePostParameter parameter, Member member) {
+		return Post.builder()
+			.member(member)
+			.title(parameter.title())
+			.summaryAi(parameter.summaryAi())
+			.stancePlaintiff(parameter.stancePlaintiff())
+			.stanceDefendant(parameter.stanceDefendant())
+			.faultRatePlaintiff(parameter.faultRatePlaintiff())
+			.faultRateDefendant(parameter.faultRateDefendant())
+			.judgement(parameter.judgement())
+			.originType(parameter.originType())
+			.category(parameter.category())
+			.build();
 	}
 
 	@Builder

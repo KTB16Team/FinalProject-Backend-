@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import aimo.backend.common.dto.DataResponse;
-import aimo.backend.common.mapper.PostMapper;
 import aimo.backend.common.util.memberLoader.MemberLoader;
 import aimo.backend.domains.post.dto.parameter.DeletePostParameter;
 import aimo.backend.domains.post.dto.parameter.FindPostAndCommentsByIdParameter;
@@ -50,7 +49,7 @@ public class PostController {
 		SavePostParameter parameter = SavePostParameter.from(memberId, request);
 		Long postId = postMemberService.save(parameter);
 		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(DataResponse.created(PostMapper.toSavePostResponse(postId)));
+			.body(DataResponse.created(SavePostResponse.of(postId)));
 	}
 
 	@GetMapping

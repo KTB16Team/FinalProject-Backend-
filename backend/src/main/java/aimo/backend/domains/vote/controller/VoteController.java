@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import aimo.backend.common.dto.DataResponse;
-import aimo.backend.common.mapper.VoteMapper;
 import aimo.backend.common.util.memberLoader.MemberLoader;
 import aimo.backend.domains.vote.dto.SaveVotePostParameter;
 import aimo.backend.domains.vote.dto.SaveVotePostRequest;

@@ -38,4 +38,12 @@ public class ChatRecord extends BaseEntity {
 		this.extension = extension;
 		this.content = content;
 	}
+
+	public static ChatRecord of(String filename, String extension, String content) {
+		return ChatRecord.builder()
+			.filename(filename)
+			.extension(extension)
+			.content(content)
+			.build();
+	}
 }

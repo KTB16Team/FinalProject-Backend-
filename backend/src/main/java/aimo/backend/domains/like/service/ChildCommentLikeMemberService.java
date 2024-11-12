@@ -6,15 +6,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import aimo.backend.common.exception.ApiException;
-import aimo.backend.common.mapper.ChildCommentLikeMapper;
 import aimo.backend.domains.comment.entity.ChildComment;
 import aimo.backend.domains.comment.service.ChildCommentService;
 import aimo.backend.domains.like.dto.parameter.LikeChildCommentParameter;
+import aimo.backend.domains.like.entity.ChildCommentLike;
 import aimo.backend.domains.like.model.LikeType;
 import aimo.backend.domains.like.repository.ChildCommentLikeRepository;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.member.repository.MemberRepository;
-import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -37,7 +36,7 @@ public class ChildCommentLikeMemberService {
 
 		if (parameter.likeType() == LikeType.LIKE) {
 			if (childCommentLikeRepository.existsByChildCommentIdAndMemberId(childCommentId, memberId)) return;
-			childCommentLikeRepository.save(ChildCommentLikeMapper.toChildCommentLike(member, childComment));
+			childCommentLikeRepository.save(ChildCommentLike.from(member, childComment));
 			return;
 		}
 

@@ -3,15 +3,12 @@ package aimo.backend.domains.privatePost.service;
 import static aimo.backend.common.exception.ErrorCode.*;
 
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.w3c.dom.Text;
+
 
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.exception.ErrorCode;
-import aimo.backend.common.mapper.PrivatePostMapper;
 import aimo.backend.common.properties.AiServerProperties;
 import aimo.backend.common.service.ExternalApiService;
 import aimo.backend.domains.member.entity.Member;
@@ -103,13 +100,13 @@ public class PrivatePostMemberService {
 		if (!validationPrivatePost(parameter.memberId(), privatePost))
 			throw ApiException.from(PRIVATE_POST_READ_UNAUTHORIZED);
 
-		return PrivatePostMapper.toResponse(privatePost);
+		return PrivatePostResponse.from(privatePost);
 	}
 
 	// 개인글 목록 조회
 	public Page<PrivatePostPreviewResponse> findPrivatePostPreviewsBy(FindPrivatePostPreviewParameter parameter) {
 		return privatePostRepository.findByMemberId(parameter.memberId(), parameter.pageable())
-			.map(PrivatePostMapper::toPreviewResponse);
+			.map(PrivatePostPreviewResponse::from);
 	}
 
 	// 개인글 공개 처리

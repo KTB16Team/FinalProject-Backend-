@@ -7,4 +7,8 @@ public record LikePostParameter(
 	Long postId,
 	LikeType likeType
 ) {
+
+	public static LikePostParameter of(Long memberId, Long postId, LikeType likeType) {
+		return new LikePostParameter(memberId, postId, likeType);
+	}
 }

@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import aimo.backend.common.exception.ApiException;
-import aimo.backend.common.mapper.PostLikeMapper;
 import aimo.backend.domains.like.dto.parameter.LikePostParameter;
 import aimo.backend.domains.like.model.LikeType;
 import aimo.backend.domains.member.entity.Member;
@@ -39,7 +38,7 @@ public class PostLikeMemberService {
 			if (postLikeRepository.existsByPostIdAndMemberId(postId, memberId))
 				return;
 
-			PostLike postLike = PostLikeMapper.toEntity(member, post);
+			PostLike postLike = PostLike.from(member, post);
 			postLikeRepository.save(postLike);
 			return ;
 		}

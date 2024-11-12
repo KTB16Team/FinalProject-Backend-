@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import aimo.backend.common.mapper.MemberMapper;
-import aimo.backend.common.mapper.S3Mapper;
 import aimo.backend.common.util.memberLoader.MemberLoader;
 import aimo.backend.domains.member.dto.parameter.DeleteProfileImageParameter;
 import aimo.backend.domains.member.dto.parameter.SignUpParameter;
@@ -29,7 +27,6 @@ import aimo.backend.domains.member.dto.request.LogoutRequest;
 import aimo.backend.domains.member.dto.response.FindMyInfoResponse;
 import aimo.backend.domains.member.dto.response.NicknameExistsResponse;
 import aimo.backend.domains.member.dto.request.SendTemporaryPasswordRequest;
-import aimo.backend.domains.member.dto.request.SignUpRequest;
 import aimo.backend.common.dto.DataResponse;
 import aimo.backend.domains.auth.security.jwtFilter.JwtTokenProvider;
 import aimo.backend.domains.member.dto.request.UpdateNicknameRequest;

@@ -1,5 +1,6 @@
 package aimo.backend.domains.post.dto.response;
 
+import aimo.backend.domains.post.entity.Post;
 import aimo.backend.domains.privatePost.model.OriginType;
 
 public record FindJudgementResponse(
@@ -31,6 +32,19 @@ public record FindJudgementResponse(
 			faultRatePlaintiff,
 			faultRateDefendant,
 			originType
+		);
+	}
+
+	public static FindJudgementResponse from(Post post) {
+		return new FindJudgementResponse(
+			post.getTitle(),
+			post.getSummaryAi(),
+			post.getStancePlaintiff(),
+			post.getStanceDefendant(),
+			post.getJudgement(),
+			post.getFaultRatePlaintiff(),
+			post.getFaultRateDefendant(),
+			post.getOriginType()
 		);
 	}
 }

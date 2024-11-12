@@ -9,9 +9,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import aimo.backend.common.dto.DataResponse;
-import aimo.backend.common.mapper.ChildCommentLikeMapper;
-import aimo.backend.common.mapper.ParentCommentLikeMapper;
-import aimo.backend.common.mapper.PostLikeMapper;
 import aimo.backend.domains.like.dto.parameter.LikeChildCommentParameter;
 import aimo.backend.domains.like.dto.parameter.LikeParentCommentParameter;
 import aimo.backend.domains.like.dto.parameter.LikePostParameter;
@@ -34,7 +31,8 @@ public class LikeController {
 	@PostMapping("/posts/{postId}/likes")
 	public ResponseEntity<DataResponse<Void>> likePost(@PathVariable Long postId,
 		@RequestParam("likeType") LikeType likeType) {
-		LikePostParameter parameter = PostLikeMapper.toLikePostParameter(postId, likeType);
+		Long memberId = MemberLoader.getMemberId();
+		LikePostParameter parameter = LikePostParameter.of(memberId, postId, likeType);
 		postLikeMemberService.likePost(parameter);
 
 		return ResponseEntity
@@ -47,8 +45,8 @@ public class LikeController {
 		@PathVariable Long childCommentId,
 		@RequestParam("likeType") LikeType likeType) {
 		Long memberId = MemberLoader.getMemberId();
-		LikeChildCommentParameter parameter = LikeChildCommentParameter
-			.of(memberId, childCommentId, likeType);
+		LikeChildCommentParameter parameter =
+			LikeChildCommentParameter.of(memberId, childCommentId, likeType);
 		childCommentLikeMemberService.likeChildComment(parameter);
 		return ResponseEntity
 			.status(HttpStatus.CREATED)
@@ -60,7 +58,8 @@ public class LikeController {
 		@PathVariable Long parentCommentId,
 		@RequestParam("likeType") LikeType likeType) {
 		Long memberId = MemberLoader.getMemberId();
-		LikeParentCommentParameter parameter = LikeParentCommentParameter.of(memberId, parentCommentId, likeType);
+		LikeParentCommentParameter parameter =
+			LikeParentCommentParameter.of(memberId, parentCommentId, likeType);
 		parentCommentLikeMemberService.likeParentComment(parameter);
 
 		return ResponseEntity.ok(DataResponse.ok());
