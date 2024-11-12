@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration scan="true" scanPeriod="30 seconds">
-    <conversionRule conversionWord="highlight" converterClass="aimo.backend.common.config.CustomHighlightConverter"/>
+<configuration>
+    <!-- Custom Highlight Converter -->
+    <conversionRule conversionWord="highlight" converterClass="com.jdh.sample.config.log.CustomHighlightConverter"/>
 
     <property name="LOG_LEVEL_PATTERN" value="%highlight(%-5level)"/>
 
-    <!-- 콘솔에 로그를 출력하는 설정 -->
-    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+    <appender name="STDOUT"
+              class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>%boldMagenta(%d{MM-dd HH:mm:ss}) [${LOG_LEVEL_PATTERN}] %cyan(%logger{5}.%M) - %msg %n</pattern>
         </encoder>
     </appender>
-
     <!-- 로그 파일에 로그를 출력하는 설정 -->
     <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
