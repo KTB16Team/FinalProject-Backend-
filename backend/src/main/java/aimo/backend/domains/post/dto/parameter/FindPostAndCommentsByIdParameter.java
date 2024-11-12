@@ -1,11 +1,11 @@
 package aimo.backend.domains.post.dto.parameter;
 
 public record FindPostAndCommentsByIdParameter(
-	Long postId,
-	Long memberId
+	Long memberId,
+	Long postId
 ) {
 
-	public static FindPostAndCommentsByIdParameter of(Long postId, Long memberId) {
-		return new FindPostAndCommentsByIdParameter(postId, memberId);
+	public static FindPostAndCommentsByIdParameter of(Long memberId, Long postId) {
+		return new FindPostAndCommentsByIdParameter(memberId, postId);
 	}
 }

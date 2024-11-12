@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MemberLoader {
 
-	// Authentication 객체에서 email을 추출하는 메서드
 	public static Long getMemberId() {
 		return (Long)SecurityContextHolder
 			.getContext()

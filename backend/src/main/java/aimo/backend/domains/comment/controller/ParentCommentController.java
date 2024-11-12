@@ -14,12 +14,9 @@ import aimo.backend.common.util.memberLoader.MemberLoader;
 import aimo.backend.domains.comment.dto.parameter.DeleteParentCommentParameter;
 import aimo.backend.domains.comment.dto.parameter.SaveParentCommentParameter;
 import aimo.backend.domains.comment.dto.parameter.UpdateParentCommentParameter;
-import aimo.backend.domains.comment.dto.request.DeleteParentCommentRequest;
 import aimo.backend.domains.comment.dto.request.SaveParentCommentRequest;
 import aimo.backend.domains.comment.dto.request.UpdateParentCommentRequest;
-import aimo.backend.domains.comment.mapper.ParentCommentMapper;
 import aimo.backend.domains.comment.service.ParentCommentMemberService;
-import aimo.backend.domains.member.entity.Member;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 

@@ -10,7 +10,6 @@ import aimo.backend.domains.comment.dto.parameter.DeleteParentCommentParameter;
 import aimo.backend.domains.comment.dto.parameter.SaveParentCommentParameter;
 import aimo.backend.domains.comment.dto.parameter.UpdateParentCommentParameter;
 import aimo.backend.domains.comment.entity.ParentComment;
-import aimo.backend.domains.comment.mapper.ParentCommentMapper;
 import aimo.backend.domains.comment.repository.ParentCommentRepository;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.member.repository.MemberRepository;
@@ -23,7 +22,6 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class ParentCommentMemberService {
 
-	private final ParentCommentMapper parentCommentMapper;
 	private final PostService postService;
 	private final ParentCommentRepository parentCommentRepository;
 	private final MemberRepository memberRepository;
@@ -45,7 +43,7 @@ public class ParentCommentMemberService {
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> ApiException.from(MEMBER_NOT_FOUND));
 		Post post = postService.findById(postId);
-		ParentComment parentComment = parentCommentMapper.toEntity(member, post, parameter.content());
+		ParentComment parentComment = ParentComment.of(member, post, parameter.content());
 
 		parentCommentRepository.save(parentComment);
 	}
@@ -87,9 +85,18 @@ public class ParentCommentMemberService {
 			.orElseThrow(() -> ApiException.from(PARENT_COMMENT_NOT_FOUND));
 	}
 
-	public void deleteIfChildrenIsEmpty(ParentComment parentComment){
-		if(parentComment.getChildComments().isEmpty()){
-			parentCommentRepository.delete(parentComment);
+	// 자식 댓글이 없고 삭제된 부모 댓글이면 삭제
+	public void deleteIfParentCommentIsDeletedAndChildrenIsEmpty(ParentComment parentComment){
+		// 부모 댓글이 삭제되지 않은 상태면 return
+		if (!parentComment.getIsDeleted()) {
+			return;
 		}
+
+		// 자식 댓글이 존재하면 return
+		if(!parentComment.getChildComments().isEmpty()){
+			return;
+		}
+
+		parentCommentRepository.delete(parentComment);
 	}
 }

@@ -56,6 +56,7 @@ public class PostService {
 	public Page<FindPostsByPostTypeResponse> findPostDtosByPostType(FindPostByPostTypeParameter parameter) {
 		Page<FindPostsByPostTypeResponse> posts = null;
 		PostType postType = parameter.postType();
+
 		Pageable pageable = PageRequest.of(
 			parameter.page(),
 			parameter.size(),
@@ -131,6 +132,7 @@ public class PostService {
 	public void deletePostBy(DeletePostParameter parameter) {
 		Long postId   = parameter.postId();
 		Long memberId = parameter.memberId();
+
 		validateDeletePost(memberId, postId);
 
 		Long privatePostId = postRepository
@@ -143,7 +145,7 @@ public class PostService {
 	}
 
 	// 글 삭제 권한 확인
-	public void validateDeletePost(Long memberId, Long postId) {
+	private void validateDeletePost(Long memberId, Long postId) {
 		Boolean exists = postRepository.existsByIdAndMember_Id(postId, memberId);
 
 		if (!exists) {
