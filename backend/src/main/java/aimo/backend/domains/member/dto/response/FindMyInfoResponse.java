@@ -17,6 +17,11 @@ public record FindMyInfoResponse(
 	}
 
 	public static FindMyInfoResponse from(Member member){
+
+		if (member.getProfileImage() == null) {
+			return new FindMyInfoResponse(member.getNickname(), member.getEmail(), null);
+		}
+
 		return new FindMyInfoResponse(member.getNickname(), member.getEmail(), member.getProfileImage().getUrl());
 	}
 }
