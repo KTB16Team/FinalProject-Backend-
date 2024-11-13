@@ -13,6 +13,7 @@ import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.comment.repository.ParentCommentRepository;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.member.repository.MemberRepository;
+import aimo.backend.domains.member.service.MemberService;
 import aimo.backend.domains.post.entity.Post;
 import aimo.backend.domains.post.service.PostService;
 import lombok.RequiredArgsConstructor;
@@ -25,10 +26,11 @@ public class ParentCommentMemberService {
 	private final PostService postService;
 	private final ParentCommentRepository parentCommentRepository;
 	private final MemberRepository memberRepository;
+	private final MemberService memberService;
 
 	// 부모 댓글 권한 확인
-	private void validateParentCommentAuthority(Member member, Long commentId) {
-		Boolean exists = parentCommentRepository.existsByIdAndMember(commentId, member);
+	private void validateParentCommentAuthority(Long memberId, Long commentId) {
+		Boolean exists = parentCommentRepository.existsByIdAndMember_Id(commentId, memberId);
 
 		if (!exists) {
 			throw ApiException.from(UNAUTHORIZED_PARENT_COMMENT);
@@ -40,9 +42,11 @@ public class ParentCommentMemberService {
 	public void saveParentComment(SaveParentCommentParameter parameter) {
 		Long memberId = parameter.memberId();
 		Long postId = parameter.postId();
+
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> ApiException.from(MEMBER_NOT_FOUND));
 		Post post = postService.findById(postId);
+
 		ParentComment parentComment = ParentComment.of(member, post, parameter.content());
 
 		parentCommentRepository.save(parentComment);
@@ -51,11 +55,12 @@ public class ParentCommentMemberService {
 	// 부모 댓글 수정
 	@Transactional(rollbackFor = ApiException.class)
 	public void validateAndUpdateParentComment(UpdateParentCommentParameter parameter) {
-		Member member = memberRepository.findById(parameter.memberId())
-			.orElseThrow(() -> ApiException.from(MEMBER_NOT_FOUND));
-		validateParentCommentAuthority(member, parameter.parentCommentId());
+		Long memberId = parameter.memberId();
+		Long parentCommentId = parameter.parentCommentId();
 
-		ParentComment parentComment = parentCommentRepository.findById(parameter.parentCommentId())
+		validateParentCommentAuthority(memberId, parentCommentId);
+
+		ParentComment parentComment = parentCommentRepository.findById(parentCommentId)
 			.orElseThrow(() -> ApiException.from(PARENT_COMMENT_NOT_FOUND));
 
 		parentComment.updateContent(parameter.content());
@@ -64,10 +69,10 @@ public class ParentCommentMemberService {
 	// 부모 댓글 삭제
 	@Transactional(rollbackFor = ApiException.class)
 	public void validateAndDeleteParentComment(DeleteParentCommentParameter parameter) {
-		Member member = memberRepository.findById(parameter.memberId())
-			.orElseThrow(() -> ApiException.from(MEMBER_NOT_FOUND));
+		Long memberId = parameter.memberId();
 		Long commentId = parameter.parentCommentId();
-		validateParentCommentAuthority(member, commentId);
+
+		validateParentCommentAuthority(memberId, commentId);
 
 		parentCommentRepository.findById(commentId)
 			.ifPresent((parentComment) -> {
@@ -91,7 +96,6 @@ public class ParentCommentMemberService {
 		if (!parentComment.getIsDeleted()) {
 			return;
 		}
-
 		// 자식 댓글이 존재하면 return
 		if(!parentComment.getChildComments().isEmpty()){
 			return;

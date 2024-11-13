@@ -7,7 +7,7 @@ public record UpdateParentCommentRequest(
 	String content
 ) {
 
-	public static UpdateParentCommentRequest of(String content) {
+	public static UpdateParentCommentRequest from(String content) {
 		return new UpdateParentCommentRequest(content);
 	}
 }

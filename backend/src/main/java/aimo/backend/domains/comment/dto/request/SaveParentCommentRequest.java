@@ -7,7 +7,7 @@ public record SaveParentCommentRequest(
 	String content
 ) {
 
-	public static SaveParentCommentRequest of(String content) {
+	public static SaveParentCommentRequest from(String content) {
 		return new SaveParentCommentRequest(content);
 	}
 }
