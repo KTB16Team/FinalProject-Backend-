@@ -30,10 +30,11 @@ public class ParentCommentController {
 	@PostMapping("/{postId}/comments")
 	public ResponseEntity<DataResponse<Void>> saveParentComment(
 		@Valid @PathVariable Long postId,
-		@Valid @RequestBody SaveParentCommentRequest request) {
+		@Valid @RequestBody SaveParentCommentRequest request
+	) {
 		Long memberId = MemberLoader.getMemberId();
-		SaveParentCommentParameter parameter =
-			SaveParentCommentParameter.of(memberId, postId, request.content());
+
+		SaveParentCommentParameter parameter = SaveParentCommentParameter.of(memberId, postId, request.content());
 		parentCommentMemberService.saveParentComment(parameter);
 
 		return ResponseEntity.ok(DataResponse.ok());
@@ -42,10 +43,15 @@ public class ParentCommentController {
 	@PutMapping("comments/{commentId}")
 	public ResponseEntity<DataResponse<Void>> updateParentComment(
 		@Valid @PathVariable Long commentId,
-		@Valid @RequestBody UpdateParentCommentRequest request) {
+		@Valid @RequestBody UpdateParentCommentRequest request
+	) {
 		Long memberId = MemberLoader.getMemberId();
-		UpdateParentCommentParameter parameter =
-			UpdateParentCommentParameter.of(memberId, commentId, request.content());
+
+		UpdateParentCommentParameter parameter = UpdateParentCommentParameter.of(
+			memberId,
+			commentId,
+			request.content());
+
 		parentCommentMemberService.validateAndUpdateParentComment(parameter);
 
 		return ResponseEntity.ok(DataResponse.ok());
@@ -56,7 +62,9 @@ public class ParentCommentController {
 		@Valid @PathVariable("commentId") Long commentId
 	) {
 		Long memberId = MemberLoader.getMemberId();
+
 		DeleteParentCommentParameter parameter = DeleteParentCommentParameter.of(memberId, commentId);
+
 		parentCommentMemberService.validateAndDeleteParentComment(parameter);
 
 		return ResponseEntity.ok(DataResponse.ok());

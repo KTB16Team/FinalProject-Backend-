@@ -38,7 +38,9 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 	}
 
 	@Override
-	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response
+	public Authentication attemptAuthentication(
+		HttpServletRequest request,
+		HttpServletResponse response
 	) throws AuthenticationException {
 		log.info("LoginFilter");
 
@@ -58,7 +60,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 		HttpServletRequest request,
 		HttpServletResponse response,
 		FilterChain chain,
-		Authentication authResult) {
+		Authentication authResult
+	) {
 		String email = extractEmail(authResult);
 
 		// 회원 id 찾기
@@ -80,7 +83,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 	protected void unsuccessfulAuthentication(
 		HttpServletRequest request,
 		HttpServletResponse response,
-		AuthenticationException failed) {
+		AuthenticationException failed
+	) {
 		String email = obtainEmail(request);
 		log.info("로그인 실패: {}", email);
 

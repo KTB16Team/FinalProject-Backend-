@@ -45,7 +45,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(
 		HttpServletRequest request,
 		HttpServletResponse response,
-		FilterChain filterChain) throws ServletException, IOException, ApiException {
+		FilterChain filterChain
+	) throws ServletException, IOException, ApiException {
 
 		final String refreshToken = jwtTokenProvider.extractRefreshToken(request).orElse(null);
 		final String accessToken = jwtTokenProvider.extractAccessToken(request).orElse(null);

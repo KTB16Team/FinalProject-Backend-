@@ -9,7 +9,7 @@ import aimo.backend.domains.member.entity.Member;
 
 public interface ParentCommentRepository extends JpaRepository<ParentComment, Long> {
 
-	Boolean existsByIdAndMember(Long id, Member member);
+	Boolean existsByIdAndMember_Id(Long id, Long memberId);
 
 	List<ParentComment> findByMemberId(Long memberId);
 

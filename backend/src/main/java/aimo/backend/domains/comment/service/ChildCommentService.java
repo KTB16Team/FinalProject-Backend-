@@ -29,8 +29,8 @@ public class ChildCommentService {
 	private final MemberService memberService;
 
 	//자식 댓글 권한 확인
-	private void validateChildCommentAuthority(Member member, Long childCommentId) throws ApiException {
-		Boolean exists = childCommentRepository.existsByIdAndMember(childCommentId, member);
+	private void validateChildCommentAuthority(Long memberId, Long childCommentId) throws ApiException {
+		Boolean exists = childCommentRepository.existsByIdAndMember_Id(childCommentId, memberId);
 
 		if (!exists) {
 			throw ApiException.from(UNAUTHORIZED_CHILD_COMMENT);
@@ -39,14 +39,15 @@ public class ChildCommentService {
 
 	//자식 댓글 저장
 	@Transactional(rollbackFor = ApiException.class)
-	public void saveChildComment(SaveChildCommentParameter saveChildCommentParameter) {
-		Long postId = saveChildCommentParameter.postId();
-		Long parentCommentId = saveChildCommentParameter.parentCommentId();
-		String content = saveChildCommentParameter.content();
-		Member member = memberService.findMemberById(saveChildCommentParameter.memberId());
-		Post post = postService.findById(postId);
+	public void saveChildComment(SaveChildCommentParameter parameter) {
+		Long postId = parameter.postId();
+		Long parentCommentId = parameter.parentCommentId();
+		String content = parameter.content();
 
+		Member member = memberService.findMemberById(parameter.memberId());
+		Post post = postService.findById(postId);
 		ParentComment parentComment = parentCommentMemberService.findById(parentCommentId);
+
 		ChildComment childComment = ChildComment.of(content, member, parentComment, post);
 		childCommentRepository.save(childComment);
 	}
@@ -54,12 +55,15 @@ public class ChildCommentService {
 	//자식 댓글 수정
 	@Transactional(rollbackFor = ApiException.class)
 	public void validateAndUpdateChildComment(
-		ValidAndUpdateChildCommentParameter validAndUpdateChildCommentParameter) {
-		Member member = memberService.findMemberById(validAndUpdateChildCommentParameter.memberId());
-		Long childCommentId = validAndUpdateChildCommentParameter.childCommentId();
-		String content = validAndUpdateChildCommentParameter.content();
+		ValidAndUpdateChildCommentParameter parameter
+	) {
+		Long memberId = parameter.memberId();
+		Long childCommentId = parameter.childCommentId();
+		String content = parameter.content();
 
-		validateChildCommentAuthority(member, childCommentId);
+		// 자식 댓글 권한 확인
+		validateChildCommentAuthority(memberId, childCommentId);
+
 		ChildComment childComment = childCommentRepository.findById(childCommentId)
 			.orElseThrow(() -> ApiException.from(UNAUTHORIZED_CHILD_COMMENT));
 
@@ -72,17 +76,17 @@ public class ChildCommentService {
 		ValidAndDeleteParentCommentParameter parameter
 	) {
 		Long childCommentId = parameter.childCommentId();
-
-		Member member = memberService.findMemberById(parameter.memberId());
+		Long memberId = parameter.memberId();
 
 		// 자식 댓글 권한 확인
-		validateChildCommentAuthority(member, childCommentId);
+		validateChildCommentAuthority(memberId, childCommentId);
 
 		ParentComment parentComment = childCommentRepository.findById(childCommentId)
 			.orElseThrow(() -> ApiException.from(CHILD_COMMENT_NOT_FOUND))
 			.getParentComment();
 
 		// 자식 댓글 삭제
+		parentComment.deleteChildComment(childCommentId);
 		childCommentRepository.deleteById(childCommentId);
 
 		// 자식 댓글이 없으며 부모 댓글이 삭제된 상태면 삭제

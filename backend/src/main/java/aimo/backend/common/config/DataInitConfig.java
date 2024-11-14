@@ -119,7 +119,6 @@ public class DataInitConfig {
 				ParentComment.builder()
 					.nickname("ParentComment" + i)
 					.content("This is a parent comment " + i)
-					.isDeleted(false)
 					.member(member)
 					.post(post)
 					.build();
@@ -135,7 +134,6 @@ public class DataInitConfig {
 					.content("This is a child comment " + i)
 					.member(member)
 					.nickname(member.getNickname())
-					.isDeleted(false)
 					.parentComment(parentComment)
 					.post(postRepo.getReferenceById(parentComment.getPost().getId()))
 					.build();
