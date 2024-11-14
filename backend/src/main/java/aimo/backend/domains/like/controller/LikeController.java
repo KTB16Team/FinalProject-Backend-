@@ -46,23 +46,29 @@ public class LikeController {
 	@PostMapping("/comments/child/{childCommentId}/likes")
 	public ResponseEntity<DataResponse<Void>> likeChildComment(
 		@PathVariable Long childCommentId,
-		@RequestParam("likeType") LikeType likeType) {
+		@RequestParam("likeType") LikeType likeType
+	) {
 		Long memberId = MemberLoader.getMemberId();
+
 		LikeChildCommentParameter parameter =
 			LikeChildCommentParameter.of(memberId, childCommentId, likeType);
+
 		childCommentLikeMemberService.likeChildComment(parameter);
-		return ResponseEntity
-			.status(HttpStatus.CREATED)
+
+		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(DataResponse.created());
 	}
 
 	@PostMapping("/comments/{parentCommentId}/likes")
 	public ResponseEntity<DataResponse<Void>> likeParentComment(
 		@PathVariable Long parentCommentId,
-		@RequestParam("likeType") LikeType likeType) {
+		@RequestParam("likeType") LikeType likeType
+	) {
 		Long memberId = MemberLoader.getMemberId();
+
 		LikeParentCommentParameter parameter =
 			LikeParentCommentParameter.of(memberId, parentCommentId, likeType);
+
 		parentCommentLikeMemberService.likeParentComment(parameter);
 
 		return ResponseEntity.ok(DataResponse.ok());
