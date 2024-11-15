@@ -71,7 +71,7 @@ public class Member extends BaseEntity {
 	@Column(nullable = false, name = "birth_date")
 	private LocalDate birthDate;
 
-	@OneToMany(mappedBy = "member")
+	@OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private List<PrivatePost> privatePosts = new ArrayList<>();
 
 	@OneToMany(mappedBy = "member")

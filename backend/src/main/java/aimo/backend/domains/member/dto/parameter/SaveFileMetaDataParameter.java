@@ -13,7 +13,7 @@ public record SaveFileMetaDataParameter(
 		return new SaveFileMetaDataParameter(memberId, filename, extension, size);
 	}
 
-	public static SaveFileMetaDataParameter from(Long memberId, SaveFileMetaDataRequest request) {
+	public static SaveFileMetaDataParameter of(Long memberId, SaveFileMetaDataRequest request) {
 		return new SaveFileMetaDataParameter(memberId, request.filename(), request.extension(), request.size());
 	}
 }

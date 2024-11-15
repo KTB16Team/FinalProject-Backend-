@@ -62,12 +62,17 @@ public class PostService {
 			parameter.size(),
 			Sort.by(Sort.Direction.DESC, "id"));
 
-		if (postType == PostType.MY) 		posts = findMyPosts(parameter.memberId(), pageable);
-		if (postType == PostType.ANY) 		posts = findAnyPosts(pageable);
-		if (postType == PostType.POPULAR) 	posts = findPopularPosts(pageable);
-		if (postType == PostType.COMMENTED) posts = findCommentedPosts(parameter.memberId(), pageable);
+		if (postType == PostType.MY)
+			posts = findMyPosts(parameter.memberId(), pageable);
+		if (postType == PostType.ANY)
+			posts = findAnyPosts(pageable);
+		if (postType == PostType.POPULAR)
+			posts = findPopularPosts(pageable);
+		if (postType == PostType.COMMENTED)
+			posts = findCommentedPosts(parameter.memberId(), pageable);
 
-		if(posts == null) throw ApiException.from(POST_TYPE_NOT_FOUND);
+		if (posts == null)
+			throw ApiException.from(POST_TYPE_NOT_FOUND);
 
 		return posts;
 	}
@@ -130,7 +135,7 @@ public class PostService {
 	// 글 삭제
 	@Transactional
 	public void deletePostBy(DeletePostParameter parameter) {
-		Long postId   = parameter.postId();
+		Long postId = parameter.postId();
 		Long memberId = parameter.memberId();
 
 		validateDeletePost(memberId, postId);
@@ -151,14 +156,5 @@ public class PostService {
 		if (!exists) {
 			throw ApiException.from(POST_DELETE_UNAUTHORIZED);
 		}
-	}
-
-	public void softDeleteBy(SoftDeletePostParameter parameter) {
-		Long memberId = MemberLoader.getMemberId();
-		Post post = findById(parameter.postId());
-		DeletePrivatePostParameter deletePrivatePostParameter =
-			DeletePrivatePostParameter.of(memberId, post.getPrivatePostId());
-		privatePostMemberService.deletePrivatePostBy(deletePrivatePostParameter);
-		post.softDelete();
 	}
 }

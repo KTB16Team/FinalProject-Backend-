@@ -11,7 +11,7 @@ public record UpdateNicknameParameter(
 		return new UpdateNicknameParameter(memberId, newNickname);
 	}
 
-	public static UpdateNicknameParameter from(Long memberId, UpdateNicknameRequest request) {
+	public static UpdateNicknameParameter of(Long memberId, UpdateNicknameRequest request) {
 		return new UpdateNicknameParameter(
 			memberId,
 			request.newNickname()

@@ -12,7 +12,7 @@ public record UpdatePasswordParameter(
 		return new UpdatePasswordParameter(memberId, password, newPassword);
 	}
 
-	public static UpdatePasswordParameter from(Long memberId, UpdatePasswordRequest updatePasswordRequest) {
+	public static UpdatePasswordParameter of(Long memberId, UpdatePasswordRequest updatePasswordRequest) {
 		return new UpdatePasswordParameter(
 			memberId,
 			updatePasswordRequest.password(),
