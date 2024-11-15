@@ -1,7 +1,5 @@
 package aimo.backend.domains.privatePost.controller;
 
-import java.io.IOException;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,24 +14,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.w3c.dom.Text;
 
 import aimo.backend.common.dto.DataResponse;
 
 import aimo.backend.common.util.memberLoader.MemberLoader;
-import aimo.backend.domains.privatePost.dto.parameter.ChatRecordParameter;
 import aimo.backend.domains.privatePost.dto.parameter.DeletePrivatePostParameter;
 import aimo.backend.domains.privatePost.dto.parameter.FindPrivatePostParameter;
 import aimo.backend.domains.privatePost.dto.parameter.FindPrivatePostPreviewParameter;
 import aimo.backend.domains.privatePost.dto.parameter.SpeechToTextParameter;
-import aimo.backend.domains.privatePost.dto.parameter.TextRecordParameter;
-import aimo.backend.domains.privatePost.dto.request.DeletePrivatePostRequest;
-import aimo.backend.domains.privatePost.dto.request.FindPrivatePostRequest;
-import aimo.backend.domains.privatePost.dto.parameter.JudgementParameter;
 import aimo.backend.domains.privatePost.dto.parameter.JudgementToAiParameter;
-import aimo.backend.domains.privatePost.dto.request.ChatRecordRequest;
-import aimo.backend.domains.privatePost.dto.request.JudgementToAiRequest;
-import aimo.backend.domains.privatePost.dto.response.JudgementResponse;
 import aimo.backend.domains.privatePost.dto.response.PrivatePostPreviewResponse;
 import aimo.backend.domains.privatePost.dto.response.PrivatePostResponse;
 import aimo.backend.domains.privatePost.dto.request.SaveAudioSuccessRequest;
@@ -43,11 +32,9 @@ import aimo.backend.domains.privatePost.dto.response.SavePrivatePostResponse;
 import aimo.backend.domains.privatePost.dto.response.SpeechToTextResponse;
 
 import aimo.backend.domains.privatePost.dto.request.TextRecordRequest;
-import aimo.backend.domains.privatePost.entity.ChatRecord;
 import aimo.backend.domains.privatePost.model.OriginType;
 import aimo.backend.domains.privatePost.service.AudioRecordService;
-import aimo.backend.domains.privatePost.service.ChatRecordService;
-import aimo.backend.domains.privatePost.service.PrivatePostMemberService;
+import aimo.backend.domains.privatePost.service.PrivatePostService;
 
 import aimo.backend.domains.privatePost.service.SaveAudioSuccessParameter;
 import aimo.backend.infrastructure.s3.S3Service;
@@ -64,7 +51,7 @@ import lombok.extern.slf4j.Slf4j;
 public class PrivatePostController {
 
 	private final AudioRecordService audioRecordService;
-	private final PrivatePostMemberService privatePostMemberService;
+	private final PrivatePostService privatePostService;
 	private final S3Service s3Service;
 
 	// 대화록 업로드 + 판결
@@ -79,7 +66,7 @@ public class PrivatePostController {
 			textRecordRequest.content(),
 			OriginType.TEXT);
 
-		Long privatePostId = privatePostMemberService.serveTextRecordToAi(judgementToAiParameter);
+		Long privatePostId = privatePostService.serveTextRecordToAi(judgementToAiParameter);
 
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(DataResponse.created(SavePrivatePostResponse.of(privatePostId)));
@@ -135,7 +122,7 @@ public class PrivatePostController {
 		FindPrivatePostParameter parameter = FindPrivatePostParameter.of(memberId, privatePostId);
 
 		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(DataResponse.from(privatePostMemberService.findPrivatePostResponseBy(parameter)));
+			.body(DataResponse.from(privatePostService.findPrivatePostResponseBy(parameter)));
 	}
 
 	@GetMapping
@@ -149,7 +136,7 @@ public class PrivatePostController {
 		FindPrivatePostPreviewParameter parameter = FindPrivatePostPreviewParameter.of(memberId, pageable);
 
 		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(DataResponse.from(privatePostMemberService.findPrivatePostPreviewsBy(parameter)));
+			.body(DataResponse.from(privatePostService.findPrivatePostPreviewsBy(parameter)));
 	}
 
 	@DeleteMapping("/{privatePostId}")
@@ -160,7 +147,7 @@ public class PrivatePostController {
 
 		DeletePrivatePostParameter parameter = DeletePrivatePostParameter.of(memberId, privatePostId);
 
-		privatePostMemberService.deletePrivatePostBy(parameter);
+		privatePostService.deletePrivatePostBy(parameter);
 
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(DataResponse.noContent());
 	}
