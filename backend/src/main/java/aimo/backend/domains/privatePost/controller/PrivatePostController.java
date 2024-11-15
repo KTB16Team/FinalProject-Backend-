@@ -100,6 +100,7 @@ public class PrivatePostController {
 		@Valid @RequestBody SpeechToTextRequest speechToTextRequest
 	) {
 		SpeechToTextParameter parameter = SpeechToTextParameter.from(speechToTextRequest);
+
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(DataResponse.created(audioRecordService.speechToText(parameter)));
 	}
@@ -109,6 +110,7 @@ public class PrivatePostController {
 		@Valid @PathVariable("filename") String filename
 	) {
 		CreatePresignedUrlRequest createPresignedUrlRequest = CreatePresignedUrlRequest.of(filename);
+
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(DataResponse.created(s3Service.createAudioPreSignedUrl(createPresignedUrlRequest)));
 	}
@@ -118,6 +120,7 @@ public class PrivatePostController {
 		@Valid @RequestBody SaveAudioSuccessRequest saveAudioSuccessRequest
 	) {
 		SaveAudioSuccessParameter parameter = SaveAudioSuccessParameter.from(saveAudioSuccessRequest);
+
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(DataResponse.created(audioRecordService.save(parameter)));
 	}
@@ -128,7 +131,9 @@ public class PrivatePostController {
 		@Valid @PathVariable Long privatePostId
 	) {
 		Long memberId = MemberLoader.getMemberId();
+
 		FindPrivatePostParameter parameter = FindPrivatePostParameter.of(memberId, privatePostId);
+
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(DataResponse.from(privatePostMemberService.findPrivatePostResponseBy(parameter)));
 	}
@@ -139,8 +144,10 @@ public class PrivatePostController {
 		@Valid @RequestParam(defaultValue = "10") Integer size
 	) {
 		Long memberId = MemberLoader.getMemberId();
+
 		Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
 		FindPrivatePostPreviewParameter parameter = FindPrivatePostPreviewParameter.of(memberId, pageable);
+
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(DataResponse.from(privatePostMemberService.findPrivatePostPreviewsBy(parameter)));
 	}
@@ -150,8 +157,11 @@ public class PrivatePostController {
 		@Valid @PathVariable("privatePostId") Long privatePostId
 	) {
 		Long memberId = MemberLoader.getMemberId();
+
 		DeletePrivatePostParameter parameter = DeletePrivatePostParameter.of(memberId, privatePostId);
+
 		privatePostMemberService.deletePrivatePostBy(parameter);
+
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(DataResponse.noContent());
 	}
 }

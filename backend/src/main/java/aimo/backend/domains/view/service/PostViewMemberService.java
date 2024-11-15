@@ -30,6 +30,7 @@ public class PostViewMemberService {
 	public void increasePostViewBy(IncreasePostViewParameter increasePostViewParameter) {
 		Long memberId = increasePostViewParameter.memberId();
 		Long postId = increasePostViewParameter.postId();
+
 		Post post = postRepository.findById(postId)
 			.orElseThrow(() -> ApiException.from(POST_NOT_FOUND));
 		Member member = memberRepository.findById(memberId)
