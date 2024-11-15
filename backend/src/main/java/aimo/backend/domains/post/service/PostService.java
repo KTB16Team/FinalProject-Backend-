@@ -15,16 +15,21 @@ import org.springframework.transaction.annotation.Transactional;
 
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.domains.comment.entity.ParentComment;
-import aimo.backend.domains.comment.service.PostCommentService;
+import aimo.backend.domains.comment.repository.ParentCommentRepository;
+import aimo.backend.domains.member.entity.Member;
+import aimo.backend.domains.member.repository.MemberRepository;
 import aimo.backend.domains.post.dto.parameter.DeletePostParameter;
+import aimo.backend.domains.post.dto.parameter.FindPostAndCommentsByIdParameter;
 import aimo.backend.domains.post.dto.parameter.FindPostByPostTypeParameter;
+import aimo.backend.domains.post.dto.parameter.SavePostParameter;
 import aimo.backend.domains.post.dto.requset.FindCommentedPostsByIdRequest;
 import aimo.backend.domains.post.dto.response.FindJudgementResponse;
+import aimo.backend.domains.post.dto.response.FindPostAndCommentsByIdResponse;
 import aimo.backend.domains.post.dto.response.FindPostsByPostTypeResponse;
 import aimo.backend.domains.post.entity.Post;
 import aimo.backend.domains.post.model.PostType;
 import aimo.backend.domains.post.repository.PostRepository;
-import aimo.backend.domains.privatePost.service.PrivatePostMemberService;
+import aimo.backend.domains.privatePost.service.PrivatePostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,19 +39,39 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional(readOnly = true)
 public class PostService {
 
-	private final PrivatePostMemberService privatePostMemberService;
+	private final PrivatePostService privatePostService;
 	private final PostRepository postRepository;
-	private final PostCommentService postCommentService;
+	private final MemberRepository memberRepository;
+	private final ParentCommentRepository parentCommentRepository;
 
-	// 글 조회
-	public Post findById(Long postId) {
-		return postRepository.findById(postId)
+	// 글 저장
+	@Transactional
+	public Long save(SavePostParameter savePostParameter) {
+		Member member = memberRepository.findById(savePostParameter.memberId())
+			.orElseThrow(() -> ApiException.from(MEMBER_NOT_FOUND));
+
+		privatePostService.publishPrivatePost(savePostParameter.privatePostId());
+		Post post = Post.of(savePostParameter, member);
+		return postRepository.save(post).getId();
+	}
+
+	// 글 조회, dto로 응답
+	public FindPostAndCommentsByIdResponse findPostAndCommentsDtoById(FindPostAndCommentsByIdParameter parameter) {
+		Post post = postRepository.findById(parameter.postId())
 			.orElseThrow(() -> ApiException.from(POST_NOT_FOUND));
+
+		Member member = memberRepository.findById(parameter.memberId())
+			.orElseThrow(() -> ApiException.from(MEMBER_NOT_FOUND));
+
+		List<ParentComment> parentComments = post.getParentComments();
+		return FindPostAndCommentsByIdResponse.from(member, post, parentComments);
 	}
 
 	// 판결문 조회
 	public FindJudgementResponse findJudgementBy(Long postId) {
-		Post post = findById(postId);
+		Post post = postRepository.findById(postId)
+			.orElseThrow(() -> ApiException.from(POST_NOT_FOUND));
+
 		return FindJudgementResponse.from(post);
 	}
 
@@ -87,7 +112,7 @@ public class PostService {
 
 	// 댓글 단 글 조회
 	public Page<FindPostsByPostTypeResponse> findCommentedPosts(Long memberId, Pageable pageable) {
-		List<ParentComment> parentComments = postCommentService.findParentCommentsByMemberId(memberId);
+		List<ParentComment> parentComments = parentCommentRepository.findAllByMemberId(memberId);
 
 		List<FindCommentedPostsByIdRequest> commentedPosts = new ArrayList<>();
 
@@ -131,7 +156,7 @@ public class PostService {
 			.orElseThrow(() -> ApiException.from(POST_NOT_FOUND))
 			.getPrivatePostId();
 
-		privatePostMemberService.unpublishPrivatePost(privatePostId);
+		privatePostService.unpublishPrivatePost(privatePostId);
 		postRepository.deleteById(postId);
 	}
 

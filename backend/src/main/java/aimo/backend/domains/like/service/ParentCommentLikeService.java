@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.domains.comment.entity.ParentComment;
-import aimo.backend.domains.comment.service.ParentCommentMemberService;
+import aimo.backend.domains.comment.repository.ParentCommentRepository;
 import aimo.backend.domains.like.dto.parameter.LikeParentCommentParameter;
 import aimo.backend.domains.like.entity.ParentCommentLike;
 import aimo.backend.domains.like.model.LikeType;
@@ -19,10 +19,10 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class ParentCommentLikeMemberService {
+public class ParentCommentLikeService {
 
 	private final ParentCommentLikeRepository parentCommentLikeRepository;
-	private final ParentCommentMemberService parentCommentMemberService;
+	private final ParentCommentRepository parentCommentRepository;
 	private final MemberRepository memberRepository;
 
 	@Transactional(rollbackFor = ApiException.class)
@@ -34,7 +34,8 @@ public class ParentCommentLikeMemberService {
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> ApiException.from(MEMBER_NOT_FOUND));
 
-		ParentComment parentComment = parentCommentMemberService.findById(parentCommentId);
+		ParentComment parentComment = parentCommentRepository.findById(parentCommentId)
+			.orElseThrow(() -> ApiException.from(PARENT_COMMENT_NOT_FOUND));
 
 		if (likeType == LikeType.LIKE) {
 			// 라이크가 이미 존재하면 무시

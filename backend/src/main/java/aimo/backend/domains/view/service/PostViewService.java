@@ -20,16 +20,16 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 @Transactional(readOnly = true)
-public class PostViewMemberService {
+public class PostViewService {
 
 	private final PostRepository postRepository;
 	private final MemberRepository memberRepository;
 	private final PostViewRepository postViewRepository;
 
 	@Transactional(rollbackFor = Exception.class)
-	public void increasePostViewBy(IncreasePostViewParameter increasePostViewParameter) {
-		Long memberId = increasePostViewParameter.memberId();
-		Long postId = increasePostViewParameter.postId();
+	public void increasePostViewBy(IncreasePostViewParameter parameter) {
+		Long memberId = parameter.memberId();
+		Long postId = parameter.postId();
 
 		Post post = postRepository.findById(postId)
 			.orElseThrow(() -> ApiException.from(POST_NOT_FOUND));

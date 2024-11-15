@@ -33,7 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class PrivatePostMemberService {
+public class PrivatePostService {
 
 	private final PrivatePostRepository privatePostRepository;
 	private final MemberRepository memberRepository;

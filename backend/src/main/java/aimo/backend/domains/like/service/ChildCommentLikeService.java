@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.domains.comment.entity.ChildComment;
-import aimo.backend.domains.comment.service.ChildCommentService;
+import aimo.backend.domains.comment.repository.ChildCommentRepository;
 import aimo.backend.domains.like.dto.parameter.LikeChildCommentParameter;
 import aimo.backend.domains.like.entity.ChildCommentLike;
 import aimo.backend.domains.like.model.LikeType;
@@ -19,11 +19,11 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class ChildCommentLikeMemberService {
+public class ChildCommentLikeService {
 
 	private final ChildCommentLikeRepository childCommentLikeRepository;
-	private final ChildCommentService childCommentService;
 	private final MemberRepository memberRepository;
+	private final ChildCommentRepository childCommentRepository;
 
 	@Transactional(rollbackFor = ApiException.class)
 	public void likeChildComment(LikeChildCommentParameter parameter) {
@@ -32,11 +32,12 @@ public class ChildCommentLikeMemberService {
 
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> ApiException.from(MEMBER_NOT_FOUND));
-
-		ChildComment childComment = childCommentService.findById(childCommentId);
+		ChildComment childComment = childCommentRepository.findById(childCommentId)
+			.orElseThrow(() -> ApiException.from(CHILD_COMMENT_NOT_FOUND));
 
 		if (parameter.likeType() == LikeType.LIKE) {
-			if (childCommentLikeRepository.existsByChildCommentIdAndMemberId(childCommentId, memberId)) return;
+			if (childCommentLikeRepository.existsByChildCommentIdAndMemberId(childCommentId, memberId))
+				return;
 
 			childCommentLikeRepository.save(ChildCommentLike.from(member, childComment));
 			return;

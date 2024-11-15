@@ -2,7 +2,6 @@ package aimo.backend.domains.comment.entity;
 
 import static lombok.AccessLevel.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import aimo.backend.common.entity.BaseEntity;

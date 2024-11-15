@@ -12,10 +12,11 @@ import aimo.backend.domains.comment.dto.parameter.ValidAndUpdateChildCommentPara
 import aimo.backend.domains.comment.entity.ChildComment;
 import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.comment.repository.ChildCommentRepository;
+import aimo.backend.domains.comment.repository.ParentCommentRepository;
 import aimo.backend.domains.member.entity.Member;
-import aimo.backend.domains.member.service.MemberService;
+import aimo.backend.domains.member.repository.MemberRepository;
 import aimo.backend.domains.post.entity.Post;
-import aimo.backend.domains.post.service.PostService;
+import aimo.backend.domains.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -24,12 +25,13 @@ import lombok.RequiredArgsConstructor;
 public class ChildCommentService {
 
 	private final ChildCommentRepository childCommentRepository;
-	private final PostService postService;
-	private final ParentCommentMemberService parentCommentMemberService;
-	private final MemberService memberService;
+	private final MemberRepository memberRepository;
+	private final PostRepository postRepository;
+	private final ParentCommentService parentCommentService;
+	private final ParentCommentRepository parentCommentRepository;
 
 	//자식 댓글 권한 확인
-	private void validateChildCommentAuthority(Long memberId, Long childCommentId) throws ApiException {
+	private void validateChildCommentAuthority(Long memberId, Long childCommentId) {
 		Boolean exists = childCommentRepository.existsByIdAndMember_Id(childCommentId, memberId);
 
 		if (!exists) {
@@ -44,9 +46,13 @@ public class ChildCommentService {
 		Long parentCommentId = parameter.parentCommentId();
 		String content = parameter.content();
 
-		Member member = memberService.findMemberById(parameter.memberId());
-		Post post = postService.findById(postId);
-		ParentComment parentComment = parentCommentMemberService.findById(parentCommentId);
+		Member member = memberRepository.findById(parameter.memberId())
+			.orElseThrow(() -> ApiException.from(MEMBER_NOT_FOUND));
+
+		Post post = postRepository.findById(postId)
+			.orElseThrow(() -> ApiException.from(POST_NOT_FOUND));
+		ParentComment parentComment = parentCommentRepository.findById(parentCommentId)
+			.orElseThrow(() -> ApiException.from(PARENT_COMMENT_NOT_FOUND));
 
 		ChildComment childComment = ChildComment.of(content, member, parentComment, post);
 		childCommentRepository.save(childComment);
@@ -90,12 +96,6 @@ public class ChildCommentService {
 		childCommentRepository.deleteById(childCommentId);
 
 		// 자식 댓글이 없으며 부모 댓글이 삭제된 상태면 삭제
-		parentCommentMemberService.deleteIfParentCommentIsDeletedAndChildrenIsEmpty(parentComment);
-	}
-
-	// id로 자식 댓글 조회
-	public ChildComment findById(Long childCommentId) {
-		return childCommentRepository.findById(childCommentId)
-			.orElseThrow(() -> ApiException.from(CHILD_COMMENT_NOT_FOUND));
+		parentCommentService.deleteIfParentCommentIsDeletedAndChildrenIsEmpty(parentComment);
 	}
 }

@@ -2,8 +2,6 @@ package aimo.backend.domains.comment.service;
 
 import static aimo.backend.common.exception.ErrorCode.*;
 
-import java.util.List;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,20 +13,18 @@ import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.comment.repository.ParentCommentRepository;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.member.repository.MemberRepository;
-import aimo.backend.domains.member.service.MemberService;
 import aimo.backend.domains.post.entity.Post;
-import aimo.backend.domains.post.service.PostService;
+import aimo.backend.domains.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class ParentCommentMemberService {
+public class ParentCommentService {
 
-	private final PostService postService;
+	private final PostRepository postRepository;
 	private final ParentCommentRepository parentCommentRepository;
 	private final MemberRepository memberRepository;
-	private final MemberService memberService;
 
 	// 부모 댓글 권한 확인
 	private void validateParentCommentAuthority(Long memberId, Long commentId) {
@@ -47,7 +43,9 @@ public class ParentCommentMemberService {
 
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> ApiException.from(MEMBER_NOT_FOUND));
-		Post post = postService.findById(postId);
+
+		Post post = postRepository.findById(postId)
+			.orElseThrow(() -> ApiException.from(POST_NOT_FOUND));
 
 		ParentComment parentComment = ParentComment.of(member, post, parameter.content());
 
@@ -84,12 +82,6 @@ public class ParentCommentMemberService {
 				}
 				parentCommentRepository.delete(parentComment);
 			});
-	}
-
-	// 부모 댓글 조회
-	public ParentComment findById(Long commentId) {
-		return parentCommentRepository.findById(commentId)
-			.orElseThrow(() -> ApiException.from(PARENT_COMMENT_NOT_FOUND));
 	}
 
 	// 자식 댓글이 없고 삭제된 부모 댓글이면 삭제

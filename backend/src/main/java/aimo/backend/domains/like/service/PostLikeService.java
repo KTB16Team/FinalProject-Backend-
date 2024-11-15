@@ -6,31 +6,33 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import aimo.backend.common.exception.ApiException;
-import aimo.backend.domains.like.dto.parameter.LikePostParameter;
+import aimo.backend.domains.like.entity.PostLike;
 import aimo.backend.domains.like.model.LikeType;
+import aimo.backend.domains.like.repository.PostLikeRepository;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.member.repository.MemberRepository;
+import aimo.backend.domains.like.dto.parameter.LikePostParameter;
 import aimo.backend.domains.post.entity.Post;
-import aimo.backend.domains.like.entity.PostLike;
-import aimo.backend.domains.like.repository.PostLikeRepository;
-import aimo.backend.domains.post.service.PostService;
+import aimo.backend.domains.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class PostLikeMemberService {
+public class PostLikeService {
 
 	private final PostLikeRepository postLikeRepository;
-	private final PostService postService;
+	private final PostRepository postRepository;
 	private final MemberRepository memberRepository;
 
 	@Transactional(rollbackFor = Exception.class)
 	public void likePost(LikePostParameter parameter) {
-		Long postId = parameter.postId(), memberId = parameter.memberId();
+		Long postId = parameter.postId();
+		Long memberId = parameter.memberId();
 		LikeType likeType = parameter.likeType();
 
-		Post post = postService.findById(postId);
+		Post post = postRepository.findById(postId)
+			.orElseThrow(() -> ApiException.from(POST_NOT_FOUND));
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> ApiException.from(MEMBER_NOT_FOUND));
 
