@@ -30,6 +30,7 @@ public class ParentCommentLikeMemberService {
 		Long memberId = parameter.memberId();
 		Long parentCommentId = parameter.parentCommentId();
 		LikeType likeType = parameter.likeType();
+
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> ApiException.from(MEMBER_NOT_FOUND));
 
@@ -38,6 +39,7 @@ public class ParentCommentLikeMemberService {
 		if (likeType == LikeType.LIKE) {
 			// 라이크가 이미 존재하면 무시
 			if (parentCommentLikeRepository.existsByParentCommentIdAndMemberId(parentCommentId, memberId)) return;
+
 			parentCommentLikeRepository.save(ParentCommentLike.from(member, parentComment));
 			return;
 		}

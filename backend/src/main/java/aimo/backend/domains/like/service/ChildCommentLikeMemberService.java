@@ -29,6 +29,7 @@ public class ChildCommentLikeMemberService {
 	public void likeChildComment(LikeChildCommentParameter parameter) {
 		Long childCommentId = parameter.childCommentId();
 		Long memberId = parameter.memberId();
+
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> ApiException.from(MEMBER_NOT_FOUND));
 
@@ -36,6 +37,7 @@ public class ChildCommentLikeMemberService {
 
 		if (parameter.likeType() == LikeType.LIKE) {
 			if (childCommentLikeRepository.existsByChildCommentIdAndMemberId(childCommentId, memberId)) return;
+
 			childCommentLikeRepository.save(ChildCommentLike.from(member, childComment));
 			return;
 		}
