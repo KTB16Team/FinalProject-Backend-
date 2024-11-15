@@ -71,6 +71,7 @@ public class LikeController {
 
 		parentCommentLikeMemberService.likeParentComment(parameter);
 
-		return ResponseEntity.ok(DataResponse.ok());
+		return ResponseEntity.status(HttpStatus.CREATED)
+			.body(DataResponse.created());
 	}
 }
