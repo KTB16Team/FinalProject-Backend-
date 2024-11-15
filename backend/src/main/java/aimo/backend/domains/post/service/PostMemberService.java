@@ -29,6 +29,7 @@ public class PostMemberService {
 	private final MemberRepository memberRepository;
 	private final PrivatePostMemberService privatePostMemberService;
 
+	// 글 저장
 	@Transactional
 	public Long save(SavePostParameter savePostParameter) {
 		Member member = memberRepository.findById(savePostParameter.memberId())

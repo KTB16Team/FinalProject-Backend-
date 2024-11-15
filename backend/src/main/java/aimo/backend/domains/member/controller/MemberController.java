@@ -55,53 +55,71 @@ public class MemberController {
 
 	@PostMapping("/logout")
 	public ResponseEntity<DataResponse<Void>> logoutMember(HttpServletRequest request) {
-		String accessToken = jwtTokenProvider.extractAccessToken(request).orElse(null);
+		String accessToken = jwtTokenProvider.extractAccessToken(request)
+			.orElse(null);
+
 		memberService.logoutMember(new LogoutRequest(accessToken));
+
 		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
 
 	@PostMapping("/signup")
 	public ResponseEntity<DataResponse<Void>> signupMember(@RequestBody @Valid SignUpParameter parameter) {
 		memberService.signUp(parameter);
+
 		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
 
 	@PostMapping
-	public ResponseEntity<DataResponse<Void>> deleteMember(@RequestBody DeleteMemberRequest deleteMemberRequest) {
+	public ResponseEntity<DataResponse<Void>> deleteMember(@RequestBody @Valid DeleteMemberRequest request) {
 		Long memberId = MemberLoader.getMemberId();
-		DeleteMemberParameter deleteMemberParameter =
-			DeleteMemberParameter.of(memberId, deleteMemberRequest.password());
-		memberService.deleteMember(deleteMemberParameter);
+
+		DeleteMemberParameter parameter = DeleteMemberParameter.of(memberId, request.password());
+
+		memberService.deleteMember(parameter);
+
 		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
 
 	@GetMapping("/profile/presigned/{filename}")
 	public ResponseEntity<DataResponse<CreatePresignedUrlResponse>> createProfileImagePreSignedUrl(
-		@Valid @PathVariable("filename") String filename) {
+		@PathVariable("filename") String filename
+	) {
 		CreatePresignedUrlRequest createPresignedUrlRequest = CreatePresignedUrlRequest.of(filename);
+
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(DataResponse.created(s3Service.createProfilePresignedUrl(createPresignedUrlRequest)));
 	}
 
 	@PostMapping("/profile/success")
-	public ResponseEntity<DataResponse<Void>> saveProfileImageMetaData(@RequestBody SaveFileMetaDataRequest request) {
+	public ResponseEntity<DataResponse<Void>> saveProfileImageMetaData(
+		@RequestBody @Valid SaveFileMetaDataRequest request
+	) {
 		Long memberId = MemberLoader.getMemberId();
-		SaveFileMetaDataParameter parameter = SaveFileMetaDataParameter.from(memberId, request);
+
+		SaveFileMetaDataParameter parameter = SaveFileMetaDataParameter.of(memberId, request);
+
 		memberService.saveProfileImageMetaData(parameter);
+
 		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
 
 	@DeleteMapping("/profile")
 	public ResponseEntity<DataResponse<Void>> deleteProfileImage() {
 		Long memberId = MemberLoader.getMemberId();
-		DeleteProfileImageParameter parameter = DeleteProfileImageParameter.of(memberId);
+
+		DeleteProfileImageParameter parameter = DeleteProfileImageParameter.from(memberId);
+
 		memberService.deleteProfileImage(parameter);
+
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(DataResponse.noContent());
 	}
 
 	@PostMapping(value = "/login", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<DataResponse<Void>> loginMember(@RequestParam("email") String email,
-		@RequestParam("password") String password) {
+	public ResponseEntity<DataResponse<Void>> loginMember(
+		@RequestParam("email") String email,
+		@RequestParam("password") String password
+	) {
 		// 실제로 실행되지 않고 Swagger 문서용도로만 사용됩니다.
 		return ResponseEntity.ok(DataResponse.ok());
 	}
@@ -119,10 +137,14 @@ public class MemberController {
 	// 비밀번호 수정(현재 비밀번호 확인)
 	@PutMapping("/password")
 	public ResponseEntity<DataResponse<Void>> updatePassword(
-		@Valid @RequestBody UpdatePasswordRequest updatePasswordRequest) {
+		@Valid @RequestBody UpdatePasswordRequest updatePasswordRequest
+	) {
 		Long memberId = MemberLoader.getMemberId();
-		UpdatePasswordParameter parameter = UpdatePasswordParameter.from(memberId, updatePasswordRequest);
+
+		UpdatePasswordParameter parameter = UpdatePasswordParameter.of(memberId, updatePasswordRequest);
+
 		memberService.updatePassword(parameter);
+
 		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
 
@@ -140,9 +162,9 @@ public class MemberController {
 	public ResponseEntity<DataResponse<NicknameExistsResponse>> checkNicknameExists(
 		@PathVariable("nickname") String nickname
 	) {
-		CheckNicknameExistsRequest request = CheckNicknameExistsRequest.of(nickname);
+		CheckNicknameExistsRequest request = CheckNicknameExistsRequest.from(nickname);
 
-		NicknameExistsResponse exist = NicknameExistsResponse.of(memberService.isNicknameExists(request));
+		NicknameExistsResponse exist = NicknameExistsResponse.from(memberService.isNicknameExists(request));
 
 		return ResponseEntity.status(HttpStatus.OK).body(DataResponse.from(exist));
 	}
@@ -153,7 +175,7 @@ public class MemberController {
 	) {
 		Long memberId = MemberLoader.getMemberId();
 
-		UpdateNicknameParameter parameter = UpdateNicknameParameter.from(memberId, updateNicknameRequest);
+		UpdateNicknameParameter parameter = UpdateNicknameParameter.of(memberId, updateNicknameRequest);
 		memberService.updateNickname(parameter);
 
 		return ResponseEntity.status(HttpStatus.CREATED)

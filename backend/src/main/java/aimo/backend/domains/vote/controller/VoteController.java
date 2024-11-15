@@ -29,9 +29,10 @@ public class VoteController {
 		@RequestParam("side") Side side
 	) {
 		Long memberId = MemberLoader.getMemberId();
-		SaveVotePostParameter saveVotePostParameter =
-			SaveVotePostParameter.of(memberId, postId, side);
-		voteService.votePost(saveVotePostParameter);
+
+		SaveVotePostParameter parameter = SaveVotePostParameter.of(memberId, postId, side);
+		voteService.votePost(parameter);
+
 		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
 }

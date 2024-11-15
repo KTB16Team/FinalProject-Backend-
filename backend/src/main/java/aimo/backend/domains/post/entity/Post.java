@@ -114,8 +114,8 @@ public class Post extends BaseEntity {
 	public Integer getCommentsCount() {
 		return parentComments
 			.stream()
-			.map(ParentComment::getChildCommentsCount)
-			.reduce(1, Integer::sum);
+			.map(parentComment -> 1 + parentComment.getChildCommentsCount())
+			.reduce(0, Integer::sum);
 	}
 
 	public String getPreview(){

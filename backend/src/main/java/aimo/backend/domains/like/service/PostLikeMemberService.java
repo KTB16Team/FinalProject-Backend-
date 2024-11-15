@@ -29,12 +29,13 @@ public class PostLikeMemberService {
 	public void likePost(LikePostParameter parameter) {
 		Long postId = parameter.postId(), memberId = parameter.memberId();
 		LikeType likeType = parameter.likeType();
+
 		Post post = postService.findById(postId);
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> ApiException.from(MEMBER_NOT_FOUND));
 
 		if (likeType == LikeType.LIKE) {
-			// 라이크가 이미 존재하면 무시
+			// 라이크가 존재하면 중복 등록 방지
 			if (postLikeRepository.existsByPostIdAndMemberId(postId, memberId))
 				return;
 
@@ -43,6 +44,7 @@ public class PostLikeMemberService {
 			return ;
 		}
 
+		// 라이크가 이미 존재하면 삭제
 		postLikeRepository.deleteByMember_IdAndPost_Id(member.getId(), postId);
 	}
 }

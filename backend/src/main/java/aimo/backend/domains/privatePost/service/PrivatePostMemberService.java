@@ -78,9 +78,9 @@ public class PrivatePostMemberService {
 	public void deletePrivatePostBy(DeletePrivatePostParameter parameter) {
 		Long memberId = parameter.memberId();
 		Long privatePostId = parameter.privatePostId();
+
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> ApiException.from(ErrorCode.MEMBER_NOT_FOUND));
-
 		PrivatePost privatePost = privatePostRepository.findById(privatePostId)
 			.orElseThrow(() -> ApiException.from(ErrorCode.PRIVATE_POST_NOT_FOUND));
 

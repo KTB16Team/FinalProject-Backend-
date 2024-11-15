@@ -33,7 +33,6 @@ public class VoteService {
 
 		voteRepository.findByPostIdAndMemberId(postId, member.getId())
 			.ifPresentOrElse(
-
 				(vote) -> vote.changeSide(side),
 				() -> {
 					Vote newVote = Vote.from(post, member, side);
