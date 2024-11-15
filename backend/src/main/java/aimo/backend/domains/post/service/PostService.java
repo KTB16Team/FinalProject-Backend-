@@ -14,10 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import aimo.backend.common.exception.ApiException;
-import aimo.backend.common.util.memberLoader.MemberLoader;
 import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.comment.service.PostCommentService;
-import aimo.backend.domains.post.dto.parameter.SoftDeletePostParameter;
 import aimo.backend.domains.post.dto.parameter.DeletePostParameter;
 import aimo.backend.domains.post.dto.parameter.FindPostByPostTypeParameter;
 import aimo.backend.domains.post.dto.requset.FindCommentedPostsByIdRequest;
@@ -26,7 +24,6 @@ import aimo.backend.domains.post.dto.response.FindPostsByPostTypeResponse;
 import aimo.backend.domains.post.entity.Post;
 import aimo.backend.domains.post.model.PostType;
 import aimo.backend.domains.post.repository.PostRepository;
-import aimo.backend.domains.privatePost.dto.parameter.DeletePrivatePostParameter;
 import aimo.backend.domains.privatePost.service.PrivatePostMemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +44,7 @@ public class PostService {
 			.orElseThrow(() -> ApiException.from(POST_NOT_FOUND));
 	}
 
+	// 판결문 조회
 	public FindJudgementResponse findJudgementBy(Long postId) {
 		Post post = findById(postId);
 		return FindJudgementResponse.from(post);
@@ -54,7 +52,6 @@ public class PostService {
 
 	// PostType으로 글 조회
 	public Page<FindPostsByPostTypeResponse> findPostDtosByPostType(FindPostByPostTypeParameter parameter) {
-		Page<FindPostsByPostTypeResponse> posts = null;
 		PostType postType = parameter.postType();
 
 		Pageable pageable = PageRequest.of(
@@ -62,23 +59,12 @@ public class PostService {
 			parameter.size(),
 			Sort.by(Sort.Direction.DESC, "id"));
 
-		if (postType == PostType.MY)
-			posts = findMyPosts(parameter.memberId(), pageable);
-		if (postType == PostType.ANY)
-			posts = findAnyPosts(pageable);
-		if (postType == PostType.POPULAR)
-			posts = findPopularPosts(pageable);
-		if (postType == PostType.COMMENTED)
-			posts = findCommentedPosts(parameter.memberId(), pageable);
-
-		if (posts == null)
-			throw ApiException.from(POST_TYPE_NOT_FOUND);
-
-		return posts;
+		// 각 PostType의 execute 메서드를 호출해 로직 실행
+		return postType.findPosts(this, parameter, pageable);
 	}
 
 	// 내가 쓴 글 조회
-	private Page<FindPostsByPostTypeResponse> findMyPosts(Long memberId, Pageable pageable) {
+	public Page<FindPostsByPostTypeResponse> findMyPosts(Long memberId, Pageable pageable) {
 		return postRepository
 			.findAllByMember_Id(memberId, pageable)
 			.map(FindPostsByPostTypeResponse::from);
@@ -86,21 +72,21 @@ public class PostService {
 	}
 
 	// 인기 글 조회
-	private Page<FindPostsByPostTypeResponse> findPopularPosts(Pageable pageable) {
+	public Page<FindPostsByPostTypeResponse> findPopularPosts(Pageable pageable) {
 		return postRepository
 			.findByViewsCount(pageable)
 			.map(FindPostsByPostTypeResponse::from);
 	}
 
 	// 최신 글 조회
-	private Page<FindPostsByPostTypeResponse> findAnyPosts(Pageable pageable) {
+	public Page<FindPostsByPostTypeResponse> findAnyPosts(Pageable pageable) {
 		return postRepository
 			.findAllByOrderByIdDesc(pageable)
 			.map(FindPostsByPostTypeResponse::from);
 	}
 
 	// 댓글 단 글 조회
-	private Page<FindPostsByPostTypeResponse> findCommentedPosts(Long memberId, Pageable pageable) {
+	public Page<FindPostsByPostTypeResponse> findCommentedPosts(Long memberId, Pageable pageable) {
 		List<ParentComment> parentComments = postCommentService.findParentCommentsByMemberId(memberId);
 
 		List<FindCommentedPostsByIdRequest> commentedPosts = new ArrayList<>();
@@ -151,9 +137,7 @@ public class PostService {
 
 	// 글 삭제 권한 확인
 	private void validateDeletePost(Long memberId, Long postId) {
-		Boolean exists = postRepository.existsByIdAndMember_Id(postId, memberId);
-
-		if (!exists) {
+		if (!postRepository.existsByIdAndMember_Id(postId, memberId)) {
 			throw ApiException.from(POST_DELETE_UNAUTHORIZED);
 		}
 	}
