@@ -28,10 +28,7 @@ import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.member.entity.ProfileImage;
 import aimo.backend.domains.member.repository.MemberRepository;
 import aimo.backend.domains.member.repository.ProfileImageRepository;
-import aimo.backend.domains.post.dto.parameter.SoftDeletePostParameter;
 import aimo.backend.domains.post.entity.Post;
-import aimo.backend.domains.post.service.PostService;
-import aimo.backend.domains.privatePost.service.PrivatePostMemberService;
 import aimo.backend.infrastructure.s3.S3Service;
 import aimo.backend.infrastructure.s3.dto.parameter.CreateResourceUrlParameter;
 import aimo.backend.infrastructure.s3.model.PresignedUrlPrefix;
@@ -52,8 +49,6 @@ public class MemberService {
 	private final ProfileImageRepository profileImageRepository;
 	private final S3Service s3Service;
 	private final MailService mailService;
-	private final PostService postService;
-	private final PrivatePostMemberService privatePostMemberService;
 
 	// 이메일로 멤버 조회
 	public Optional<Member> findByEmail(String email) {
@@ -127,6 +122,7 @@ public class MemberService {
 		member.updateProfileImage(profileImage);
 	}
 
+	// 프로필 이미지 삭제
 	@Transactional(rollbackFor = ApiException.class)
 	public void deleteProfileImage(DeleteProfileImageParameter parameter) {
 		Member member = findMemberById(parameter.memberId());
@@ -135,6 +131,7 @@ public class MemberService {
 		member.updateProfileImage(null);
 	}
 
+	// 비밀번호 변경
 	@Transactional(rollbackFor = ApiException.class)
 	public void updatePassword(UpdatePasswordParameter parameter) {
 		Member member = findMemberById(parameter.memberId());
@@ -160,7 +157,7 @@ public class MemberService {
 	}
 
 	// id 로 멤버 조회
-	public Member findMemberById(Long memberId) {
+	private Member findMemberById(Long memberId) {
 		return memberRepository.findById(memberId)
 			.orElseThrow(() -> ApiException.from(ErrorCode.MEMBER_NOT_FOUND));
 	}
@@ -171,7 +168,7 @@ public class MemberService {
 	}
 
 	// 비밀번호 확인
-	protected void checkPassword(String password, String encodedPassword) {
+	private void checkPassword(String password, String encodedPassword) {
 		boolean matches = passwordEncoder.matches(password, encodedPassword);
 
 		if (!matches) {
@@ -194,7 +191,8 @@ public class MemberService {
 	// 임시 비밀번호 발급
 	@Transactional(rollbackFor = ApiException.class)
 	public void updateTemporaryPasswordAndSendMail(
-		SendTemporaryPasswordRequest sendTemporaryPasswordRequest) throws MessagingException {
+		SendTemporaryPasswordRequest sendTemporaryPasswordRequest
+	) throws MessagingException {
 		String temporaryPassword = UUID.randomUUID().toString().substring(0, 8);
 
 		Member member = memberRepository.findByEmail(sendTemporaryPasswordRequest.email())

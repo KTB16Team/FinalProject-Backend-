@@ -12,7 +12,6 @@ import aimo.backend.domains.comment.model.CommentConstants;
 import aimo.backend.domains.like.entity.ChildCommentLike;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.post.entity.Post;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
