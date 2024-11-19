@@ -2,6 +2,8 @@ package aimo.backend.domains.comment.service;
 
 import static aimo.backend.common.exception.ErrorCode.*;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -9,6 +11,7 @@ import aimo.backend.common.exception.ApiException;
 import aimo.backend.domains.comment.dto.parameter.DeleteParentCommentParameter;
 import aimo.backend.domains.comment.dto.parameter.SaveParentCommentParameter;
 import aimo.backend.domains.comment.dto.parameter.UpdateParentCommentParameter;
+import aimo.backend.domains.comment.dto.response.FindCommentsResponse;
 import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.comment.repository.ParentCommentRepository;
 import aimo.backend.domains.member.entity.Member;
@@ -96,5 +99,19 @@ public class ParentCommentService {
 		}
 
 		parentCommentRepository.delete(parentComment);
+	}
+
+	public List<FindCommentsResponse> findComments(Long memberId, Long postId) {
+		Member member = memberRepository.findById(memberId)
+			.orElseThrow(() -> ApiException.from(MEMBER_NOT_FOUND));
+
+		// 부모 댓글 fetch join으로 조회
+		List<ParentComment> parentComments = parentCommentRepository.findAllByPost_IdWithChildComments(postId);
+
+		List<FindCommentsResponse> responses = parentComments.stream()
+			.map(parentComment -> FindCommentsResponse.of(member, parentComment))
+			.toList();
+
+		return responses;
 	}
 }
