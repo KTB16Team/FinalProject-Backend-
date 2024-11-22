@@ -1,4 +1,4 @@
-package aimo.backend.domains.auth.security.loginFilter;
+package aimo.backend.domains.security.filter.loginFilter;
 
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;

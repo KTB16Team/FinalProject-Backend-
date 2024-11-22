@@ -1,4 +1,4 @@
-package aimo.backend.domains.auth.security.jwtFilter;
+package aimo.backend.domains.security.filter.jwtFilter;
 
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;

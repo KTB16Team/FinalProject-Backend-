@@ -1,10 +1,10 @@
-package aimo.backend.common.config;
+package aimo.backend.domains.security;
 
 import aimo.backend.common.properties.SecurityProperties;
-import aimo.backend.domains.auth.security.exceptionHandlingFilter.ExceptionHandlingFilter;
-import aimo.backend.domains.auth.security.jwtFilter.JwtAuthenticationFilter;
-import aimo.backend.domains.auth.security.jwtFilter.JwtTokenProvider;
-import aimo.backend.domains.auth.security.loginFilter.LoginFilter;
+import aimo.backend.domains.security.filter.exceptionHandlingFilter.ExceptionHandlingFilter;
+import aimo.backend.domains.security.filter.jwtFilter.JwtAuthenticationFilter;
+import aimo.backend.domains.security.filter.jwtFilter.JwtTokenProvider;
+import aimo.backend.domains.security.filter.loginFilter.LoginFilter;
 import aimo.backend.domains.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 

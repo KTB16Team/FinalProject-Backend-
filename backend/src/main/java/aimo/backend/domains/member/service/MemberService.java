@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.exception.ErrorCode;
-import aimo.backend.domains.auth.security.jwtFilter.JwtTokenProvider;
+import aimo.backend.domains.security.filter.jwtFilter.JwtTokenProvider;
 import aimo.backend.domains.comment.entity.ChildComment;
 import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.member.dto.parameter.DeleteMemberContentsParameter;
