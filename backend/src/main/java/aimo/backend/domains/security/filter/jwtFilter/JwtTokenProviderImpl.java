@@ -6,11 +6,13 @@ import aimo.backend.common.dto.DataResponse;
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.properties.JwtProperties;
 import aimo.backend.domains.member.entity.AccessToken;
-import aimo.backend.domains.member.service.AccessTokenService;
+import aimo.backend.domains.member.entity.RefreshToken;
+import aimo.backend.domains.member.repository.AccessTokenRepository;
+import aimo.backend.domains.member.repository.RefreshTokenRepository;
 import aimo.backend.common.util.responseWriter.ResponseWriter;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.member.repository.MemberRepository;
-import aimo.backend.domains.member.service.RefreshTokenService;
+import aimo.backend.domains.security.dto.JwtDTO;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -43,19 +45,19 @@ public class JwtTokenProviderImpl implements JwtTokenProvider {
 	private final JwtProperties jwtProperties;
 	private final MemberRepository memberRepository;
 	private final Key key;
-	private final RefreshTokenService refreshTokenService;
-	private final AccessTokenService accessTokenService;
+	private final RefreshTokenRepository refreshTokenRepository;
+	private final AccessTokenRepository accessTokenRepository;
 
 	public JwtTokenProviderImpl(
 		JwtProperties jwtProperties,
 		MemberRepository memberRepository,
-		RefreshTokenService refreshTokenService,
-		AccessTokenService accessTokenService) {
+		RefreshTokenRepository refreshTokenRepository,
+		AccessTokenRepository accessTokenRepository) {
 		this.jwtProperties = jwtProperties;
 		this.memberRepository = memberRepository;
 		this.key = Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes());
-		this.refreshTokenService = refreshTokenService;
-		this.accessTokenService = accessTokenService;
+		this.refreshTokenRepository = refreshTokenRepository;
+		this.accessTokenRepository = accessTokenRepository;
 	}
 
 	//authentication을 만들어주는 메서드
@@ -95,14 +97,31 @@ public class JwtTokenProviderImpl implements JwtTokenProvider {
 
 	@Override
 	@Transactional
+	public void saveOrUpdateRefreshToken(Long memberId, String refreshToken) {
+		Optional<RefreshToken> optionalRefreshToken = refreshTokenRepository.findById(memberId);
+
+		// refreshToken이 없으면 생성 및 저장, 있으면 refreshToken 값 변경
+		RefreshToken refreshTokenObj;
+		if (optionalRefreshToken.isEmpty()) {
+			refreshTokenObj = new RefreshToken(memberId, refreshToken);
+		} else {
+			refreshTokenObj = optionalRefreshToken.get();
+			refreshTokenObj.setRefreshToken(refreshToken);
+		}
+
+		refreshTokenRepository.save(refreshTokenObj);
+	}
+
+	@Override
+	@Transactional
 	public void expireTokens(String accessToken) {
 		// accessToken을 Black List에 저장
 		Long memberId = extractMemberId(accessToken)
 			.orElseThrow(() -> ApiException.from(INVALID_ACCESS_TOKEN));
 
 		AccessToken accessTokenEntity = new AccessToken(memberId, accessToken);
-		accessTokenService.save(accessTokenEntity);
-		refreshTokenService.deleteBy(memberId);
+		accessTokenRepository.save(accessTokenEntity);
+		accessTokenRepository.deleteById(memberId);
 	}
 
 	@Override
@@ -212,10 +231,11 @@ public class JwtTokenProviderImpl implements JwtTokenProvider {
 
 		expireTokens(accessToken);
 		sendAccessAndRefreshToken(response, newAccessToken, newRefreshToken);
+		saveOrUpdateRefreshToken(memberId, newRefreshToken);
 	}
 
 	@Override
 	public boolean isLogout(String accessToken) {
-		return accessTokenService.isBlackListed(accessToken);
+		return accessTokenRepository.existsByAccessToken(accessToken);
 	}
 }

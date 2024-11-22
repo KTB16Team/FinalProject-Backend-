@@ -1,4 +1,4 @@
-package aimo.backend.domains.security.filter.jwtFilter;
+package aimo.backend.domains.security.dto;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

@@ -73,6 +73,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 		String refreshToken = jwtTokenProvider.createRefreshToken(memberId);
 
 		jwtTokenProvider.sendAccessAndRefreshToken(response, accessToken, refreshToken);
+		jwtTokenProvider.saveOrUpdateRefreshToken(memberId, refreshToken);
 
 		log.info("로그인 성공: {}", email);
 		log.info("accessToken={}", accessToken);

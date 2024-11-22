@@ -16,6 +16,8 @@ public interface JwtTokenProvider {
 
 	String createRefreshToken(Long memberId);
 
+	void saveOrUpdateRefreshToken(Long memberId, String refreshToken);
+
 	void sendAccessAndRefreshToken(HttpServletResponse response, String accessToken, String refreshToken);
 
 	Optional<String> extractAccessToken(HttpServletRequest request);

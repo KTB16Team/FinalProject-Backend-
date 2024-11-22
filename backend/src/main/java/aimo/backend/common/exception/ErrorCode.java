@@ -25,6 +25,7 @@ public enum ErrorCode {
 	UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "인증에 실패하였습니다.", "AUTH-005"),
 	ACCESS_TOKEN_IS_NULL(HttpStatus.BAD_REQUEST, "엑세스 토큰이 누락되었습니다.", "AUTH-006"),
 	REFRESH_TOKEN_IS_NULL(HttpStatus.BAD_REQUEST, "리프레쉬 토큰이 누락되었습니다.", "AUTH-007"),
+	REFRESH_TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "해당하는 리프레쉬 토큰을 찾을 수 없습니다.", "AUTH-008"),
 
 	//Member
 	INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호가 잘못 되었습니다.", "MEMBER-001"),
