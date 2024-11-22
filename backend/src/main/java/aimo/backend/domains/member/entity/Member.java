@@ -48,7 +48,7 @@ public class Member extends BaseEntity {
 	@Column(nullable = false, unique = true)
 	private String nickname;
 
-	@Column(nullable = false, unique = true)
+	@Column(nullable = false)
 	private String email;
 
 	@Column(nullable = false)
@@ -59,7 +59,6 @@ public class Member extends BaseEntity {
 	private MemberRole role;
 
 	@Enumerated(EnumType.STRING)
-	@Column(nullable = false)
 	private Gender gender;
 
 	@Enumerated(EnumType.STRING)
@@ -72,7 +71,6 @@ public class Member extends BaseEntity {
 	@JoinColumn(name = "profile_image_id", referencedColumnName = "profile_id")
 	private ProfileImage profileImage;
 
-	@Column(nullable = false, name = "birth_date")
 	private LocalDate birthDate;
 
 	@OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -121,12 +119,11 @@ public class Member extends BaseEntity {
 			.memberRole(memberRole)
 			.provider(provider)
 			.providerId(providerId)
-			.profileImage(null)
 			.build();
 	}
 
 
-	@Builder(access = PRIVATE)
+	@Builder
 	private Member(
 		String nickname,
 		String email,

@@ -1,13 +1,5 @@
 package aimo.backend.domains.security;
 
-import aimo.backend.common.properties.SecurityProperties;
-import aimo.backend.domains.security.filter.exceptionHandlingFilter.ExceptionHandlingFilter;
-import aimo.backend.domains.security.filter.jwtFilter.JwtAuthenticationFilter;
-import aimo.backend.domains.security.filter.jwtFilter.JwtTokenProvider;
-import aimo.backend.domains.security.filter.loginFilter.LoginFilter;
-import aimo.backend.domains.member.service.MemberService;
-import lombok.RequiredArgsConstructor;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,6 +18,16 @@ import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import aimo.backend.common.properties.SecurityProperties;
+import aimo.backend.domains.member.service.MemberService;
+import aimo.backend.domains.security.filter.exceptionHandlingFilter.ExceptionHandlingFilter;
+import aimo.backend.domains.security.filter.jwtFilter.JwtAuthenticationFilter;
+import aimo.backend.domains.security.filter.jwtFilter.JwtTokenProvider;
+import aimo.backend.domains.security.filter.loginFilter.LoginFilter;
+import aimo.backend.domains.security.oAuth.CustomOAuth2UserService;
+import aimo.backend.domains.security.oAuth.OAuth2LoginSuccessHandler;
+import lombok.RequiredArgsConstructor;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -35,6 +37,8 @@ public class SecurityConfig {
 
 	private final UserDetailsService userDetailsService;
 	private final JwtTokenProvider jwtTokenProvider;
+	private final CustomOAuth2UserService customOAuth2UserService;
+	private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 
 	private final UrlBasedCorsConfigurationSource ConfigurationSource;
 	private final SecurityProperties securityProperties;
@@ -73,6 +77,12 @@ public class SecurityConfig {
 			.headers(headers -> headers
 				.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
 			);
+
+		// oauth
+		http.oauth2Login((oauth2) -> oauth2
+			.userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint
+				.userService(customOAuth2UserService))
+			.successHandler(oAuth2LoginSuccessHandler));
 
 		return http.build();
 	}
