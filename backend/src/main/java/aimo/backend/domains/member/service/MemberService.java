@@ -62,7 +62,7 @@ public class MemberService {
 		validateDuplicateNickname(parameter.nickname());
 
 		String encodedPassword = passwordEncoder.encode(parameter.password());
-		Member member = Member.of(parameter, encodedPassword);
+		Member member = Member.createStandardMember(parameter, encodedPassword);
 		memberRepository.save(member);
 	}
 
