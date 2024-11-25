@@ -2,9 +2,9 @@ name: BE CI/CD with MySQL and EC2 Deploy
 
 on:
   push:
-    branches: [ "develop" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "develop" ]
+    branches: [ "main" ]
 
 jobs:
   backend-CI-and-Deploy:
