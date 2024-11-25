@@ -1,9 +1,8 @@
-package aimo.backend.domains.auth.security.jwtFilter;
+package aimo.backend.common.security.filter.jwtFilter;
 
 import static aimo.backend.common.exception.ErrorCode.*;
 
 import aimo.backend.common.exception.ApiException;
-import aimo.backend.common.exception.ErrorCode;
 import aimo.backend.common.properties.SecurityProperties;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

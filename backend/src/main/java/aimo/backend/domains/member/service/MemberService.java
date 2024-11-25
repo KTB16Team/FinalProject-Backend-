@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.exception.ErrorCode;
-import aimo.backend.domains.auth.security.jwtFilter.JwtTokenProvider;
+import aimo.backend.common.security.filter.jwtFilter.JwtTokenProvider;
 import aimo.backend.domains.comment.entity.ChildComment;
 import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.member.dto.parameter.DeleteMemberContentsParameter;
@@ -62,7 +62,7 @@ public class MemberService {
 		validateDuplicateNickname(parameter.nickname());
 
 		String encodedPassword = passwordEncoder.encode(parameter.password());
-		Member member = Member.of(parameter, encodedPassword);
+		Member member = Member.createStandardMember(parameter, encodedPassword);
 		memberRepository.save(member);
 	}
 

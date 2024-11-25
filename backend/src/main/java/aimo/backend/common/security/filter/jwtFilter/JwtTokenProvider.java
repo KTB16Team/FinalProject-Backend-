@@ -1,4 +1,4 @@
-package aimo.backend.domains.auth.security.jwtFilter;
+package aimo.backend.common.security.filter.jwtFilter;
 
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,6 +15,8 @@ public interface JwtTokenProvider {
 	String createAccessToken(Long memberId);
 
 	String createRefreshToken(Long memberId);
+
+	void saveOrUpdateRefreshToken(Long memberId, String refreshToken);
 
 	void sendAccessAndRefreshToken(HttpServletResponse response, String accessToken, String refreshToken);
 
