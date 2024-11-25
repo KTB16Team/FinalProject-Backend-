@@ -55,6 +55,15 @@ jobs:
         run: chmod +x gradlew
         working-directory: ${{ secrets.WORKING_DIRECTORY }}
 
+      # Gradle 빌드 및 테스트 실행 (로컬 컨테이너의 MySQL 사용)
+      - name: Build and Test with Gradle
+        run: ./gradlew clean build -Dspring.profiles.active=local
+        working-directory: ${{ secrets.WORKING_DIRECTORY }}
+        env:
+          SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/aimo
+          SPRING_DATASOURCE_USERNAME: admin
+          SPRING_DATASOURCE_PASSWORD: ${{ secrets.DB_PASSWORD }}
+
       # 빌드된 JAR 파일을 EC2로 복사
       - name: Copy JAR file to EC2
         uses: appleboy/scp-action@master
