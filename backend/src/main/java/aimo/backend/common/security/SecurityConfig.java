@@ -1,4 +1,4 @@
-package aimo.backend.domains.security;
+package aimo.backend.common.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,12 +20,12 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import aimo.backend.common.properties.SecurityProperties;
 import aimo.backend.domains.member.service.MemberService;
-import aimo.backend.domains.security.filter.exceptionHandlingFilter.ExceptionHandlingFilter;
-import aimo.backend.domains.security.filter.jwtFilter.JwtAuthenticationFilter;
-import aimo.backend.domains.security.filter.jwtFilter.JwtTokenProvider;
-import aimo.backend.domains.security.filter.loginFilter.LoginFilter;
-import aimo.backend.domains.security.oAuth.CustomOAuth2UserService;
-import aimo.backend.domains.security.oAuth.OAuth2LoginSuccessHandler;
+import aimo.backend.common.security.filter.exceptionHandlingFilter.ExceptionHandlingFilter;
+import aimo.backend.common.security.filter.jwtFilter.JwtAuthenticationFilter;
+import aimo.backend.common.security.filter.jwtFilter.JwtTokenProvider;
+import aimo.backend.common.security.filter.loginFilter.LoginFilter;
+import aimo.backend.common.security.oAuth.CustomOAuth2UserService;
+import aimo.backend.common.security.oAuth.OAuth2LoginSuccessHandler;
 import lombok.RequiredArgsConstructor;
 
 @Configuration
@@ -47,7 +47,7 @@ public class SecurityConfig {
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		// 비활성확 목록
+		// 비활성화 목록
 		http
 			.csrf(AbstractHttpConfigurer::disable) // 세션을 사용안하므로 csrf 공격 없으므로 csrf 비활성화
 			.httpBasic(AbstractHttpConfigurer::disable) // 기본 인증 방식 비활성화
@@ -79,10 +79,11 @@ public class SecurityConfig {
 			);
 
 		// oauth
-		http.oauth2Login((oauth2) -> oauth2
-			.userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint
-				.userService(customOAuth2UserService))
-			.successHandler(oAuth2LoginSuccessHandler));
+		http
+			.oauth2Login((oauth2) -> oauth2
+				.userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint
+					.userService(customOAuth2UserService))
+				.successHandler(oAuth2LoginSuccessHandler));
 
 		return http.build();
 	}

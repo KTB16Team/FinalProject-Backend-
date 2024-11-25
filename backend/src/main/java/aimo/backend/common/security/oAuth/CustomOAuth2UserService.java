@@ -1,4 +1,4 @@
-package aimo.backend.domains.security.oAuth;
+package aimo.backend.common.security.oAuth;
 
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.member.repository.MemberRepository;
-import aimo.backend.domains.security.dto.CustomUserDetails;
-import aimo.backend.domains.security.dto.OAuth2UserInfo;
+import aimo.backend.common.security.dto.CustomUserDetails;
+import aimo.backend.common.security.dto.OAuth2UserInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

@@ -1,4 +1,4 @@
-package aimo.backend.domains.security.filter.loginFilter;
+package aimo.backend.common.security.filter.loginFilter;
 
 import static aimo.backend.common.exception.ErrorCode.*;
 
@@ -10,7 +10,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import aimo.backend.domains.security.filter.jwtFilter.JwtTokenProvider;
+import aimo.backend.common.security.filter.jwtFilter.JwtTokenProvider;
 import aimo.backend.common.dto.DataResponse;
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.util.responseWriter.ResponseWriter;

@@ -1,11 +1,11 @@
-package aimo.backend.domains.security.dto;
+package aimo.backend.common.security.dto;
 
 import java.util.Map;
 
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.member.model.MemberRole;
 import aimo.backend.domains.member.model.Provider;
-import aimo.backend.domains.security.dto.response.KakaoOAuth2Response;
+import aimo.backend.common.security.dto.response.KakaoOAuth2Response;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;

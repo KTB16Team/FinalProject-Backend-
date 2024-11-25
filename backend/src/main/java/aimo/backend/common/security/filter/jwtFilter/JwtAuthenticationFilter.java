@@ -1,4 +1,4 @@
-package aimo.backend.domains.security.filter.jwtFilter;
+package aimo.backend.common.security.filter.jwtFilter;
 
 import static aimo.backend.common.exception.ErrorCode.*;
 

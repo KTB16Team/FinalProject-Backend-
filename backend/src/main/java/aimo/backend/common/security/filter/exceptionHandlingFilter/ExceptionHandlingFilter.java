@@ -1,4 +1,4 @@
-package aimo.backend.domains.security.filter.exceptionHandlingFilter;
+package aimo.backend.common.security.filter.exceptionHandlingFilter;
 
 import aimo.backend.common.dto.ErrorResponse;
 import aimo.backend.common.exception.ApiException;

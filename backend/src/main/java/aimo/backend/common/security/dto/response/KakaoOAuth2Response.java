@@ -1,4 +1,4 @@
-package aimo.backend.domains.security.dto.response;
+package aimo.backend.common.security.dto.response;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;

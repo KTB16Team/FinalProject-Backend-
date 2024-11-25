@@ -1,12 +1,12 @@
-package aimo.backend.domains.security.oAuth;
+package aimo.backend.common.security.oAuth;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
+import aimo.backend.common.security.dto.CustomUserDetails;
+import aimo.backend.common.security.filter.jwtFilter.JwtTokenProvider;
 import aimo.backend.domains.member.entity.Member;
-import aimo.backend.domains.security.dto.CustomUserDetails;
-import aimo.backend.domains.security.filter.jwtFilter.JwtTokenProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

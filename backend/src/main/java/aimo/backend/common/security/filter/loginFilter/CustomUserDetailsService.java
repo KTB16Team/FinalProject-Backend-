@@ -1,6 +1,5 @@
-package aimo.backend.domains.security.filter.loginFilter;
+package aimo.backend.common.security.filter.loginFilter;
 
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -8,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.member.service.MemberService;
-import aimo.backend.domains.security.dto.CustomUserDetails;
+import aimo.backend.common.security.dto.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor

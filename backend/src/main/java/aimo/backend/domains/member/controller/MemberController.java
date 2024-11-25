@@ -28,7 +28,7 @@ import aimo.backend.domains.member.dto.response.FindMyInfoResponse;
 import aimo.backend.domains.member.dto.response.NicknameExistsResponse;
 import aimo.backend.domains.member.dto.request.SendTemporaryPasswordRequest;
 import aimo.backend.common.dto.DataResponse;
-import aimo.backend.domains.security.filter.jwtFilter.JwtTokenProvider;
+import aimo.backend.common.security.filter.jwtFilter.JwtTokenProvider;
 import aimo.backend.domains.member.dto.request.UpdateNicknameRequest;
 import aimo.backend.domains.member.dto.request.UpdatePasswordRequest;
 import aimo.backend.infrastructure.s3.S3Service;

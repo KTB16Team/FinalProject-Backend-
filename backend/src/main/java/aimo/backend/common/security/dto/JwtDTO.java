@@ -1,4 +1,4 @@
-package aimo.backend.domains.security.dto;
+package aimo.backend.common.security.dto;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

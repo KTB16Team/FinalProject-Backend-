@@ -1,4 +1,4 @@
-package aimo.backend.domains.security.filter.jwtFilter;
+package aimo.backend.common.security.filter.jwtFilter;
 
 import static aimo.backend.common.exception.ErrorCode.*;
 
@@ -12,7 +12,7 @@ import aimo.backend.domains.member.repository.RefreshTokenRepository;
 import aimo.backend.common.util.responseWriter.ResponseWriter;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.member.repository.MemberRepository;
-import aimo.backend.domains.security.dto.JwtDTO;
+import aimo.backend.common.security.dto.JwtDTO;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
