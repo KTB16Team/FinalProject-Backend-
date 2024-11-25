@@ -19,6 +19,7 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import aimo.backend.common.properties.SecurityProperties;
+import aimo.backend.common.security.oAuth.OAuth2LoginFailureHandler;
 import aimo.backend.domains.member.service.MemberService;
 import aimo.backend.common.security.filter.exceptionHandlingFilter.ExceptionHandlingFilter;
 import aimo.backend.common.security.filter.jwtFilter.JwtAuthenticationFilter;
@@ -39,6 +40,7 @@ public class SecurityConfig {
 	private final JwtTokenProvider jwtTokenProvider;
 	private final CustomOAuth2UserService customOAuth2UserService;
 	private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
+	private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
 
 	private final UrlBasedCorsConfigurationSource ConfigurationSource;
 	private final SecurityProperties securityProperties;
@@ -83,7 +85,8 @@ public class SecurityConfig {
 			.oauth2Login((oauth2) -> oauth2
 				.userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint
 					.userService(customOAuth2UserService))
-				.successHandler(oAuth2LoginSuccessHandler));
+				.successHandler(oAuth2LoginSuccessHandler)
+				.failureHandler(oAuth2LoginFailureHandler));
 
 		return http.build();
 	}
