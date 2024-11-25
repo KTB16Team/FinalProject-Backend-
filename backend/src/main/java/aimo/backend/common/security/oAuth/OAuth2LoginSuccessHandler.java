@@ -1,5 +1,7 @@
 package aimo.backend.common.security.oAuth;
 
+import java.io.IOException;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -22,14 +24,22 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 		HttpServletRequest request,
 		HttpServletResponse response,
 		Authentication authentication
-	) {
+	) throws IOException {
 		CustomUserDetails userDetails = (CustomUserDetails)authentication.getPrincipal();
 		Member member = userDetails.getMember();
 
 		String accessToken = jwtTokenProvider.createAccessToken(member.getId());
 		String refreshToken = jwtTokenProvider.createRefreshToken(member.getId());
 
-		jwtTokenProvider.sendAccessAndRefreshToken(response, accessToken, refreshToken);
-		jwtTokenProvider.saveOrUpdateRefreshToken(member.getId(), refreshToken);
+		// jwtTokenProvider.sendAccessAndRefreshToken(response, accessToken, refreshToken);
+		// jwtTokenProvider.saveOrUpdateRefreshToken(member.getId(), refreshToken);
+
+		// React의 Redirect URI로 리다이렉트
+		String redirectUrl = String.format(
+			"http://localhost:3000/oauth/callback/kakao?accessToken=%s&refreshToken=%s",
+			accessToken, refreshToken
+		);
+
+		getRedirectStrategy().sendRedirect(request, response, redirectUrl);
 	}
 }
