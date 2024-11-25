@@ -57,10 +57,10 @@ jobs:
 
       # Gradle 빌드 및 테스트 실행 (로컬 컨테이너의 MySQL 사용)
       - name: Build and Test with Gradle
-        run: ./gradlew clean build -Dspring.profiles.active=local
+        run: ./gradlew clean build -Dspring.profiles.active=dev
         working-directory: ${{ secrets.WORKING_DIRECTORY }}
         env:
-          SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/aimo
+          SPRING_DATASOURCE_URL: jdbc:mysql://aimodbfordev.cbimeayem48r.ap-northeast-2.rds.amazonaws.com:3306/aimo
           SPRING_DATASOURCE_USERNAME: admin
           SPRING_DATASOURCE_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
