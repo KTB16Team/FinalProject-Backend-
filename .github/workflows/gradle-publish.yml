@@ -49,6 +49,7 @@ jobs:
           echo "${{ secrets.APPLICATION_DEFAULT }}" > $WORKING_DIRECTORY/src/main/resources/application.yml
           echo "${{ secrets.APPLICATION_DEV }}" > $WORKING_DIRECTORY/src/main/resources/application-dev.yml
           echo "${{ secrets.APPLICATION_LOCAL }}" > $WORKING_DIRECTORY/src/main/resources/application-local.yml
+          echo "${{ secrets.APPLICATION_PROD }}" > $WORKING_DIRECTORY/src/main/resources/application-prod.yml
 
       # Gradle 실행 권한 설정
       - name: Grant execute permission to gradlew
@@ -77,12 +78,12 @@ jobs:
           host: $EC2_HOST_1
           username: $EC2_USER
           key: $EC2_SSH_KEY
-          envs:
-            AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
-            AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
-            AWS_REGION: $AWS_REGION
-            TARGET_GROUP_ARN: $TARGET_GROUP_ARN
-            INSTANCE_ID: $EC2_INSTANCE_ID_1
+          envs: |
+            AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+            AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+            AWS_REGION=$AWS_REGION
+            TARGET_GROUP_ARN=$TARGET_GROUP_ARN
+            INSTANCE_ID=$EC2_INSTANCE_ID_1
           script: |
             # 대상 그룹에서 인스턴스 제거
             aws elbv2 deregister-targets --target-group-arn $TARGET_GROUP_ARN --targets Id=$INSTANCE_ID
@@ -119,12 +120,12 @@ jobs:
           host: $EC2_HOST_2
           username: $EC2_USER
           key: $EC2_SSH_KEY
-          envs:
-            AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
-            AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
-            AWS_REGION: $AWS_REGION
-            TARGET_GROUP_ARN: $TARGET_GROUP_ARN
-            INSTANCE_ID: $EC2_INSTANCE_ID_2
+          envs: |
+            AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+            AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+            AWS_REGION=$AWS_REGION
+            TARGET_GROUP_ARN=$TARGET_GROUP_ARN
+            INSTANCE_ID=$EC2_INSTANCE_ID_2
           script: |
             # 대상 그룹에서 인스턴스 제거
             aws elbv2 deregister-targets --target-group-arn $TARGET_GROUP_ARN --targets Id=$INSTANCE_ID
