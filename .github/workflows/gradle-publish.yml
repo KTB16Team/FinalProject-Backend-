@@ -15,7 +15,6 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_REGION: ${{ secrets.AWS_REGION }}
       TARGET_GROUP_ARN: ${{ secrets.TARGET_GROUP_ARN }}
-      WORKING_DIRECTORY: ${{ secrets.WORKING_DIRECTORY }}
       EC2_USER: ${{ secrets.EC2_USER }}
       EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
       EC2_HOST_1: ${{ secrets.EC2_HOST_1 }}
@@ -37,22 +36,23 @@ jobs:
 
       # 환경별 application.yml 파일 생성
       - name: Create application.yml files
+        working-directory: backend
         run: |
-          mkdir -p mkdir -p backend/src/main/resources/
-          echo "${{ secrets.APPLICATION_DEFAULT }}" > backend/src/main/resources/application.yml
-          echo "${{ secrets.APPLICATION_DEV }}" > backend/src/main/resources/application-dev.yml
-          echo "${{ secrets.APPLICATION_LOCAL }}" > backend/src/main/resources/application-local.yml
-          echo "${{ secrets.APPLICATION_PROD }}" > backend/src/main/resources/application-prod.yml
+          mkdir -p src/main/resources/
+          echo "${{ secrets.APPLICATION_DEFAULT }}" > src/main/resources/application.yml
+          echo "${{ secrets.APPLICATION_DEV }}" > src/main/resources/application-dev.yml
+          echo "${{ secrets.APPLICATION_LOCAL }}" > src/main/resources/application-local.yml
+          echo "${{ secrets.APPLICATION_PROD }}" > src/main/resources/application-prod.yml
 
       # Gradle 실행 권한 설정
       - name: Grant execute permission to gradlew
         run: chmod +x gradlew
-        working-directory: $WORKING_DIRECTORY
+        working-directory: backend
 
       # Gradle 빌드
       - name: Build and Test with Gradle
         run: ./gradlew clean build
-        working-directory: $WORKING_DIRECTORY
+        working-directory: backend
         env:
           SPRING_DATASOURCE_URL: jdbc:mysql://aimodb.cbimeayem48r.ap-northeast-2.rds.amazonaws.com:3306/aimo
           SPRING_DATASOURCE_USERNAME: admin
@@ -64,17 +64,17 @@ jobs:
         with:
           source: backend/build/libs/*.jar
           target: /home/ubuntu/
-          host: $EC2_HOST_1
-          username: $EC2_USER
-          key: $EC2_SSH_KEY
+          host: ${{ secrets.EC2_HOST_1 }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
 
       # EC2_HOST_1에서 배포 및 대상 그룹 관리
       - name: Deploy to EC2_HOST_1
         uses: appleboy/ssh-action@master
         with:
-          host: $EC2_HOST_1
-          username: $EC2_USER
-          key: $EC2_SSH_KEY
+          host: ${{ secrets.EC2_HOST_1 }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
           envs: |
             AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
             AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
@@ -106,17 +106,17 @@ jobs:
         with:
           source: backend/build/libs/*.jar
           target: /home/ubuntu/
-          host: $EC2_HOST_2
-          username: $EC2_USER
-          key: $EC2_SSH_KEY
+          host: ${{ secrets.EC2_HOST_2 }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
 
       # EC2_HOST_2에서 배포 및 대상 그룹 관리
       - name: Deploy to EC2_HOST_2
         uses: appleboy/ssh-action@master
         with:
-          host: $EC2_HOST_2
-          username: $EC2_USER
-          key: $EC2_SSH_KEY
+          host: ${{ secrets.EC2_HOST_2 }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
           envs: |
             AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
             AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
