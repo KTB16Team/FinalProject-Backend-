@@ -76,13 +76,14 @@ jobs:
           host: ${{ secrets.EC2_HOST_1 }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          envs: |
-            AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
-            AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            AWS_REGION=${{ secrets.AWS_REGION }}
-            TARGET_GROUP_ARN=${{ secrets.TARGET_GROUP_ARN }}
-            INSTANCE_ID=${{ secrets.EC2_INSTANCE_ID_1 }}
           script: |
+            # GitHub Secrets에서 환경 변수 설정
+            export AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}"
+            export AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+            export AWS_REGION="${{ secrets.AWS_REGION }}"
+            TARGET_GROUP_ARN="${{ secrets.TARGET_GROUP_ARN }}"
+            INSTANCE_ID="${{ secrets.EC2_INSTANCE_ID_1 }}"
+
             # 변수 값 확인
             echo "TARGET_GROUP_ARN: $TARGET_GROUP_ARN"
             echo "INSTANCE_ID: $INSTANCE_ID"
@@ -117,6 +118,7 @@ jobs:
             # 인스턴스가 정상 상태가 될 때까지 대기
             echo "Waiting for instance $INSTANCE_ID to be in service in target group $TARGET_GROUP_ARN"
             aws elbv2 wait target-in-service --target-group-arn "$TARGET_GROUP_ARN" --targets Id="$INSTANCE_ID"
+      
       
 
       # 빌드된 JAR 파일을 EC2_HOST_2로 복사
