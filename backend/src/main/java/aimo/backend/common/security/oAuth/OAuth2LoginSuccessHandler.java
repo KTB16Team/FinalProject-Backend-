@@ -6,6 +6,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
+import aimo.backend.common.properties.FrontProperties;
 import aimo.backend.common.security.dto.CustomUserDetails;
 import aimo.backend.common.security.filter.jwtFilter.JwtTokenProvider;
 import aimo.backend.domains.member.entity.Member;
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
 	private final JwtTokenProvider jwtTokenProvider;
+	private final FrontProperties frontProperties;
 
 	@Override
 	public void onAuthenticationSuccess(
@@ -36,8 +38,10 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
 		// React의 Redirect URI로 리다이렉트
 		String redirectUrl = String.format(
-			"http://localhost:3000/oauth/callback/kakao?accessToken=%s&refreshToken=%s",
-			accessToken, refreshToken
+			"%s/oauth/callback/kakao?accessToken=%s&refreshToken=%s",
+			frontProperties.getDomain(),
+			accessToken,
+			refreshToken
 		);
 
 		getRedirectStrategy().sendRedirect(request, response, redirectUrl);
