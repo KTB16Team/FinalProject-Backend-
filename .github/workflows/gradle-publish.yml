@@ -60,7 +60,7 @@ jobs:
         run: ./gradlew clean build
         working-directory: ${{ secrets.WORKING_DIRECTORY }}
         env:
-          SPRING_DATASOURCE_URL: jdbc:mysql://aimodbfordev.cbimeayem48r.ap-northeast-2.rds.amazonaws.com:3306/aimo
+          SPRING_DATASOURCE_URL: jdbc:mysql://aimodb.cbimeayem48r.ap-northeast-2.rds.amazonaws.com:3306/aimo
           SPRING_DATASOURCE_USERNAME: admin
           SPRING_DATASOURCE_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
@@ -68,7 +68,7 @@ jobs:
       - name: Copy JAR file to EC2
         uses: appleboy/scp-action@master
         with:
-          host: ${{ secrets.EC2_HOST_DEV }}
+          host: ${{ secrets.EC2_HOST}}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           debug: true
@@ -79,7 +79,7 @@ jobs:
       - name: Copy CloudWatch config to EC2
         uses: appleboy/scp-action@master
         with:
-          host: ${{ secrets.EC2_HOST_DEV }}
+          host: ${{ secrets.EC2_HOST}}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           source: cloudwatch-config.json
@@ -89,7 +89,7 @@ jobs:
       - name: Test EC2 SSH Connection
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.EC2_HOST_DEV }}
+          host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           debug: true
@@ -100,7 +100,7 @@ jobs:
       - name: Deploy to EC2
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.EC2_HOST_DEV }}
+          host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           debug: true
