@@ -57,7 +57,7 @@ jobs:
 
       # Gradle 빌드 및 테스트 실행 (로컬 컨테이너의 MySQL 사용)
       - name: Build and Test with Gradle
-        run: ./gradlew clean build -Dspring.profiles.active=dev
+        run: ./gradlew clean build
         working-directory: ${{ secrets.WORKING_DIRECTORY }}
         env:
           SPRING_DATASOURCE_URL: jdbc:mysql://aimodbfordev.cbimeayem48r.ap-northeast-2.rds.amazonaws.com:3306/aimo
@@ -112,4 +112,4 @@ jobs:
             if screen -list | grep -q "\bbe\b"; then screen -S be -X quit; fi
             
             # 새로운 screen 세션으로 애플리케이션 실행
-            screen -dmS be java -jar /home/ubuntu/backend/build/libs/backend-server.jar --spring.profiles.active=dev
+            screen -dmS be java -jar /home/ubuntu/backend/build/libs/backend-server.jar 
