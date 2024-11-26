@@ -34,16 +34,6 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # 환경별 application.yml 파일 생성
-      - name: Create application.yml files
-        working-directory: backend
-        run: |
-          mkdir -p src/main/resources/
-          echo "${{ secrets.APPLICATION_DEFAULT }}" > src/main/resources/application.yml
-          echo "${{ secrets.APPLICATION_DEV }}" > src/main/resources/application-dev.yml
-          echo "${{ secrets.APPLICATION_LOCAL }}" > src/main/resources/application-local.yml
-          echo "${{ secrets.APPLICATION_PROD }}" > src/main/resources/application-prod.yml
-
       # Gradle 실행 권한 설정
       - name: Grant execute permission to gradlew
         run: chmod +x gradlew
@@ -76,29 +66,33 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           envs: |
-            AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
-            AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
-            AWS_REGION=$AWS_REGION
-            TARGET_GROUP_ARN=$TARGET_GROUP_ARN
-            INSTANCE_ID=$EC2_INSTANCE_ID_1
+            AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            AWS_REGION=${{ secrets.AWS_REGION }}
+            TARGET_GROUP_ARN=${{ secrets.TARGET_GROUP_ARN }}
+            INSTANCE_ID=${{ secrets.EC2_INSTANCE_ID_1 }}
           script: |
             # 대상 그룹에서 인스턴스 제거
-            aws elbv2 deregister-targets --target-group-arn $TARGET_GROUP_ARN --targets Id=$INSTANCE_ID
+            echo "Deregistering instance $INSTANCE_ID from target group $TARGET_GROUP_ARN"
+            aws elbv2 deregister-targets --target-group-arn "$TARGET_GROUP_ARN" --targets Id="$INSTANCE_ID"
 
             # 기존 애플리케이션 종료
             if screen -list | grep -q "\bbe\b"; then screen -S be -X quit; fi
 
             # 새로운 애플리케이션 실행
+            echo "Starting new application instance"
             screen -dmS be java -jar /home/ubuntu/backend-server.jar
 
             # 애플리케이션 시작 대기
             sleep 30
 
             # 대상 그룹에 인스턴스 등록
-            aws elbv2 register-targets --target-group-arn $TARGET_GROUP_ARN --targets Id=$INSTANCE_ID
+            echo "Registering instance $INSTANCE_ID to target group $TARGET_GROUP_ARN"
+            aws elbv2 register-targets --target-group-arn "$TARGET_GROUP_ARN" --targets Id="$INSTANCE_ID"
 
             # 인스턴스가 정상 상태가 될 때까지 대기
-            aws elbv2 wait target-in-service --target-group-arn $TARGET_GROUP_ARN --targets Id=$INSTANCE_ID
+            echo "Waiting for instance $INSTANCE_ID to be in service in target group $TARGET_GROUP_ARN"
+            aws elbv2 wait target-in-service --target-group-arn "$TARGET_GROUP_ARN" --targets Id="$INSTANCE_ID"
 
       # 빌드된 JAR 파일을 EC2_HOST_2로 복사
       - name: Copy JAR file to EC2_HOST_2
@@ -118,26 +112,30 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           envs: |
-            AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
-            AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
-            AWS_REGION=$AWS_REGION
-            TARGET_GROUP_ARN=$TARGET_GROUP_ARN
-            INSTANCE_ID=$EC2_INSTANCE_ID_2
+            AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            AWS_REGION=${{ secrets.AWS_REGION }}
+            TARGET_GROUP_ARN=${{ secrets.TARGET_GROUP_ARN }}
+            INSTANCE_ID=${{ secrets.EC2_INSTANCE_ID_2 }}
           script: |
             # 대상 그룹에서 인스턴스 제거
-            aws elbv2 deregister-targets --target-group-arn $TARGET_GROUP_ARN --targets Id=$INSTANCE_ID
+            echo "Deregistering instance $INSTANCE_ID from target group $TARGET_GROUP_ARN"
+            aws elbv2 deregister-targets --target-group-arn "$TARGET_GROUP_ARN" --targets Id="$INSTANCE_ID"
 
             # 기존 애플리케이션 종료
             if screen -list | grep -q "\bbe\b"; then screen -S be -X quit; fi
 
             # 새로운 애플리케이션 실행
+            echo "Starting new application instance"
             screen -dmS be java -jar /home/ubuntu/backend-server.jar
 
             # 애플리케이션 시작 대기
             sleep 30
 
             # 대상 그룹에 인스턴스 등록
-            aws elbv2 register-targets --target-group-arn $TARGET_GROUP_ARN --targets Id=$INSTANCE_ID
+            echo "Registering instance $INSTANCE_ID to target group $TARGET_GROUP_ARN"
+            aws elbv2 register-targets --target-group-arn "$TARGET_GROUP_ARN" --targets Id="$INSTANCE_ID"
 
             # 인스턴스가 정상 상태가 될 때까지 대기
-            aws elbv2 wait target-in-service --target-group-arn $TARGET_GROUP_ARN --targets Id=$INSTANCE_ID
+            echo "Waiting for instance $INSTANCE_ID to be in service in target group $TARGET_GROUP_ARN"
+            aws elbv2 wait target-in-service --target-group-arn "$TARGET_GROUP_ARN" --targets Id="$INSTANCE_ID"
