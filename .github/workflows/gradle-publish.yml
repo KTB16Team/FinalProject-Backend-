@@ -49,7 +49,6 @@ jobs:
           echo "${{ secrets.APPLICATION_DEFAULT }}" > $WORKING_DIRECTORY/src/main/resources/application.yml
           echo "${{ secrets.APPLICATION_DEV }}" > $WORKING_DIRECTORY/src/main/resources/application-dev.yml
           echo "${{ secrets.APPLICATION_LOCAL }}" > $WORKING_DIRECTORY/src/main/resources/application-local.yml
-          echo "${{ secrets.APPLICATION_PROD }}" > $WORKING_DIRECTORY/src/main/resources/application-prod.yml
 
       # Gradle 실행 권한 설정
       - name: Grant execute permission to gradlew
