@@ -16,10 +16,9 @@ import aimo.backend.domains.like.entity.PostLike;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.post.dto.parameter.SavePostParameter;
 import aimo.backend.domains.post.model.Category;
+import aimo.backend.domains.privatePost.model.OriginType;
 import aimo.backend.domains.vote.entity.Vote;
 import aimo.backend.domains.vote.model.Side;
-import aimo.backend.domains.privatePost.model.OriginType;
-import aimo.backend.domains.view.entity.PostView;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -89,8 +88,8 @@ public class Post extends BaseEntity {
 	@Column(nullable = false, columnDefinition = "VARCHAR(100) DEFAULT 'COMMON'")
 	private Category category;
 
-	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY, orphanRemoval = true, cascade = {CascadeType.REMOVE})
-	private List<PostLike> postLikes = new ArrayList<>();
+	@Column(columnDefinition = "INT DEFAULT 0")
+	private Integer postLikesCount = 0;
 
 	@Column(columnDefinition = "INT DEFAULT 0")
 	private Integer postViewsCount = 0;
@@ -101,10 +100,6 @@ public class Post extends BaseEntity {
 	public void setMember(Member member) {
 		this.member = member;
 		member.getPosts().add(this);
-	}
-
-	public Integer getPostLikesCount() {
-		return postLikes.size();
 	}
 
 	public Integer getCommentsCount() {
@@ -141,6 +136,16 @@ public class Post extends BaseEntity {
 	// 투표 수 조회
 	public Integer getVotesCount() {
 		return votes.size();
+	}
+
+	// 좋아요 수 증가
+	public void increasePostLikesCount() {
+		this.postLikesCount++;
+	}
+
+	// 좋아요 수 감소
+	public void decreasePostLikesCount() {
+		this.postLikesCount--;
 	}
 
 	// 조회 수 증가
@@ -191,7 +196,6 @@ public class Post extends BaseEntity {
 		this.faultRateDefendant = faultRateDefendant;
 		this.originType = originType;
 		this.category = category;
-		this.postLikes = postLikes;
 		this.votes = votes;
 	}
 

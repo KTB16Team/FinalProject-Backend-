@@ -2,6 +2,7 @@ package aimo.backend.domains.post.dto.response;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -34,11 +35,10 @@ public class FindPostAndCommentsByIdResponse {
 	private final LocalDateTime createdAt;
 	private final List<ParentCommentDto> comments;
 
-	public static FindPostAndCommentsByIdResponse from(Member member, Post post, List<ParentComment> parentComments) {
+	public static FindPostAndCommentsByIdResponse from(Member member, Post post, List<ParentComment> parentComments, boolean postLikeExists) {
 		return new FindPostAndCommentsByIdResponse(
 			post.getMember() == member,
-			post.getPostLikes().stream()
-				.anyMatch(postLike -> postLike.getMember() == member),
+			postLikeExists,
 			post.getVotes().stream()
 				.filter(vote -> vote.getMember() == member)
 				.findFirst()

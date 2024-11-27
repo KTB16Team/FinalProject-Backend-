@@ -16,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.comment.repository.ParentCommentRepository;
+import aimo.backend.domains.like.entity.PostLike;
+import aimo.backend.domains.like.repository.PostLikeRepository;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.member.repository.MemberRepository;
 import aimo.backend.domains.post.dto.parameter.DeletePostParameter;
@@ -43,6 +45,7 @@ public class PostService {
 	private final PostRepository postRepository;
 	private final MemberRepository memberRepository;
 	private final ParentCommentRepository parentCommentRepository;
+	private final PostLikeRepository postLikeRepository;
 
 	// 글 저장
 	@Transactional
@@ -59,12 +62,13 @@ public class PostService {
 	public FindPostAndCommentsByIdResponse findPostAndCommentsDtoById(FindPostAndCommentsByIdParameter parameter) {
 		Post post = postRepository.findById(parameter.postId())
 			.orElseThrow(() -> ApiException.from(POST_NOT_FOUND));
-
 		Member member = memberRepository.findById(parameter.memberId())
 			.orElseThrow(() -> ApiException.from(MEMBER_NOT_FOUND));
-
 		List<ParentComment> parentComments = post.getParentComments();
-		return FindPostAndCommentsByIdResponse.from(member, post, parentComments);
+
+		boolean postLikeExists = postLikeRepository.existsByPostIdAndMemberId(post.getId(), member.getId());
+
+		return FindPostAndCommentsByIdResponse.from(member, post, parentComments, postLikeExists);
 	}
 
 	// 판결문 조회
