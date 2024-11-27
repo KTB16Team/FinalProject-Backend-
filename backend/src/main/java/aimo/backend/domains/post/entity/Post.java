@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import org.hibernate.annotations.BatchSize;
+
 import aimo.backend.common.entity.BaseEntity;
 import aimo.backend.domains.comment.entity.ChildComment;
 import aimo.backend.domains.comment.entity.ParentComment;
@@ -51,9 +53,11 @@ public class Post extends BaseEntity {
 	private Member member;
 
 	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY, orphanRemoval = true, cascade = ALL)
+	@BatchSize(size = 10)
 	private List<ParentComment> parentComments = new ArrayList<>();
 
 	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY, orphanRemoval = true, cascade = ALL)
+	@BatchSize(size = 10)
 	private List<ChildComment> childComments = new ArrayList<>();
 
 	@JoinColumn(name = "origin_private_post_id")
@@ -77,8 +81,7 @@ public class Post extends BaseEntity {
 	@Column(nullable = false)
 	private Integer faultRateDefendant;
 
-	@Column(nullable = false)
-	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)	@Enumerated(EnumType.STRING)
 	private OriginType originType;
 
 	@Column(nullable = false, length = 2500)
@@ -95,6 +98,7 @@ public class Post extends BaseEntity {
 	private Integer postViewsCount = 0;
 
 	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY, orphanRemoval = true, cascade = {CascadeType.REMOVE})
+	@BatchSize(size = 10)
 	private List<Vote> votes = new ArrayList<>();
 
 	// 편의 메서드
@@ -133,6 +137,11 @@ public class Post extends BaseEntity {
 	// 투표 수 조회
 	public Integer getVotesCount() {
 		return votes.size();
+	}
+
+	// 댓글 수
+	public Integer getCommentsCount() {
+		return parentComments.size() + childComments.size();
 	}
 
 	// 좋아요 수 증가

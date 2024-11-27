@@ -104,10 +104,7 @@ public class PostService {
 	public Page<FindPostsByPostTypeResponse> findMyPosts(Long memberId, Pageable pageable) {
 		return postRepository
 			.findAllByMember_Id(memberId, pageable)
-			.map(post -> {
-				Integer commentsCount = countComments(post.getId());
-				return FindPostsByPostTypeResponse.of(post, commentsCount);
-			});
+			.map(FindPostsByPostTypeResponse::from);
 
 	}
 
@@ -115,28 +112,21 @@ public class PostService {
 	public Page<FindPostsByPostTypeResponse> findPopularPosts(Pageable pageable) {
 		return postRepository
 			.findAllByOrderByPostViewsCountDesc(pageable)
-			.map(post -> {
-				Integer commentsCount = countComments(post.getId());
-				return FindPostsByPostTypeResponse.of(post, commentsCount);
-			});
+			.map(FindPostsByPostTypeResponse::from);
 	}
 
 	// 최신 글 조회
 	public Page<FindPostsByPostTypeResponse> findAnyPosts(Pageable pageable) {
-		return postRepository.findAllByOrderByIdDesc(pageable)
-			.map(post -> {
-				Integer commentsCount = countComments(post.getId());
-				return FindPostsByPostTypeResponse.of(post, commentsCount);
-			});
+		return postRepository
+			.findAllByOrderByIdDesc(pageable)
+			.map(FindPostsByPostTypeResponse::from);
 	}
 
 	// 댓글 단 글 조회
 	public Page<FindPostsByPostTypeResponse> findCommentedPosts(Long memberId, Pageable pageable) {
-		return postRepository.findPostsByCommentsWrittenByMember(memberId, pageable)
-			.map(post -> {
-				Integer commentsCount = countComments(post.getId());
-				return FindPostsByPostTypeResponse.of(post, commentsCount);
-			});
+		return postRepository
+			.findPostsByCommentsWrittenByMember(memberId, pageable)
+			.map(FindPostsByPostTypeResponse::from);
 	}
 
 	// 글 삭제
