@@ -92,8 +92,8 @@ public class Post extends BaseEntity {
 	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY, orphanRemoval = true, cascade = {CascadeType.REMOVE})
 	private List<PostLike> postLikes = new ArrayList<>();
 
-	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY, orphanRemoval = true, cascade = {CascadeType.REMOVE})
-	private List<PostView> postViews = new ArrayList<>();
+	@Column(columnDefinition = "INT DEFAULT 0")
+	private Integer postViewsCount = 0;
 
 	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY, orphanRemoval = true, cascade = {CascadeType.REMOVE})
 	private List<Vote> votes = new ArrayList<>();
@@ -105,10 +105,6 @@ public class Post extends BaseEntity {
 
 	public Integer getPostLikesCount() {
 		return postLikes.size();
-	}
-
-	public Integer getPostViewsCount() {
-		return postViews.size();
 	}
 
 	public Integer getCommentsCount() {
@@ -142,8 +138,14 @@ public class Post extends BaseEntity {
 			.sum();
 	}
 
+	// 투표 수 조회
 	public Integer getVotesCount() {
 		return votes.size();
+	}
+
+	// 조회 수 증가
+	public void increasePostViewsCount() {
+		this.postViewsCount++;
 	}
 
 	public static Post of(SavePostParameter parameter, Member member) {
@@ -163,7 +165,7 @@ public class Post extends BaseEntity {
 	}
 
 	@Builder
-	public Post(
+	private Post(
 		Long privatePostId,
 		Member member,
 		String title,
@@ -176,9 +178,8 @@ public class Post extends BaseEntity {
 		OriginType originType,
 		Category category,
 		List<PostLike> postLikes,
-		List<PostView> postViews,
-		List<Vote> votes) {
-
+		List<Vote> votes
+	) {
 		this.privatePostId = privatePostId;
 		this.member = member;
 		this.title = title;
@@ -191,7 +192,6 @@ public class Post extends BaseEntity {
 		this.originType = originType;
 		this.category = category;
 		this.postLikes = postLikes;
-		this.postViews = postViews;
 		this.votes = votes;
 	}
 

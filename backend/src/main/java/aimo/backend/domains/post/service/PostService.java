@@ -99,7 +99,7 @@ public class PostService {
 	// 인기 글 조회
 	public Page<FindPostsByPostTypeResponse> findPopularPosts(Pageable pageable) {
 		return postRepository
-			.findByViewsCount(pageable)
+			.findAllByOrderByPostViewsCountDesc(pageable)
 			.map(FindPostsByPostTypeResponse::from);
 	}
 
