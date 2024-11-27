@@ -6,6 +6,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.RandomStringUtils;
+
 import aimo.backend.domains.comment.entity.ChildComment;
 import aimo.backend.domains.member.dto.parameter.SignUpParameter;
 import aimo.backend.domains.privatePost.entity.PrivatePost;
@@ -46,7 +48,7 @@ public class Member extends BaseEntity {
 	@Column(nullable = false, unique = true)
 	private String nickname;
 
-	@Column(nullable = false, unique = true)
+	@Column(nullable = false)
 	private String email;
 
 	@Column(nullable = false)
@@ -57,18 +59,18 @@ public class Member extends BaseEntity {
 	private MemberRole role;
 
 	@Enumerated(EnumType.STRING)
-	@Column(nullable = false)
 	private Gender gender;
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private Provider provider;
 
+	private String providerId;
+
 	@OneToOne(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
 	@JoinColumn(name = "profile_image_id", referencedColumnName = "profile_id")
 	private ProfileImage profileImage;
 
-	@Column(nullable = false, name = "birth_date")
 	private LocalDate birthDate;
 
 	@OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -96,7 +98,7 @@ public class Member extends BaseEntity {
 	}
 
 
-	public static Member of(SignUpParameter signUpParameter, String encodedPassword) {
+	public static Member createStandardMember(SignUpParameter signUpParameter, String encodedPassword) {
 		return Member.builder()
 			.nickname(signUpParameter.nickname())
 			.email(signUpParameter.email())
@@ -109,6 +111,17 @@ public class Member extends BaseEntity {
 			.build();
 	}
 
+	public static Member createOAuthMember(String email, String nickname, MemberRole memberRole, Provider provider, String providerId) {
+		return Member.builder()
+			.nickname(nickname)
+			.email(email)
+			.password(RandomStringUtils.randomAlphanumeric(20))
+			.memberRole(memberRole)
+			.provider(provider)
+			.providerId(providerId)
+			.build();
+	}
+
 
 	@Builder
 	private Member(
@@ -118,6 +131,7 @@ public class Member extends BaseEntity {
 		MemberRole memberRole,
 		Gender gender,
 		Provider provider,
+		String providerId,
 		LocalDate birthDate,
 		ProfileImage profileImage,
 		List<PrivatePost> privatePosts,
@@ -131,6 +145,7 @@ public class Member extends BaseEntity {
 		this.role = memberRole;
 		this.gender = gender;
 		this.provider = provider;
+		this.providerId = providerId;
 		this.birthDate = birthDate;
 		this.profileImage = profileImage;
 		this.privatePosts = privatePosts;

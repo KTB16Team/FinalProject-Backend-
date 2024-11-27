@@ -1,4 +1,4 @@
-name: BE CI/CD with MySQL and EC2 Deploy
+name: BE CI/CD with Rolling Deployment
 
 on:
   push:
@@ -10,21 +10,22 @@ jobs:
   backend-CI-and-Deploy:
     runs-on: ubuntu-latest
 
-    services:
-      db:
-        image: mysql:8.0
-        env:
-          MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          MYSQL_DATABASE: aimo
-          MYSQL_USER: ${{ secrets.DB_USERNAME }}
-          MYSQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
-        ports:
-          - 3306:3306
-        options: --health-cmd="mysqladmin ping -h localhost" --health-interval=10s --health-timeout=5s --health-retries=10
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      TARGET_GROUP_ARN: ${{ secrets.TARGET_GROUP_ARN }}
+      EC2_USER: ${{ secrets.EC2_USER }}
+      EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+      EC2_HOST_1: ${{ secrets.EC2_HOST_1 }}
+      EC2_HOST_2: ${{ secrets.EC2_HOST_2 }}
+      EC2_INSTANCE_ID_1: ${{ secrets.EC2_INSTANCE_ID_1 }}
+      EC2_INSTANCE_ID_2: ${{ secrets.EC2_INSTANCE_ID_2 }}
 
     steps:
       # 소스 코드 체크아웃
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       # JDK 17 설정
       - name: Set up JDK 17
@@ -33,83 +34,135 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # YML 파일 생성
-      - name: YML 파일 생성
-        working-directory: .
-        run: |
-          # backend 디렉토리 생성
-          mkdir -p backend/src/main/resources/
-          
-          # application.yml 파일들 생성
-          echo "${{ secrets.APPLICATION_DEFAULT }}" > backend/src/main/resources/application.yml
-          echo "${{ secrets.APPLICATION_DEV }}" > backend/src/main/resources/application-dev.yml
-          echo "${{ secrets.APPLICATION_LOCAL }}" > backend/src/main/resources/application-local.yml
-          echo "${{ secrets.APPLICATION_PROD }}" > backend/src/main/resources/application-prod.yml
-          # github actions 시간대 확인
-          echo ===================
-          date 
-          echo ===================
-          
       # Gradle 실행 권한 설정
       - name: Grant execute permission to gradlew
         run: chmod +x gradlew
-        working-directory: ${{ secrets.WORKING_DIRECTORY }}
+        working-directory: backend
 
-      # Gradle 빌드 및 테스트 실행 (로컬 컨테이너의 MySQL 사용)
+      # Gradle 빌드
       - name: Build and Test with Gradle
-        run: ./gradlew clean build -Dspring.profiles.active=local
-        working-directory: ${{ secrets.WORKING_DIRECTORY }}
+        run: ./gradlew clean build
+        working-directory: backend
         env:
-          SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/aimo
+          SPRING_DATASOURCE_URL: jdbc:mysql://aimodb.cbimeayem48r.ap-northeast-2.rds.amazonaws.com:3306/aimo
           SPRING_DATASOURCE_USERNAME: admin
           SPRING_DATASOURCE_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
-      # 빌드된 JAR 파일을 EC2로 복사
-      - name: Copy JAR file to EC2
+      # 빌드된 JAR 파일을 EC2_HOST_1로 복사
+      - name: Copy JAR file to EC2_HOST_1
         uses: appleboy/scp-action@master
         with:
-          host: ${{ secrets.EC2_HOST_DEV }}
+          source: backend/build/libs/*.jar
+          target: /home/ubuntu/
+          host: ${{ secrets.EC2_HOST_1 }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          debug: true
-          source: ${{ secrets.WORKING_DIRECTORY }}/build/libs/*.jar
-          target: /home/ubuntu/
 
-      # CloudWatch 설정 파일을 EC2로 복사
-      - name: Copy CloudWatch config to EC2
+      # EC2_HOST_1에서 배포 및 대상 그룹 관리
+      # 빌드된 JAR 파일을 EC2_HOST_1로 복사
+      - name: Copy JAR file to EC2_HOST_1
         uses: appleboy/scp-action@master
         with:
-          host: ${{ secrets.EC2_HOST_DEV }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          source: cloudwatch-config.json
+          source: backend/build/libs/*.jar
           target: /home/ubuntu/
-
-      # EC2 연결 테스트 추가 (debug 옵션 활성화)
-      - name: Test EC2 SSH Connection
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.EC2_HOST_DEV }}
+          host: ${{ secrets.EC2_HOST_1 }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          debug: true
-          script: |
-            echo "SSH 연결 테스트 성공"
 
-      # EC2에서 애플리케이션 실행 (screen 세션 사용)
-      - name: Deploy to EC2
+      # EC2_HOST_1에서 배포 및 대상 그룹 관리
+      - name: Deploy to EC2_HOST_1
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.EC2_HOST_DEV }}
+          host: ${{ secrets.EC2_HOST_1 }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          debug: true
           script: |
-            # CloudWatch 에이전트를 설정 파일로 시작
-            sudo amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/home/ubuntu/cloudwatch-config.json -s
-            
-            # 기존 screen 세션이 있다면 종료
+            # GitHub Secrets에서 환경 변수 설정
+            export AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}"
+            export AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+            export AWS_REGION="${{ secrets.AWS_REGION }}"
+            TARGET_GROUP_ARN="${{ secrets.TARGET_GROUP_ARN }}"
+            INSTANCE_ID="${{ secrets.EC2_INSTANCE_ID_1 }}"
+
+            # 변수 값 확인
+            echo "TARGET_GROUP_ARN: $TARGET_GROUP_ARN"
+            echo "INSTANCE_ID: $INSTANCE_ID"
+
+            # 대상 그룹에서 인스턴스 제거
+            if [ -z "$TARGET_GROUP_ARN" ]; then
+              echo "Error: TARGET_GROUP_ARN is empty"
+              exit 1
+            fi
+            if [ -z "$INSTANCE_ID" ]; then
+              echo "Error: INSTANCE_ID is empty"
+              exit 1
+            fi
+
+            echo "Deregistering instance $INSTANCE_ID from target group $TARGET_GROUP_ARN"
+            aws elbv2 deregister-targets --target-group-arn "$TARGET_GROUP_ARN" --targets Id="$INSTANCE_ID"
+
+            # 기존 애플리케이션 종료
             if screen -list | grep -q "\bbe\b"; then screen -S be -X quit; fi
-            
-            # 새로운 screen 세션으로 애플리케이션 실행
-            screen -dmS be java -jar /home/ubuntu/backend/build/libs/backend-server.jar --spring.profiles.active=dev
+
+            # 새로운 애플리케이션 실행
+            echo "Starting new application instance"
+            screen -dmS be java -jar /home/ubuntu/backend-server.jar
+
+            # 애플리케이션 시작 대기
+            sleep 30
+
+            # 대상 그룹에 인스턴스 등록
+            echo "Registering instance $INSTANCE_ID to target group $TARGET_GROUP_ARN"
+            aws elbv2 register-targets --target-group-arn "$TARGET_GROUP_ARN" --targets Id="$INSTANCE_ID"
+
+            # 인스턴스가 정상 상태가 될 때까지 대기
+            echo "Waiting for instance $INSTANCE_ID to be in service in target group $TARGET_GROUP_ARN"
+            aws elbv2 wait target-in-service --target-group-arn "$TARGET_GROUP_ARN" --targets Id="$INSTANCE_ID"
+      
+      
+
+      # 빌드된 JAR 파일을 EC2_HOST_2로 복사
+      - name: Copy JAR file to EC2_HOST_2
+        uses: appleboy/scp-action@master
+        with:
+          source: backend/build/libs/*.jar
+          target: /home/ubuntu/
+          host: ${{ secrets.EC2_HOST_2 }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+
+      # EC2_HOST_2에서 배포 및 대상 그룹 관리
+      - name: Deploy to EC2_HOST_2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST_2 }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          envs: |
+            AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            AWS_REGION=${{ secrets.AWS_REGION }}
+            TARGET_GROUP_ARN=${{ secrets.TARGET_GROUP_ARN }}
+            INSTANCE_ID=${{ secrets.EC2_INSTANCE_ID_2 }}
+          script: |
+            # 대상 그룹에서 인스턴스 제거
+            echo "Deregistering instance $INSTANCE_ID from target group $TARGET_GROUP_ARN"
+            aws elbv2 deregister-targets --target-group-arn "$TARGET_GROUP_ARN" --targets Id="$INSTANCE_ID"
+
+            # 기존 애플리케이션 종료
+            if screen -list | grep -q "\bbe\b"; then screen -S be -X quit; fi
+
+            # 새로운 애플리케이션 실행
+            echo "Starting new application instance"
+            screen -dmS be java -jar /home/ubuntu/backend-server.jar
+
+            # 애플리케이션 시작 대기
+            sleep 30
+
+            # 대상 그룹에 인스턴스 등록
+            echo "Registering instance $INSTANCE_ID to target group $TARGET_GROUP_ARN"
+            aws elbv2 register-targets --target-group-arn "$TARGET_GROUP_ARN" --targets Id="$INSTANCE_ID"
+
+            # 인스턴스가 정상 상태가 될 때까지 대기
+            echo "Waiting for instance $INSTANCE_ID to be in service in target group $TARGET_GROUP_ARN"
+            aws elbv2 wait target-in-service --target-group-arn "$TARGET_GROUP_ARN" --targets Id="$INSTANCE_ID"

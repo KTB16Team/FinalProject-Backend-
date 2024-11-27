@@ -1,6 +1,7 @@
 package aimo.backend.domains.member.repository;
 
 import aimo.backend.domains.member.entity.Member;
+import aimo.backend.domains.member.model.Provider;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -13,4 +14,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 	boolean existsByNickname(String nickname);
 
 	boolean existsByEmail(String email);
+
+	Optional<Member> findByProviderAndProviderId(Provider provider, String providerId);
 }

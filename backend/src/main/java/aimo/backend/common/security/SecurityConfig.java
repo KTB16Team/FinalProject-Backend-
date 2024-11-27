@@ -1,12 +1,4 @@
-package aimo.backend.common.config;
-
-import aimo.backend.common.properties.SecurityProperties;
-import aimo.backend.domains.auth.security.exceptionHandlingFilter.ExceptionHandlingFilter;
-import aimo.backend.domains.auth.security.jwtFilter.JwtAuthenticationFilter;
-import aimo.backend.domains.auth.security.jwtFilter.JwtTokenProvider;
-import aimo.backend.domains.auth.security.loginFilter.LoginFilter;
-import aimo.backend.domains.member.service.MemberService;
-import lombok.RequiredArgsConstructor;
+package aimo.backend.common.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,6 +18,17 @@ import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import aimo.backend.common.properties.SecurityProperties;
+import aimo.backend.common.security.oAuth.OAuth2LoginFailureHandler;
+import aimo.backend.domains.member.service.MemberService;
+import aimo.backend.common.security.filter.exceptionHandlingFilter.ExceptionHandlingFilter;
+import aimo.backend.common.security.filter.jwtFilter.JwtAuthenticationFilter;
+import aimo.backend.common.security.filter.jwtFilter.JwtTokenProvider;
+import aimo.backend.common.security.filter.loginFilter.LoginFilter;
+import aimo.backend.common.security.oAuth.CustomOAuth2UserService;
+import aimo.backend.common.security.oAuth.OAuth2LoginSuccessHandler;
+import lombok.RequiredArgsConstructor;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -35,6 +38,9 @@ public class SecurityConfig {
 
 	private final UserDetailsService userDetailsService;
 	private final JwtTokenProvider jwtTokenProvider;
+	private final CustomOAuth2UserService customOAuth2UserService;
+	private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
+	private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
 
 	private final UrlBasedCorsConfigurationSource ConfigurationSource;
 	private final SecurityProperties securityProperties;
@@ -43,7 +49,7 @@ public class SecurityConfig {
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		// 비활성확 목록
+		// 비활성화 목록
 		http
 			.csrf(AbstractHttpConfigurer::disable) // 세션을 사용안하므로 csrf 공격 없으므로 csrf 비활성화
 			.httpBasic(AbstractHttpConfigurer::disable) // 기본 인증 방식 비활성화
@@ -73,6 +79,14 @@ public class SecurityConfig {
 			.headers(headers -> headers
 				.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
 			);
+
+		// oauth
+		http
+			.oauth2Login((oauth2) -> oauth2
+				.userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint
+					.userService(customOAuth2UserService))
+				.successHandler(oAuth2LoginSuccessHandler)
+				.failureHandler(oAuth2LoginFailureHandler));
 
 		return http.build();
 	}

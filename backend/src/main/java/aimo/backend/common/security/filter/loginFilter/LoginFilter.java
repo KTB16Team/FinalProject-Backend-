@@ -1,4 +1,4 @@
-package aimo.backend.domains.auth.security.loginFilter;
+package aimo.backend.common.security.filter.loginFilter;
 
 import static aimo.backend.common.exception.ErrorCode.*;
 
@@ -10,7 +10,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import aimo.backend.domains.auth.security.jwtFilter.JwtTokenProvider;
+import aimo.backend.common.security.filter.jwtFilter.JwtTokenProvider;
 import aimo.backend.common.dto.DataResponse;
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.util.responseWriter.ResponseWriter;
@@ -73,6 +73,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 		String refreshToken = jwtTokenProvider.createRefreshToken(memberId);
 
 		jwtTokenProvider.sendAccessAndRefreshToken(response, accessToken, refreshToken);
+		jwtTokenProvider.saveOrUpdateRefreshToken(memberId, refreshToken);
 
 		log.info("로그인 성공: {}", email);
 		log.info("accessToken={}", accessToken);
