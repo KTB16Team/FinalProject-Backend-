@@ -128,10 +128,19 @@ jobs:
             # 대상 그룹에 인스턴스 등록 (포트 8080 사용)
             echo "Registering instance $INSTANCE_ID to target group $TARGET_GROUP_ARN using port 8080"
             aws elbv2 register-targets --target-group-arn "$TARGET_GROUP_ARN" --targets Id="$INSTANCE_ID",Port=8080
-
+            
+            # 인위적인 헬스 체크 (3회 반복)
+            echo "Performing manual health checks with curl (3 times)"
+            for i in {1..3}; do
+              echo "Health check attempt $i"
+              curl -X GET http://localhost:8080/actuator/health
+              sleep 5
+            done
             # 인스턴스가 정상 상태가 될 때까지 대기
             echo "Waiting for instance $INSTANCE_ID to be in service in target group $TARGET_GROUP_ARN"
             aws elbv2 wait target-in-service --target-group-arn "$TARGET_GROUP_ARN" --targets Id="$INSTANCE_ID",Port=8080
+
+
 
       # EC2_HOST_2에서 배포 및 대상 그룹 관리
       - name: Deploy to EC2_HOST_2
@@ -170,7 +179,17 @@ jobs:
             # 대상 그룹에 인스턴스 등록 (포트 8080 사용)
             echo "Registering instance $INSTANCE_ID to target group $TARGET_GROUP_ARN using port 8080"
             aws elbv2 register-targets --target-group-arn "$TARGET_GROUP_ARN" --targets Id="$INSTANCE_ID",Port=8080
-
+            
+            # 인위적인 헬스 체크 (3회 반복)
+            echo "Performing manual health checks with curl (3 times)"
+            for i in {1..3}; do
+              echo "Health check attempt $i"
+              curl -X GET http://localhost:8080/actuator/health
+              sleep 5
+            done
             # 인스턴스가 정상 상태가 될 때까지 대기
             echo "Waiting for instance $INSTANCE_ID to be in service in target group $TARGET_GROUP_ARN"
             aws elbv2 wait target-in-service --target-group-arn "$TARGET_GROUP_ARN" --targets Id="$INSTANCE_ID",Port=8080
+
+
+
