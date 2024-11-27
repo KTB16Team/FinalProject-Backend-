@@ -7,9 +7,54 @@ on:
     branches: [ "develop" ]
 
 jobs:
-  backend-CI-and-Deploy:
+  # Job 1: 빌드 및 S3 업로드
+  build-and-upload:
     runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      S3_BUCKET_NAME: aimo-be-server
 
+    steps:
+      # 1. 소스 코드 체크아웃
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. JDK 17 설정
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # 3. Gradle 실행 권한 설정
+      - name: Grant execute permission to gradlew
+        run: chmod +x gradlew
+        working-directory: backend
+
+      # 4. Gradle 빌드 및 테스트
+      - name: Build and Test with Gradle
+        run: ./gradlew clean build
+        working-directory: backend
+        env:
+          SPRING_DATASOURCE_URL: jdbc:mysql://aimodb.cbimeayem48r.ap-northeast-2.rds.amazonaws.com:3306/aimo
+          SPRING_DATASOURCE_USERNAME: admin
+          SPRING_DATASOURCE_PASSWORD: ${{ secrets.DB_PASSWORD }}
+
+      # 5. 빌드된 JAR 파일을 S3로 업로드
+      - name: Upload JAR to S3
+        run: |
+          aws s3 cp backend/build/libs/backend-server.jar s3://$S3_BUCKET_NAME/
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+
+  # Job 2: EC2 배포
+  deploy-to-ec2:
+    runs-on: ubuntu-latest
+    needs: build-and-upload
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -21,43 +66,9 @@ jobs:
       EC2_HOST_2: ${{ secrets.EC2_HOST_2 }}
       EC2_INSTANCE_ID_1: ${{ secrets.EC2_INSTANCE_ID_1 }}
       EC2_INSTANCE_ID_2: ${{ secrets.EC2_INSTANCE_ID_2 }}
+      S3_BUCKET_NAME: aimo-be-server
 
     steps:
-      # 소스 코드 체크아웃
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      # JDK 17 설정
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-
-      # Gradle 실행 권한 설정
-      - name: Grant execute permission to gradlew
-        run: chmod +x gradlew
-        working-directory: backend
-
-      # Gradle 빌드
-      - name: Build and Test with Gradle
-        run: ./gradlew clean build
-        working-directory: backend
-        env:
-          SPRING_DATASOURCE_URL: jdbc:mysql://aimodb.cbimeayem48r.ap-northeast-2.rds.amazonaws.com:3306/aimo
-          SPRING_DATASOURCE_USERNAME: admin
-          SPRING_DATASOURCE_PASSWORD: ${{ secrets.DB_PASSWORD }}
-
-      # 빌드된 JAR 파일을 EC2_HOST_1로 복사
-      - name: Copy JAR file to EC2_HOST_1
-        uses: appleboy/scp-action@master
-        with:
-          source: backend/build/libs/*.jar
-          target: /home/ubuntu/
-          host: ${{ secrets.EC2_HOST_1 }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-
       # EC2_HOST_1에서 배포 및 대상 그룹 관리
       - name: Deploy to EC2_HOST_1
         uses: appleboy/ssh-action@master
@@ -72,6 +83,7 @@ jobs:
             export AWS_REGION="${{ secrets.AWS_REGION }}"
             TARGET_GROUP_ARN="${{ secrets.TARGET_GROUP_ARN }}"
             INSTANCE_ID="${{ secrets.EC2_INSTANCE_ID_1 }}"
+            S3_BUCKET_NAME="aimo-be-server"
 
             # 변수 값 확인
             echo "TARGET_GROUP_ARN: $TARGET_GROUP_ARN"
@@ -93,6 +105,10 @@ jobs:
             # 기존 애플리케이션 종료
             if screen -list | grep -q "\bbe\b"; then screen -S be -X quit; fi
 
+            # S3에서 새로운 JAR 파일 다운로드
+            echo "Downloading JAR file from S3"
+            aws s3 cp s3://$S3_BUCKET_NAME/backend-server.jar /home/ubuntu/backend-server.jar
+
             # 새로운 애플리케이션 실행
             echo "Starting new application instance"
             screen -dmS be java -jar /home/ubuntu/backend-server.jar
@@ -107,18 +123,6 @@ jobs:
             # 인스턴스가 정상 상태가 될 때까지 대기
             echo "Waiting for instance $INSTANCE_ID to be in service in target group $TARGET_GROUP_ARN"
             aws elbv2 wait target-in-service --target-group-arn "$TARGET_GROUP_ARN" --targets Id="$INSTANCE_ID"
-      
-      
-
-      # 빌드된 JAR 파일을 EC2_HOST_2로 복사
-      - name: Copy JAR file to EC2_HOST_2
-        uses: appleboy/scp-action@master
-        with:
-          source: backend/build/libs/*.jar
-          target: /home/ubuntu/
-          host: ${{ secrets.EC2_HOST_2 }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
 
       # EC2_HOST_2에서 배포 및 대상 그룹 관리
       - name: Deploy to EC2_HOST_2
@@ -127,19 +131,25 @@ jobs:
           host: ${{ secrets.EC2_HOST_2 }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          envs: |
-            AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
-            AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            AWS_REGION=${{ secrets.AWS_REGION }}
-            TARGET_GROUP_ARN=${{ secrets.TARGET_GROUP_ARN }}
-            INSTANCE_ID=${{ secrets.EC2_INSTANCE_ID_2 }}
           script: |
+            # GitHub Secrets에서 환경 변수 설정
+            export AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}"
+            export AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+            export AWS_REGION="${{ secrets.AWS_REGION }}"
+            TARGET_GROUP_ARN="${{ secrets.TARGET_GROUP_ARN }}"
+            INSTANCE_ID="${{ secrets.EC2_INSTANCE_ID_2 }}"
+            S3_BUCKET_NAME="aimo-be-server"
+
             # 대상 그룹에서 인스턴스 제거
             echo "Deregistering instance $INSTANCE_ID from target group $TARGET_GROUP_ARN"
             aws elbv2 deregister-targets --target-group-arn "$TARGET_GROUP_ARN" --targets Id="$INSTANCE_ID"
 
             # 기존 애플리케이션 종료
             if screen -list | grep -q "\bbe\b"; then screen -S be -X quit; fi
+
+            # S3에서 새로운 JAR 파일 다운로드
+            echo "Downloading JAR file from S3"
+            aws s3 cp s3://$S3_BUCKET_NAME/backend-server.jar /home/ubuntu/backend-server.jar
 
             # 새로운 애플리케이션 실행
             echo "Starting new application instance"
