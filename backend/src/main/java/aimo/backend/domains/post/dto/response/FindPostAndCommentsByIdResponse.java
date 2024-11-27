@@ -2,7 +2,6 @@ package aimo.backend.domains.post.dto.response;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -10,7 +9,6 @@ import aimo.backend.domains.comment.entity.ChildComment;
 import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.post.entity.Post;
-import aimo.backend.domains.vote.model.Side;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -35,21 +33,17 @@ public class FindPostAndCommentsByIdResponse {
 	private final LocalDateTime createdAt;
 	private final List<ParentCommentDto> comments;
 
-	public static FindPostAndCommentsByIdResponse from(Member member, Post post, List<ParentComment> parentComments, boolean postLikeExists) {
+	public static FindPostAndCommentsByIdResponse of(Member member, Post post, List<ParentComment> parentComments, boolean postLikeExists, String side, Integer commentsCount) {
 		return new FindPostAndCommentsByIdResponse(
 			post.getMember() == member,
 			postLikeExists,
-			post.getVotes().stream()
-				.filter(vote -> vote.getMember() == member)
-				.findFirst()
-				.map(vote -> vote.getSide().getValue())
-				.orElse(Side.NONE.getValue()),
+			side,
 			post.getTitle(),
 			post.getMember().getNickname(),
 			post.getSummaryAi(),
 			post.getPostLikesCount(),
 			post.getPostViewsCount(),
-			post.getCommentsCount(),
+			commentsCount,
 			post.getVotesCount(),
 			post.getPlaintiffVotesCount(),
 			post.getDefendantVotesCount(),

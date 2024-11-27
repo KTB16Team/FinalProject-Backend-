@@ -97,18 +97,13 @@ public class Post extends BaseEntity {
 	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY, orphanRemoval = true, cascade = {CascadeType.REMOVE})
 	private List<Vote> votes = new ArrayList<>();
 
+	// 편의 메서드
 	public void setMember(Member member) {
 		this.member = member;
 		member.getPosts().add(this);
 	}
 
-	public Integer getCommentsCount() {
-		return parentComments
-			.stream()
-			.map(parentComment -> 1 + parentComment.getChildCommentsCount())
-			.reduce(0, Integer::sum);
-	}
-
+	// 본문 미리보기
 	public String getPreview(){
 		return summaryAi.length() > PREVIEW_LENGTH.getValue() ?
 			summaryAi.substring(0, PREVIEW_LENGTH.getValue()) + "..." : summaryAi;
@@ -119,6 +114,7 @@ public class Post extends BaseEntity {
 		this.privatePostId = null;
 	}
 
+	// 원고 투표수 조회
 	public Integer getPlaintiffVotesCount() {
 		return votes.stream()
 			.filter(vote -> vote.getSide() == Side.PLAINTIFF)
@@ -126,6 +122,7 @@ public class Post extends BaseEntity {
 			.sum();
 	}
 
+	// 피고 투표수 조회
 	public Integer getDefendantVotesCount() {
 		return votes.stream()
 			.filter(vote -> vote.getSide() == Side.DEFENDANT)
@@ -145,6 +142,10 @@ public class Post extends BaseEntity {
 
 	// 좋아요 수 감소
 	public void decreasePostLikesCount() {
+		if (postLikesCount == 0) {
+			return;
+		}
+
 		this.postLikesCount--;
 	}
 

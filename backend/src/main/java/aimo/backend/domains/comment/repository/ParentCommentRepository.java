@@ -17,4 +17,6 @@ public interface ParentCommentRepository extends JpaRepository<ParentComment, Lo
 
 	@Query("SELECT DISTINCT p FROM ParentComment p JOIN FETCH p.childComments WHERE p.post.id = :postId")
 	List<ParentComment> findAllByPost_IdWithChildComments(Long postId);
+
+	Integer countByPost_Id(Long postId);
 }

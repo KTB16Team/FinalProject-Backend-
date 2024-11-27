@@ -20,31 +20,7 @@ public record FindPostsByPostTypeResponse(
 		LocalDateTime createdAt
 ) {
 
-	public static FindPostsByPostTypeResponse of(
-		Long id,
-		String title,
-		String contentPreview,
-		Integer likesCount,
-		Integer viewsCount,
-		Integer commentsCount,
-		Float voteRatePlaintiff,
-		Float voteRateDefendant,
-		LocalDateTime createdAt
-	) {
-		return new FindPostsByPostTypeResponse(
-			id,
-			title,
-			contentPreview,
-			likesCount,
-			viewsCount,
-			commentsCount,
-			voteRatePlaintiff,
-			voteRateDefendant,
-			createdAt
-		);
-	}
-
-	public static FindPostsByPostTypeResponse from(FindCommentedPostsByIdRequest request) {
+	public static FindPostsByPostTypeResponse of(FindCommentedPostsByIdRequest request) {
 		return new FindPostsByPostTypeResponse(
 			request.postId(),
 			request.title(),
@@ -57,7 +33,8 @@ public record FindPostsByPostTypeResponse(
 			request.createdAt()
 		);
 	}
-	public static FindPostsByPostTypeResponse from(Post post) {
+
+	public static FindPostsByPostTypeResponse of(Post post, Integer commentsCount) {
 		final Float plaintiffVotesCount = (float)post.getPlaintiffVotesCount();
 		final Float defendantVotesCount = (float)post.getDefendantVotesCount();
 		final Float votesCount = (float)post.getVotesCount();
@@ -76,7 +53,7 @@ public record FindPostsByPostTypeResponse(
 			post.getPreview(),
 			post.getPostLikesCount(),
 			post.getPostViewsCount(),
-			post.getCommentsCount(),
+			commentsCount,
 			voteRatePlaintiff,
 			voteRateDefendant,
 			post.getCreatedAt()
