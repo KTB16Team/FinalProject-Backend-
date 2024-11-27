@@ -116,13 +116,13 @@ jobs:
             # 애플리케이션 시작 대기
             sleep 30
 
-            # 대상 그룹에 인스턴스 등록
-            echo "Registering instance $INSTANCE_ID to target group $TARGET_GROUP_ARN"
-            aws elbv2 register-targets --target-group-arn "$TARGET_GROUP_ARN" --targets Id="$INSTANCE_ID"
+            # 대상 그룹에 인스턴스 등록 (포트 8080 사용)
+            echo "Registering instance $INSTANCE_ID to target group $TARGET_GROUP_ARN using port 8080"
+            aws elbv2 register-targets --target-group-arn "$TARGET_GROUP_ARN" --targets Id="$INSTANCE_ID",Port=8080
 
             # 인스턴스가 정상 상태가 될 때까지 대기
             echo "Waiting for instance $INSTANCE_ID to be in service in target group $TARGET_GROUP_ARN"
-            aws elbv2 wait target-in-service --target-group-arn "$TARGET_GROUP_ARN" --targets Id="$INSTANCE_ID"
+            aws elbv2 wait target-in-service --target-group-arn "$TARGET_GROUP_ARN" --targets Id="$INSTANCE_ID",Port=8080
 
       # EC2_HOST_2에서 배포 및 대상 그룹 관리
       - name: Deploy to EC2_HOST_2
@@ -158,10 +158,10 @@ jobs:
             # 애플리케이션 시작 대기
             sleep 30
 
-            # 대상 그룹에 인스턴스 등록
-            echo "Registering instance $INSTANCE_ID to target group $TARGET_GROUP_ARN"
-            aws elbv2 register-targets --target-group-arn "$TARGET_GROUP_ARN" --targets Id="$INSTANCE_ID"
+            # 대상 그룹에 인스턴스 등록 (포트 8080 사용)
+            echo "Registering instance $INSTANCE_ID to target group $TARGET_GROUP_ARN using port 8080"
+            aws elbv2 register-targets --target-group-arn "$TARGET_GROUP_ARN" --targets Id="$INSTANCE_ID",Port=8080
 
             # 인스턴스가 정상 상태가 될 때까지 대기
             echo "Waiting for instance $INSTANCE_ID to be in service in target group $TARGET_GROUP_ARN"
-            aws elbv2 wait target-in-service --target-group-arn "$TARGET_GROUP_ARN" --targets Id="$INSTANCE_ID"
+            aws elbv2 wait target-in-service --target-group-arn "$TARGET_GROUP_ARN" --targets Id="$INSTANCE_ID",Port=8080
