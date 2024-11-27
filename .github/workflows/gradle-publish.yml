@@ -35,7 +35,6 @@ jobs:
           mkdir -p src/main/resources/
           echo "${{ secrets.APPLICATION_DEFAULT }}" > src/main/resources/application.yml
           echo "${{ secrets.APPLICATION_DEV }}" > src/main/resources/application-dev.yml
-          echo "${{ secrets.APPLICATION_LOCAL }}" > src/main/resources/application-local.yml
 
       # 3. Gradle 실행 권한 설정
       - name: Grant execute permission to gradlew
