@@ -40,3 +40,4 @@ backend/src/main/resources/application.yml
 .vscode/
 
 ### log ###
+log/*
