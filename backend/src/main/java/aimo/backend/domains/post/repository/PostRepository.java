@@ -2,7 +2,6 @@ package aimo.backend.domains.post.repository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,9 +12,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
 	Page<Post> findAllByMember_Id(Long memberId, Pageable pageable);
 
-	@EntityGraph(attributePaths = { "votes", "parentComments", "childComments" })
 	Page<Post> findAllByOrderByIdDesc(Pageable pageable);
-
 
 	Page<Post> findAllByOrderByPostViewsCountDesc(Pageable pageable);
 
