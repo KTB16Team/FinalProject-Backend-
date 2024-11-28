@@ -1,7 +1,10 @@
 package aimo.backend.domains.comment.controller;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -16,6 +19,7 @@ import aimo.backend.domains.comment.dto.parameter.SaveParentCommentParameter;
 import aimo.backend.domains.comment.dto.parameter.UpdateParentCommentParameter;
 import aimo.backend.domains.comment.dto.request.SaveParentCommentRequest;
 import aimo.backend.domains.comment.dto.request.UpdateParentCommentRequest;
+import aimo.backend.domains.comment.dto.response.FindCommentsResponse;
 import aimo.backend.domains.comment.service.ParentCommentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -68,5 +72,14 @@ public class ParentCommentController {
 		parentCommentService.validateAndDeleteParentComment(parameter);
 
 		return ResponseEntity.ok(DataResponse.ok());
+	}
+
+	@GetMapping("/{postId}/comments")
+	public ResponseEntity<DataResponse<List<FindCommentsResponse>>> findComments(
+		@PathVariable("postId") Long postId
+	) {
+		Long memberId = MemberLoader.getMemberId();
+
+		return ResponseEntity.ok(DataResponse.from(parentCommentService.findComments(memberId, postId)));
 	}
 }

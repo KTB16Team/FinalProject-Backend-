@@ -9,7 +9,6 @@ import aimo.backend.domains.comment.entity.ChildComment;
 import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.post.entity.Post;
-import aimo.backend.domains.vote.model.Side;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -34,22 +33,17 @@ public class FindPostAndCommentsByIdResponse {
 	private final LocalDateTime createdAt;
 	private final List<ParentCommentDto> comments;
 
-	public static FindPostAndCommentsByIdResponse from(Member member, Post post, List<ParentComment> parentComments) {
+	public static FindPostAndCommentsByIdResponse of(Member member, Post post, List<ParentComment> parentComments, boolean postLikeExists, String side, Integer commentsCount) {
 		return new FindPostAndCommentsByIdResponse(
 			post.getMember() == member,
-			post.getPostLikes().stream()
-				.anyMatch(postLike -> postLike.getMember() == member),
-			post.getVotes().stream()
-				.filter(vote -> vote.getMember() == member)
-				.findFirst()
-				.map(vote -> vote.getSide().getValue())
-				.orElse(Side.NONE.getValue()),
+			postLikeExists,
+			side,
 			post.getTitle(),
 			post.getMember().getNickname(),
 			post.getSummaryAi(),
 			post.getPostLikesCount(),
 			post.getPostViewsCount(),
-			post.getCommentsCount(),
+			commentsCount,
 			post.getVotesCount(),
 			post.getPlaintiffVotesCount(),
 			post.getDefendantVotesCount(),

@@ -1,13 +1,12 @@
 package aimo.backend.domains.like.entity;
 
+import static jakarta.persistence.GenerationType.*;
 import static lombok.AccessLevel.*;
 
-import aimo.backend.domains.member.entity.Member;
-import aimo.backend.domains.post.entity.Post;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.Builder;
@@ -22,19 +21,20 @@ import lombok.NoArgsConstructor;
 		@UniqueConstraint(columnNames = {"post_id", "member_id"})
 	})
 @NoArgsConstructor(access = PROTECTED)
-public class PostLike extends Like {
+public class PostLike {
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "post_id")
-	private Post post;
+	@Id
+	@GeneratedValue(strategy = IDENTITY)
+	@Column(name = "like_id")
+	private Long id;
+
+	private Long postId;
+
+	private Long memberId;
 
 	@Builder
-	private PostLike(Post post, Member member) {
-		super(member);
-		this.post = post;
-	}
-
-	public static PostLike from(Member member, Post post) {
-		return PostLike.builder().member(member).post(post).build();
+	private PostLike (Long postId, Long memberId) {
+		this.postId = postId;
+		this.memberId = memberId;
 	}
 }

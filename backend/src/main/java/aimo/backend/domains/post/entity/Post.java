@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import org.hibernate.annotations.BatchSize;
+
 import aimo.backend.common.entity.BaseEntity;
 import aimo.backend.domains.comment.entity.ChildComment;
 import aimo.backend.domains.comment.entity.ParentComment;
@@ -16,10 +18,9 @@ import aimo.backend.domains.like.entity.PostLike;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.post.dto.parameter.SavePostParameter;
 import aimo.backend.domains.post.model.Category;
+import aimo.backend.domains.privatePost.model.OriginType;
 import aimo.backend.domains.vote.entity.Vote;
 import aimo.backend.domains.vote.model.Side;
-import aimo.backend.domains.privatePost.model.OriginType;
-import aimo.backend.domains.view.entity.PostView;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -52,9 +53,11 @@ public class Post extends BaseEntity {
 	private Member member;
 
 	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY, orphanRemoval = true, cascade = ALL)
+	@BatchSize(size = 10)
 	private List<ParentComment> parentComments = new ArrayList<>();
 
 	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY, orphanRemoval = true, cascade = ALL)
+	@BatchSize(size = 10)
 	private List<ChildComment> childComments = new ArrayList<>();
 
 	@JoinColumn(name = "origin_private_post_id")
@@ -78,8 +81,7 @@ public class Post extends BaseEntity {
 	@Column(nullable = false)
 	private Integer faultRateDefendant;
 
-	@Column(nullable = false)
-	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)	@Enumerated(EnumType.STRING)
 	private OriginType originType;
 
 	@Column(nullable = false, length = 2500)
@@ -89,35 +91,23 @@ public class Post extends BaseEntity {
 	@Column(nullable = false, columnDefinition = "VARCHAR(100) DEFAULT 'COMMON'")
 	private Category category;
 
-	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY, orphanRemoval = true, cascade = {CascadeType.REMOVE})
-	private List<PostLike> postLikes = new ArrayList<>();
+	@Column(columnDefinition = "INT DEFAULT 0")
+	private Integer postLikesCount = 0;
+
+	@Column(columnDefinition = "INT DEFAULT 0")
+	private Integer postViewsCount = 0;
 
 	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY, orphanRemoval = true, cascade = {CascadeType.REMOVE})
-	private List<PostView> postViews = new ArrayList<>();
-
-	@OneToMany(mappedBy = "post", fetch = FetchType.LAZY, orphanRemoval = true, cascade = {CascadeType.REMOVE})
+	@BatchSize(size = 10)
 	private List<Vote> votes = new ArrayList<>();
 
+	// 편의 메서드
 	public void setMember(Member member) {
 		this.member = member;
 		member.getPosts().add(this);
 	}
 
-	public Integer getPostLikesCount() {
-		return postLikes.size();
-	}
-
-	public Integer getPostViewsCount() {
-		return postViews.size();
-	}
-
-	public Integer getCommentsCount() {
-		return parentComments
-			.stream()
-			.map(parentComment -> 1 + parentComment.getChildCommentsCount())
-			.reduce(0, Integer::sum);
-	}
-
+	// 본문 미리보기
 	public String getPreview(){
 		return summaryAi.length() > PREVIEW_LENGTH.getValue() ?
 			summaryAi.substring(0, PREVIEW_LENGTH.getValue()) + "..." : summaryAi;
@@ -128,6 +118,7 @@ public class Post extends BaseEntity {
 		this.privatePostId = null;
 	}
 
+	// 원고 투표수 조회
 	public Integer getPlaintiffVotesCount() {
 		return votes.stream()
 			.filter(vote -> vote.getSide() == Side.PLAINTIFF)
@@ -135,6 +126,7 @@ public class Post extends BaseEntity {
 			.sum();
 	}
 
+	// 피고 투표수 조회
 	public Integer getDefendantVotesCount() {
 		return votes.stream()
 			.filter(vote -> vote.getSide() == Side.DEFENDANT)
@@ -142,8 +134,33 @@ public class Post extends BaseEntity {
 			.sum();
 	}
 
+	// 투표 수 조회
 	public Integer getVotesCount() {
 		return votes.size();
+	}
+
+	// 댓글 수
+	public Integer getCommentsCount() {
+		return parentComments.size() + childComments.size();
+	}
+
+	// 좋아요 수 증가
+	public void increasePostLikesCount() {
+		this.postLikesCount++;
+	}
+
+	// 좋아요 수 감소
+	public void decreasePostLikesCount() {
+		if (postLikesCount == 0) {
+			return;
+		}
+
+		this.postLikesCount--;
+	}
+
+	// 조회 수 증가
+	public void increasePostViewsCount() {
+		this.postViewsCount++;
 	}
 
 	public static Post of(SavePostParameter parameter, Member member) {
@@ -163,7 +180,7 @@ public class Post extends BaseEntity {
 	}
 
 	@Builder
-	public Post(
+	private Post(
 		Long privatePostId,
 		Member member,
 		String title,
@@ -176,9 +193,8 @@ public class Post extends BaseEntity {
 		OriginType originType,
 		Category category,
 		List<PostLike> postLikes,
-		List<PostView> postViews,
-		List<Vote> votes) {
-
+		List<Vote> votes
+	) {
 		this.privatePostId = privatePostId;
 		this.member = member;
 		this.title = title;
@@ -190,8 +206,6 @@ public class Post extends BaseEntity {
 		this.faultRateDefendant = faultRateDefendant;
 		this.originType = originType;
 		this.category = category;
-		this.postLikes = postLikes;
-		this.postViews = postViews;
 		this.votes = votes;
 	}
 
