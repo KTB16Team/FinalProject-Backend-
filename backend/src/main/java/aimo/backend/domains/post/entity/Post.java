@@ -158,8 +158,8 @@ public class Post extends BaseEntity {
 	}
 
 	// 조회 수 증가
-	public void increasePostViewsCount() {
-		this.postViewsCount++;
+	public void addPostViewsCount(int addCount) {
+		this.postViewsCount+=addCount;
 	}
 
 	public static Post of(SavePostParameter parameter, Member member) {

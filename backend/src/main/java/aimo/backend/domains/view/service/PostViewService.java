@@ -2,6 +2,10 @@ package aimo.backend.domains.view.service;
 
 import static aimo.backend.common.exception.ErrorCode.*;
 
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +26,8 @@ public class PostViewService {
 
 	private final PostRepository postRepository;
 	private final PostViewRepository postViewRepository;
+	@Qualifier("postViewsCount")
+	private final Map<Long, AtomicInteger> postViewsCount;
 
 	@Transactional(rollbackFor = Exception.class)
 	public void increasePostViewBy(IncreasePostViewParameter parameter) {
@@ -38,7 +44,8 @@ public class PostViewService {
 				.postId(postId)
 				.memberId(memberId)
 				.build());
-			post.increasePostViewsCount();
+			postViewsCount.computeIfAbsent(postId, id -> new AtomicInteger(0))
+				.incrementAndGet();
 		}
 	}
 

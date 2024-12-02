@@ -21,6 +21,8 @@ public class SchedulerTasks {
 
 	@Qualifier("postLikesCount")
 	private final Map<Long, AtomicInteger> postLikesCount;
+	@Qualifier("postViewsCount")
+	private final Map<Long, AtomicInteger> postViewsCount;
 	private final PostRepository postRepository;
 
 	// 좋아요수 증가를 DB에 반영
@@ -32,6 +34,20 @@ public class SchedulerTasks {
 				.orElseThrow(() -> ApiException.from(POST_NOT_FOUND));
 
 			post.addPostLikesCount(count.get());
+
+			count.set(0); // 캐시 초기화
+		});
+	}
+
+	// 조회수 증가를 DB에 반영
+	@Scheduled(fixedRate = 60000) // 매 1분마다 캐시를 DB에 반영
+	@Transactional
+	public void persistPostViewsCount() {
+		postViewsCount.forEach((postId, count) -> {
+			Post post = postRepository.findById(postId)
+				.orElseThrow(() -> ApiException.from(POST_NOT_FOUND));
+
+			post.addPostViewsCount(count.get());
 
 			count.set(0); // 캐시 초기화
 		});
