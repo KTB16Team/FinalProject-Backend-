@@ -2,6 +2,10 @@ package aimo.backend.domains.like.service;
 
 import static aimo.backend.common.exception.ErrorCode.*;
 
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +27,9 @@ public class PostLikeService {
 	private final PostLikeRepository postLikeRepository;
 	private final PostRepository postRepository;
 	private final MemberRepository memberRepository;
+
+	@Qualifier("postLikesCount")
+	private final Map<Long, AtomicInteger> postLikesCount;
 
 	@Transactional(rollbackFor = Exception.class)
 	public void likePost(LikePostParameter parameter) {
@@ -50,13 +57,15 @@ public class PostLikeService {
 			postLikeRepository.save(postLike);
 
 			// 포스트 라이크 수 증가
-			post.increasePostLikesCount();
-			return ;
+			postLikesCount.computeIfAbsent(postId, id -> new AtomicInteger(0))
+				.incrementAndGet();
+			return;
 		}
 
 		// 라이크가 이미 존재하면 삭제
 		postLikeRepository.deleteByMemberIdAndPostId(memberId, postId);
-		post.decreasePostLikesCount();
+		postLikesCount.computeIfAbsent(postId, id -> new AtomicInteger(0))
+			.decrementAndGet();
 	}
 
 	// 글 존재 여부

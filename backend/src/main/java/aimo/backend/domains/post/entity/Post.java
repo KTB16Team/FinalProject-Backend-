@@ -144,18 +144,17 @@ public class Post extends BaseEntity {
 		return parentComments.size() + childComments.size();
 	}
 
-	// 좋아요 수 증가
-	public void increasePostLikesCount() {
-		this.postLikesCount++;
-	}
 
-	// 좋아요 수 감소
-	public void decreasePostLikesCount() {
-		if (postLikesCount == 0) {
+	// 좋아요 수 증가 or 감소
+	public void addPostLikesCount(int addCount) {
+		int result = this.postLikesCount + addCount;
+
+		if (result < 0) {
+			this.postLikesCount = 0;
 			return;
 		}
 
-		this.postLikesCount--;
+		this.postLikesCount = result;
 	}
 
 	// 조회 수 증가
