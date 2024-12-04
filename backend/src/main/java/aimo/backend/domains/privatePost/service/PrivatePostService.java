@@ -20,6 +20,8 @@ import aimo.backend.domains.privatePost.dto.parameter.FindPrivatePostParameter;
 import aimo.backend.domains.privatePost.dto.parameter.FindPrivatePostPreviewParameter;
 import aimo.backend.domains.privatePost.dto.parameter.JudgementParameter;
 import aimo.backend.domains.privatePost.dto.parameter.JudgementToAiParameter;
+import aimo.backend.domains.privatePost.dto.parameter.UpdatePostContentParameter;
+import aimo.backend.domains.privatePost.dto.request.UpdateContentToPrivatePostRequest;
 import aimo.backend.domains.privatePost.dto.response.JudgementResponse;
 import aimo.backend.domains.privatePost.dto.response.PrivatePostPreviewResponse;
 import aimo.backend.domains.privatePost.dto.response.PrivatePostResponse;
@@ -83,6 +85,32 @@ public class PrivatePostService {
 
 		SummaryAndJudgementRequest request = SummaryAndJudgementRequest.from(parameter, member);
 		messageQueueService.send(request);
+	}
+
+	// AI로부터 받은 콜백 응답을 기존에 저장했던 PrivatePost에 업데이트
+	@Transactional
+	public void updateContentToPrivatePost(UpdateContentToPrivatePostRequest request) {
+		Long privatePostId = request.id();
+		Integer faultRatePlaintiff = request.faultRate().intValue();
+		Integer faultRateDefendant = calculateFaultRateDefendant(request.faultRate());
+
+		UpdatePostContentParameter parameter = new UpdatePostContentParameter(
+			request.stancePlaintiff(),
+			request.stanceDefendant(),
+			request.title(),
+			request.summaryAi(),
+			request.judgement(),
+			faultRatePlaintiff,
+			faultRateDefendant
+		);
+
+		PrivatePost privatePost = privatePostRepository.findById(privatePostId)
+			.orElseThrow(() -> ApiException.from(ErrorCode.PRIVATE_POST_NOT_FOUND));
+		privatePost.updateContent(parameter);
+	}
+
+	private Integer calculateFaultRateDefendant(Float faultRate) {
+		return 100 - faultRate.intValue();
 	}
 
 	private JudgementResponse mapToJudgementResponse(JudgementFromAiResponse judgementFromAi, JudgementToAiParameter parameter) {

@@ -4,6 +4,7 @@ import static lombok.AccessLevel.*;
 
 import aimo.backend.common.entity.BaseEntity;
 import aimo.backend.domains.privatePost.dto.parameter.JudgementParameter;
+import aimo.backend.domains.privatePost.dto.parameter.UpdatePostContentParameter;
 import aimo.backend.domains.privatePost.model.ContentLength;
 import aimo.backend.domains.privatePost.model.OriginType;
 import aimo.backend.domains.member.entity.Member;
@@ -131,6 +132,16 @@ public class PrivatePost extends BaseEntity {
 			.originType(originType)
 			.published(false)
 			.build();
+	}
+
+	public void updateContent(UpdatePostContentParameter parameter) {
+		this.stancePlaintiff = parameter.stancePlaintiff();
+		this.stanceDefendant = parameter.stanceDefendant();
+		this.title = parameter.title();
+		this.summaryAi = parameter.summaryAi();
+		this.judgement = parameter.judgement();
+		this.faultRatePlaintiff = parameter.faultRatePlaintiff();
+		this.faultRateDefendant = parameter.faultRateDefendant();
 	}
 
 

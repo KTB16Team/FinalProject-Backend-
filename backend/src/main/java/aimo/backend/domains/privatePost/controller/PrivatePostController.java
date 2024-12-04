@@ -23,6 +23,7 @@ import aimo.backend.domains.privatePost.dto.parameter.FindPrivatePostParameter;
 import aimo.backend.domains.privatePost.dto.parameter.FindPrivatePostPreviewParameter;
 import aimo.backend.domains.privatePost.dto.parameter.SpeechToTextParameter;
 import aimo.backend.domains.privatePost.dto.parameter.JudgementToAiParameter;
+import aimo.backend.domains.privatePost.dto.request.UpdateContentToPrivatePostRequest;
 import aimo.backend.domains.privatePost.dto.response.PrivatePostPreviewResponse;
 import aimo.backend.domains.privatePost.dto.response.PrivatePostResponse;
 import aimo.backend.domains.privatePost.dto.request.SaveAudioSuccessRequest;
@@ -87,6 +88,18 @@ public class PrivatePostController {
 
 		return ResponseEntity.ok(DataResponse.ok());
 	}
+
+	// AI로부터의 판결문 요청 콜백
+	@PostMapping("/judgement/callback")
+	public ResponseEntity<DataResponse<Void>> updateContentToPrivatePost(
+		@Valid @RequestBody UpdateContentToPrivatePostRequest request
+	) {
+		privatePostService.updateContentToPrivatePost(request);
+
+		return ResponseEntity.ok(DataResponse.ok());
+	}
+
+
 
 	// @PostMapping("/chat")
 	// public ResponseEntity<DataResponse<SavePrivatePostResponse>> uploadChatRecord(
