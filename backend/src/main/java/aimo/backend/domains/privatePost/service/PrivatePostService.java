@@ -41,36 +41,7 @@ public class PrivatePostService {
 
 	private final PrivatePostRepository privatePostRepository;
 	private final MemberRepository memberRepository;
-	private final AiServerProperties aiServerProperties;
-	private final ExternalApiService externalApiService;
 	private final MessageQueueService messageQueueService;
-
-	@Transactional
-	public Long uploadTextRecordAndRequestJudgement(JudgementToAiParameter parameter) {
-		Long memberId = parameter.memberId();
-		Member member = memberRepository.findById(memberId)
-			.orElseThrow(() -> ApiException.from(ErrorCode.MEMBER_NOT_FOUND));
-
-		JudgementResponse judgementResponse = requestJudgementToAi(parameter, member);
-		JudgementParameter judgementParameter = JudgementParameter.from(memberId, judgementResponse);
-		TextRecord textRecord = TextRecord.of(parameter.content());
-		PrivatePost privatePost = PrivatePost.from(judgementParameter, member, textRecord);
-
-		return privatePostRepository.save(privatePost).getId();
-	}
-
-	// AI 서버에 판단 요청
-	private JudgementResponse requestJudgementToAi(JudgementToAiParameter parameter, Member member) {
-		String url = aiServerProperties.getDomainUrl() + aiServerProperties.getJudgementApi();
-
-		SummaryAndJudgementRequest summaryAndJudgementRequest =
-			SummaryAndJudgementRequest.from(parameter, member);
-
-		return externalApiService
-			.post(url, summaryAndJudgementRequest, JudgementFromAiResponse.class)
-			.map(judgementFromAi -> mapToJudgementResponse(judgementFromAi, parameter))
-			.block();
-	}
 
 	// mq에 판단 요청
 	@Async
@@ -79,11 +50,16 @@ public class PrivatePostService {
 		Member member = memberRepository.findById(parameter.memberId())
 			.orElseThrow(() -> ApiException.from(ErrorCode.MEMBER_NOT_FOUND));
 
+		// db에 저장
 		TextRecord textRecord = TextRecord.of(parameter.content());
 		PrivatePost privatePost = PrivatePost.createWithoutContent(member, textRecord, parameter.originType());
 		privatePostRepository.save(privatePost);
 
-		SummaryAndJudgementRequest request = SummaryAndJudgementRequest.from(parameter, member);
+		// mq에 요청
+		SummaryAndJudgementRequest request = SummaryAndJudgementRequest.from(
+			privatePost.getId(),
+			parameter.content(),
+			member);
 		messageQueueService.send(request);
 	}
 

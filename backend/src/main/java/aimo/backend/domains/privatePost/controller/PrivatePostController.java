@@ -55,25 +55,7 @@ public class PrivatePostController {
 	private final PrivatePostService privatePostService;
 	private final S3Service s3Service;
 
-	// 대화록 업로드 + 판결
 	@PostMapping("/judgement/text")
-	public ResponseEntity<DataResponse<SavePrivatePostResponse>> uploadTextRecordAndRequestJudgement(
-		@Valid @RequestBody UploadTextRecordAndRequestJudgementRequest request
-	) {
-		Long memberId = MemberLoader.getMemberId();
-
-		JudgementToAiParameter judgementToAiParameter = JudgementToAiParameter.of(
-			memberId,
-			request.content(),
-			OriginType.TEXT);
-
-		Long privatePostId = privatePostService.uploadTextRecordAndRequestJudgement(judgementToAiParameter);
-
-		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(DataResponse.created(SavePrivatePostResponse.of(privatePostId)));
-	}
-
-	@PostMapping("/judgement/text/v2")
 	public ResponseEntity<DataResponse<Void>> uploadTextRecordAndJudgementV2(
 		@Valid @RequestBody UploadTextRecordAndRequestJudgementRequest uploadTextRecordAndRequestJudgementRequest
 	) {
@@ -98,8 +80,6 @@ public class PrivatePostController {
 
 		return ResponseEntity.ok(DataResponse.ok());
 	}
-
-
 
 	// @PostMapping("/chat")
 	// public ResponseEntity<DataResponse<SavePrivatePostResponse>> uploadChatRecord(
