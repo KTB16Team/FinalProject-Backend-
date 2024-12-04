@@ -8,6 +8,7 @@ import aimo.backend.common.properties.CorsProperties;
 import aimo.backend.common.properties.FrontProperties;
 import aimo.backend.common.properties.JwtProperties;
 import aimo.backend.common.properties.MailProperties;
+import aimo.backend.common.properties.RabbitMqProperties;
 import aimo.backend.common.properties.RedisProperties;
 import aimo.backend.common.properties.S3Properties;
 import aimo.backend.common.properties.SecurityProperties;
@@ -21,7 +22,8 @@ import aimo.backend.common.properties.SecurityProperties;
 	S3Properties.class,
 	MailProperties.class,
 	FrontProperties.class,
-	RedisProperties.class
+	RedisProperties.class,
+	RabbitMqProperties.class
 })
 public class PropertiesConfig {
 }

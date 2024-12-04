@@ -71,6 +71,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     //health check
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    //rabbitmq
+    implementation 'org.springframework.boot:spring-boot-starter-amqp'
 }
 
 tasks.named('test') {
