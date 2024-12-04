@@ -39,19 +39,18 @@ public class PrivatePost extends BaseEntity {
 	@JoinColumn(name = "member_id", nullable = false)
 	private Member member;
 
-	@Column(name = "stance_plaintiff", nullable = false, length = 2500)
+	@Column(name = "stance_plaintiff", length = 2500)
 	private String stancePlaintiff;
 
-	@Column(name = "stance_defendant", nullable = false, length = 2500)
+	@Column(name = "stance_defendant", length = 2500)
 	private String stanceDefendant;
 
-	@Column(nullable = false)
 	private String title;
 
-	@Column(name = "summary_ai", nullable = false, length = 2500)
+	@Column(name = "summary_ai", length = 2500)
 	private String summaryAi;
 
-	@Column(nullable = false, length = 2500)
+	@Column(length = 2500)
 	private String judgement;
 
 	@OneToOne(fetch = FetchType.LAZY)
@@ -71,43 +70,12 @@ public class PrivatePost extends BaseEntity {
 	@Column(nullable = false)
 	private OriginType originType;
 
-	@Column(nullable = false)
 	private Integer faultRatePlaintiff;
 
-	@Column(nullable = false)
 	private Integer faultRateDefendant;
 
 	@Column(nullable = false)
 	private Boolean published;
-
-	public void publish() {
-		this.published = true;
-	}
-
-	public void unpublish() {
-		this.published = false;
-	}
-
-	public String getPreview() {
-		return summaryAi.length() > ContentLength.PREVIEW_LENGTH.getValue() ?
-			summaryAi.substring(0, ContentLength.PREVIEW_LENGTH.getValue()) + "..." : summaryAi;
-	}
-
-	public static PrivatePost from(JudgementParameter parameter, Member member, TextRecord textRecord) {
-		return PrivatePost.builder()
-			.title(parameter.title())
-			.member(member)
-			.stancePlaintiff(parameter.stancePlaintiff())
-			.stanceDefendant(parameter.stanceDefendant())
-			.summaryAi(parameter.summary())
-			.judgement(parameter.judgement())
-			.originType(parameter.originType())
-			.faultRatePlaintiff(parameter.faultRatePlaintiff())
-			.faultRateDefendant(parameter.faultRateDefendant())
-			.textRecord(textRecord)
-			.published(false)
-			.build();
-	}
 
 	@Builder
 	private PrivatePost(
@@ -138,5 +106,45 @@ public class PrivatePost extends BaseEntity {
 		this.faultRatePlaintiff = faultRatePlaintiff;
 		this.faultRateDefendant = faultRateDefendant;
 		this.published = published;
+	}
+
+	public static PrivatePost from(JudgementParameter parameter, Member member, TextRecord textRecord) {
+		return PrivatePost.builder()
+			.title(parameter.title())
+			.member(member)
+			.stancePlaintiff(parameter.stancePlaintiff())
+			.stanceDefendant(parameter.stanceDefendant())
+			.summaryAi(parameter.summary())
+			.judgement(parameter.judgement())
+			.originType(parameter.originType())
+			.faultRatePlaintiff(parameter.faultRatePlaintiff())
+			.faultRateDefendant(parameter.faultRateDefendant())
+			.textRecord(textRecord)
+			.published(false)
+			.build();
+	}
+
+	public static PrivatePost createWithoutContent(Member member, TextRecord textRecord, OriginType originType) {
+		return PrivatePost.builder()
+			.member(member)
+			.textRecord(textRecord)
+			.originType(originType)
+			.published(false)
+			.build();
+	}
+
+
+
+	public void publish() {
+		this.published = true;
+	}
+
+	public void unpublish() {
+		this.published = false;
+	}
+
+	public String getPreview() {
+		return summaryAi.length() > ContentLength.PREVIEW_LENGTH.getValue() ?
+			summaryAi.substring(0, ContentLength.PREVIEW_LENGTH.getValue()) + "..." : summaryAi;
 	}
 }

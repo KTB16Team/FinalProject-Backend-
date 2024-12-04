@@ -1,4 +1,4 @@
-package aimo.backend.domains.privatePost.service;
+package aimo.backend.domains.privatePost.dto.parameter;
 
 import aimo.backend.domains.privatePost.dto.request.SaveAudioSuccessRequest;
 

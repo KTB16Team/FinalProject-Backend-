@@ -4,7 +4,7 @@ import static jakarta.persistence.GenerationType.*;
 import static lombok.AccessLevel.*;
 
 import aimo.backend.common.entity.BaseEntity;
-import aimo.backend.domains.privatePost.service.SaveAudioSuccessParameter;
+import aimo.backend.domains.privatePost.dto.parameter.SaveAudioSuccessParameter;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

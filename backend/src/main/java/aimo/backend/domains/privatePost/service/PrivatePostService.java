@@ -3,12 +3,14 @@ package aimo.backend.domains.privatePost.service;
 import static aimo.backend.common.exception.ErrorCode.*;
 
 import org.springframework.data.domain.Page;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.exception.ErrorCode;
+import aimo.backend.common.messageQueue.MessageQueueService;
 import aimo.backend.common.properties.AiServerProperties;
 import aimo.backend.common.service.ExternalApiService;
 import aimo.backend.domains.member.entity.Member;
@@ -39,14 +41,15 @@ public class PrivatePostService {
 	private final MemberRepository memberRepository;
 	private final AiServerProperties aiServerProperties;
 	private final ExternalApiService externalApiService;
+	private final MessageQueueService messageQueueService;
 
 	@Transactional
-	public Long serveTextRecordToAi(JudgementToAiParameter parameter) {
+	public Long uploadTextRecordAndRequestJudgement(JudgementToAiParameter parameter) {
 		Long memberId = parameter.memberId();
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> ApiException.from(ErrorCode.MEMBER_NOT_FOUND));
 
-		JudgementResponse judgementResponse = serveContentToAi(parameter, member);
+		JudgementResponse judgementResponse = requestJudgementToAi(parameter, member);
 		JudgementParameter judgementParameter = JudgementParameter.from(memberId, judgementResponse);
 		TextRecord textRecord = TextRecord.of(parameter.content());
 		PrivatePost privatePost = PrivatePost.from(judgementParameter, member, textRecord);
@@ -55,7 +58,7 @@ public class PrivatePostService {
 	}
 
 	// AI 서버에 판단 요청
-	public JudgementResponse serveContentToAi(JudgementToAiParameter parameter, Member member) {
+	private JudgementResponse requestJudgementToAi(JudgementToAiParameter parameter, Member member) {
 		String url = aiServerProperties.getDomainUrl() + aiServerProperties.getJudgementApi();
 
 		SummaryAndJudgementRequest summaryAndJudgementRequest =
@@ -65,6 +68,21 @@ public class PrivatePostService {
 			.post(url, summaryAndJudgementRequest, JudgementFromAiResponse.class)
 			.map(judgementFromAi -> mapToJudgementResponse(judgementFromAi, parameter))
 			.block();
+	}
+
+	// mq에 판단 요청
+	@Async
+	@Transactional
+	public void uploadTextRecordAndRequestJudgementV2(JudgementToAiParameter parameter) {
+		Member member = memberRepository.findById(parameter.memberId())
+			.orElseThrow(() -> ApiException.from(ErrorCode.MEMBER_NOT_FOUND));
+
+		TextRecord textRecord = TextRecord.of(parameter.content());
+		PrivatePost privatePost = PrivatePost.createWithoutContent(member, textRecord, parameter.originType());
+		privatePostRepository.save(privatePost);
+
+		SummaryAndJudgementRequest request = SummaryAndJudgementRequest.from(parameter, member);
+		messageQueueService.send(request);
 	}
 
 	private JudgementResponse mapToJudgementResponse(JudgementFromAiResponse judgementFromAi, JudgementToAiParameter parameter) {

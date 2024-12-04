@@ -31,12 +31,12 @@ import aimo.backend.domains.privatePost.dto.request.SpeechToTextRequest;
 import aimo.backend.domains.privatePost.dto.response.SavePrivatePostResponse;
 import aimo.backend.domains.privatePost.dto.response.SpeechToTextResponse;
 
-import aimo.backend.domains.privatePost.dto.request.TextRecordRequest;
+import aimo.backend.domains.privatePost.dto.request.UploadTextRecordAndRequestJudgementRequest;
 import aimo.backend.domains.privatePost.model.OriginType;
 import aimo.backend.domains.privatePost.service.AudioRecordService;
 import aimo.backend.domains.privatePost.service.PrivatePostService;
 
-import aimo.backend.domains.privatePost.service.SaveAudioSuccessParameter;
+import aimo.backend.domains.privatePost.dto.parameter.SaveAudioSuccessParameter;
 import aimo.backend.infrastructure.s3.S3Service;
 import aimo.backend.infrastructure.s3.dto.request.CreatePresignedUrlRequest;
 import aimo.backend.infrastructure.s3.dto.response.CreatePresignedUrlResponse;
@@ -56,20 +56,36 @@ public class PrivatePostController {
 
 	// 대화록 업로드 + 판결
 	@PostMapping("/judgement/text")
-	public ResponseEntity<DataResponse<SavePrivatePostResponse>> uploadTextRecordAndJudgement(
-		@Valid @RequestBody TextRecordRequest textRecordRequest
+	public ResponseEntity<DataResponse<SavePrivatePostResponse>> uploadTextRecordAndRequestJudgement(
+		@Valid @RequestBody UploadTextRecordAndRequestJudgementRequest request
 	) {
 		Long memberId = MemberLoader.getMemberId();
 
 		JudgementToAiParameter judgementToAiParameter = JudgementToAiParameter.of(
 			memberId,
-			textRecordRequest.content(),
+			request.content(),
 			OriginType.TEXT);
 
-		Long privatePostId = privatePostService.serveTextRecordToAi(judgementToAiParameter);
+		Long privatePostId = privatePostService.uploadTextRecordAndRequestJudgement(judgementToAiParameter);
 
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(DataResponse.created(SavePrivatePostResponse.of(privatePostId)));
+	}
+
+	@PostMapping("/judgement/text/v2")
+	public ResponseEntity<DataResponse<Void>> uploadTextRecordAndJudgementV2(
+		@Valid @RequestBody UploadTextRecordAndRequestJudgementRequest uploadTextRecordAndRequestJudgementRequest
+	) {
+		Long memberId = MemberLoader.getMemberId();
+
+		JudgementToAiParameter judgementToAiParameter = JudgementToAiParameter.of(
+			memberId,
+			uploadTextRecordAndRequestJudgementRequest.content(),
+			OriginType.TEXT);
+
+		privatePostService.uploadTextRecordAndRequestJudgementV2(judgementToAiParameter);
+
+		return ResponseEntity.ok(DataResponse.ok());
 	}
 
 	// @PostMapping("/chat")
