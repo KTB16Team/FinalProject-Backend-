@@ -29,7 +29,6 @@ import aimo.backend.domains.privatePost.dto.response.PrivatePostResponse;
 import aimo.backend.domains.privatePost.dto.request.SaveAudioSuccessRequest;
 import aimo.backend.domains.privatePost.dto.response.SaveAudioSuccessResponse;
 import aimo.backend.domains.privatePost.dto.request.SpeechToTextRequest;
-import aimo.backend.domains.privatePost.dto.response.SavePrivatePostResponse;
 import aimo.backend.domains.privatePost.dto.response.SpeechToTextResponse;
 
 import aimo.backend.domains.privatePost.dto.request.UploadTextRecordAndRequestJudgementRequest;
@@ -56,17 +55,17 @@ public class PrivatePostController {
 	private final S3Service s3Service;
 
 	@PostMapping("/judgement/text")
-	public ResponseEntity<DataResponse<Void>> uploadTextRecordAndJudgementV2(
-		@Valid @RequestBody UploadTextRecordAndRequestJudgementRequest uploadTextRecordAndRequestJudgementRequest
+	public ResponseEntity<DataResponse<Void>> uploadTextRecordAndJudgement(
+		@Valid @RequestBody UploadTextRecordAndRequestJudgementRequest request
 	) {
 		Long memberId = MemberLoader.getMemberId();
 
 		JudgementToAiParameter judgementToAiParameter = JudgementToAiParameter.of(
 			memberId,
-			uploadTextRecordAndRequestJudgementRequest.content(),
+			request.content(),
 			OriginType.TEXT);
 
-		privatePostService.uploadTextRecordAndRequestJudgementV2(judgementToAiParameter);
+		privatePostService.uploadTextRecordAndRequestJudgement(judgementToAiParameter);
 
 		return ResponseEntity.ok(DataResponse.ok());
 	}

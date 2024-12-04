@@ -2,6 +2,7 @@ package aimo.backend.domains.privatePost.service;
 
 import static aimo.backend.common.exception.ErrorCode.*;
 
+import org.springframework.amqp.AmqpException;
 import org.springframework.data.domain.Page;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -11,14 +12,11 @@ import org.springframework.transaction.annotation.Transactional;
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.exception.ErrorCode;
 import aimo.backend.common.messageQueue.MessageQueueService;
-import aimo.backend.common.properties.AiServerProperties;
-import aimo.backend.common.service.ExternalApiService;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.member.repository.MemberRepository;
 import aimo.backend.domains.privatePost.dto.parameter.DeletePrivatePostParameter;
 import aimo.backend.domains.privatePost.dto.parameter.FindPrivatePostParameter;
 import aimo.backend.domains.privatePost.dto.parameter.FindPrivatePostPreviewParameter;
-import aimo.backend.domains.privatePost.dto.parameter.JudgementParameter;
 import aimo.backend.domains.privatePost.dto.parameter.JudgementToAiParameter;
 import aimo.backend.domains.privatePost.dto.parameter.UpdatePostContentParameter;
 import aimo.backend.domains.privatePost.dto.request.UpdateContentToPrivatePostRequest;
@@ -45,8 +43,8 @@ public class PrivatePostService {
 
 	// mq에 판단 요청
 	@Async
-	@Transactional
-	public void uploadTextRecordAndRequestJudgementV2(JudgementToAiParameter parameter) {
+	@Transactional(rollbackFor = {ApiException.class, AmqpException.class})
+	public void uploadTextRecordAndRequestJudgement(JudgementToAiParameter parameter) {
 		Member member = memberRepository.findById(parameter.memberId())
 			.orElseThrow(() -> ApiException.from(ErrorCode.MEMBER_NOT_FOUND));
 
