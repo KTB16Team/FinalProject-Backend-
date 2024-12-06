@@ -6,11 +6,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import aimo.backend.common.exception.ApiException;
+import aimo.backend.domains.like.dto.parameter.LikePostParameter;
 import aimo.backend.domains.like.entity.PostLike;
 import aimo.backend.domains.like.model.LikeType;
 import aimo.backend.domains.like.repository.PostLikeRepository;
+import aimo.backend.domains.member.model.MemberPoint;
 import aimo.backend.domains.member.repository.MemberRepository;
-import aimo.backend.domains.like.dto.parameter.LikePostParameter;
+import aimo.backend.domains.member.service.MemberPointService;
 import aimo.backend.domains.post.entity.Post;
 import aimo.backend.domains.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,7 @@ public class PostLikeService {
 	private final PostLikeRepository postLikeRepository;
 	private final PostRepository postRepository;
 	private final MemberRepository memberRepository;
+	private final MemberPointService memberPointService;
 
 	@Transactional(rollbackFor = Exception.class)
 	public void likePost(LikePostParameter parameter) {
@@ -51,7 +54,9 @@ public class PostLikeService {
 
 			// 포스트 라이크 수 증가
 			post.increasePostLikesCount();
-			return ;
+			// 멤버 포인트 증가
+			memberPointService.increaseMemberPoint(memberId, MemberPoint.INCREASE_POINT_FROM_LIKE.getPoint());
+			return;
 		}
 
 		// 라이크가 이미 존재하면 삭제

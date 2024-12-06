@@ -14,7 +14,9 @@ import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.comment.repository.ChildCommentRepository;
 import aimo.backend.domains.comment.repository.ParentCommentRepository;
 import aimo.backend.domains.member.entity.Member;
+import aimo.backend.domains.member.model.MemberPoint;
 import aimo.backend.domains.member.repository.MemberRepository;
+import aimo.backend.domains.member.service.MemberPointService;
 import aimo.backend.domains.post.entity.Post;
 import aimo.backend.domains.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +31,7 @@ public class ChildCommentService {
 	private final PostRepository postRepository;
 	private final ParentCommentService parentCommentService;
 	private final ParentCommentRepository parentCommentRepository;
+	private final MemberPointService memberPointService;
 
 	//자식 댓글 권한 확인
 	private void validateChildCommentAuthority(Long memberId, Long childCommentId) {
@@ -56,6 +59,9 @@ public class ChildCommentService {
 
 		ChildComment childComment = ChildComment.of(content, member, parentComment, post);
 		childCommentRepository.save(childComment);
+
+		// 멤버 포인트 증가
+		memberPointService.increaseMemberPoint(member.getId(), MemberPoint.INCREASE_POINT_FROM_COMMENT.getPoint());
 	}
 
 	//자식 댓글 수정
