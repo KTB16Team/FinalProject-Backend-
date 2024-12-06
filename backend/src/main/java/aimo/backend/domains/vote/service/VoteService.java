@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.domains.member.entity.Member;
-import aimo.backend.domains.member.model.MemberPoint;
+import aimo.backend.domains.member.model.PointRule;
 import aimo.backend.domains.member.repository.MemberRepository;
 import aimo.backend.domains.member.service.MemberPointService;
 import aimo.backend.domains.post.entity.Post;
@@ -48,7 +48,7 @@ public class VoteService {
 
 					// 포인트 증가
 					memberPointService.increaseMemberPoint(member.getId(),
-						MemberPoint.INCREASE_POINT_FROM_VOTE.getPoint());
+						PointRule.INCREASE_POINT_FROM_VOTE.getPoint());
 				}
 			);
 	}

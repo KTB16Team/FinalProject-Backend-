@@ -13,7 +13,7 @@ import aimo.backend.domains.like.entity.ChildCommentLike;
 import aimo.backend.domains.like.model.LikeType;
 import aimo.backend.domains.like.repository.ChildCommentLikeRepository;
 import aimo.backend.domains.member.entity.Member;
-import aimo.backend.domains.member.model.MemberPoint;
+import aimo.backend.domains.member.model.PointRule;
 import aimo.backend.domains.member.repository.MemberRepository;
 import aimo.backend.domains.member.service.MemberPointService;
 import lombok.RequiredArgsConstructor;
@@ -46,7 +46,7 @@ public class ChildCommentLikeService {
 			// 좋아요 저장
 			childCommentLikeRepository.save(ChildCommentLike.from(member, childComment));
 			// 포인트 증가
-			memberPointService.increaseMemberPoint(memberId, MemberPoint.INCREASE_POINT_FROM_LIKE.getPoint());
+			memberPointService.increaseMemberPoint(memberId, PointRule.INCREASE_POINT_FROM_LIKE.getPoint());
 			return;
 		}
 

@@ -3,7 +3,7 @@ package aimo.backend.domains.member.model;
 import lombok.Getter;
 
 @Getter
-public enum MemberPoint {
+public enum PointRule {
 
 	INCREASE_POINT_FROM_LIKE(5),
 	INCREASE_POINT_FROM_COMMENT(5),
@@ -15,7 +15,7 @@ public enum MemberPoint {
 
 	private final int point;
 
-	MemberPoint(int point) {
+	PointRule(int point) {
 		this.point = point;
 	}
 }
