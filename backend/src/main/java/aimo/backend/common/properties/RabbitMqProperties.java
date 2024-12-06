@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@ConfigurationProperties(prefix = "rabbitmq")
+@ConfigurationProperties(prefix = "spring.rabbitmq")
 public class RabbitMqProperties {
 
 	private String port;
