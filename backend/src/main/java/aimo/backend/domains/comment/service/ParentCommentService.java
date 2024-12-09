@@ -15,7 +15,7 @@ import aimo.backend.domains.comment.dto.response.FindCommentsResponse;
 import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.comment.repository.ParentCommentRepository;
 import aimo.backend.domains.member.entity.Member;
-import aimo.backend.domains.member.model.PointRule;
+import aimo.backend.domains.member.model.IncreasePoint;
 import aimo.backend.domains.member.repository.MemberRepository;
 import aimo.backend.domains.member.service.MemberPointService;
 import aimo.backend.domains.post.entity.Post;
@@ -57,7 +57,7 @@ public class ParentCommentService {
 		parentCommentRepository.save(parentComment);
 
 		// 포인트 증가
-		memberPointService.increaseMemberPoint(memberId, PointRule.INCREASE_POINT_FROM_COMMENT.getPoint());
+		memberPointService.checkAndIncreaseMemberPoint(memberId, IncreasePoint.COMMENT);
 	}
 
 	// 부모 댓글 수정

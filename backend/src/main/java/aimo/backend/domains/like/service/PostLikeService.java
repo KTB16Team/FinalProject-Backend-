@@ -10,7 +10,7 @@ import aimo.backend.domains.like.dto.parameter.LikePostParameter;
 import aimo.backend.domains.like.entity.PostLike;
 import aimo.backend.domains.like.model.LikeType;
 import aimo.backend.domains.like.repository.PostLikeRepository;
-import aimo.backend.domains.member.model.PointRule;
+import aimo.backend.domains.member.model.IncreasePoint;
 import aimo.backend.domains.member.repository.MemberRepository;
 import aimo.backend.domains.member.service.MemberPointService;
 import aimo.backend.domains.post.entity.Post;
@@ -55,7 +55,7 @@ public class PostLikeService {
 			// 포스트 라이크 수 증가
 			post.increasePostLikesCount();
 			// 멤버 포인트 증가
-			memberPointService.increaseMemberPoint(memberId, PointRule.INCREASE_POINT_FROM_LIKE.getPoint());
+			memberPointService.checkAndIncreaseMemberPoint(memberId, IncreasePoint.LIKE);
 			return;
 		}
 
