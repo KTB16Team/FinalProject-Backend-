@@ -5,6 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.exception.ErrorCode;
+import aimo.backend.domains.member.dto.response.FindMemberPointResponse;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.member.entity.MemberAttemptCount;
 import aimo.backend.domains.member.model.IncreasePoint;
@@ -34,5 +35,11 @@ public class MemberPointService {
 		}
 
 		memberAttemptCountRepository.save(memberAttemptCount);
+	}
+
+	public FindMemberPointResponse findMemberPoint(Long memberId) {
+		Member member = memberRepository.findById(memberId)
+			.orElseThrow(() -> ApiException.from(ErrorCode.MEMBER_NOT_FOUND));
+		return new FindMemberPointResponse(member.getPoint());
 	}
 }
