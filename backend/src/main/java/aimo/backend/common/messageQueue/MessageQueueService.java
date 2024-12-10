@@ -10,8 +10,8 @@ import lombok.RequiredArgsConstructor;
 public class MessageQueueService {
 
 	private final RabbitTemplate rabbitTemplate;
-	private final String DIRECT_EXCHANGE_NAME = "direct_exchange"; // 추후 변경
-	private final String DIRECT_QUEUE_ROUTING_KEY = "direct_routing_key"; // 추후 변경
+	private final String DIRECT_EXCHANGE_NAME = "aiProcessingExchange"; // 추후 변경
+	private final String DIRECT_QUEUE_ROUTING_KEY = "ai.processing.key"; // 추후 변경
 
 	public void send(Object data) {
 		rabbitTemplate.convertAndSend(DIRECT_EXCHANGE_NAME,DIRECT_QUEUE_ROUTING_KEY,data);
