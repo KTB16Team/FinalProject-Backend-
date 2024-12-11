@@ -14,4 +14,12 @@ public class RabbitMqProperties {
 	private String host;
 	private String username;
 	private String password;
+
+	private Ssl ssl;
+
+	@Getter
+	@Setter
+	public static class Ssl {
+		private boolean enabled;
+	}
 }
