@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.hibernate.annotations.ColumnDefault;
 
 import aimo.backend.domains.comment.entity.ChildComment;
 import aimo.backend.domains.member.dto.parameter.SignUpParameter;
@@ -85,6 +86,10 @@ public class Member extends BaseEntity {
 	@OneToMany(mappedBy = "member")
 	private List<ChildComment> childComments = new ArrayList<>();
 
+	@Column(nullable = false)
+	@ColumnDefault("0")
+	private int point = 0;
+
 	public void updateProfileImage(ProfileImage profileImage) {
 		this.profileImage = profileImage;
 	}
@@ -152,5 +157,9 @@ public class Member extends BaseEntity {
 		this.posts = posts;
 		this.parentComments = parentComments;
 		this.childComments = childComments;
+	}
+
+	public void increasePoint(int point) {
+		this.point += point;
 	}
 }

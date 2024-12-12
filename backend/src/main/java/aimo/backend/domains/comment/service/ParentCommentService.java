@@ -15,7 +15,9 @@ import aimo.backend.domains.comment.dto.response.FindCommentsResponse;
 import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.comment.repository.ParentCommentRepository;
 import aimo.backend.domains.member.entity.Member;
+import aimo.backend.domains.member.model.IncreasePoint;
 import aimo.backend.domains.member.repository.MemberRepository;
+import aimo.backend.domains.member.service.MemberPointService;
 import aimo.backend.domains.post.entity.Post;
 import aimo.backend.domains.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,7 @@ public class ParentCommentService {
 	private final PostRepository postRepository;
 	private final ParentCommentRepository parentCommentRepository;
 	private final MemberRepository memberRepository;
+	private final MemberPointService memberPointService;
 
 	// 부모 댓글 권한 확인
 	private void validateParentCommentAuthority(Long memberId, Long commentId) {
@@ -51,8 +54,10 @@ public class ParentCommentService {
 			.orElseThrow(() -> ApiException.from(POST_NOT_FOUND));
 
 		ParentComment parentComment = ParentComment.of(member, post, parameter.content());
-
 		parentCommentRepository.save(parentComment);
+
+		// 포인트 증가
+		memberPointService.checkAndIncreaseMemberPoint(memberId, IncreasePoint.COMMENT);
 	}
 
 	// 부모 댓글 수정
@@ -79,7 +84,7 @@ public class ParentCommentService {
 
 		parentCommentRepository.findById(commentId)
 			.ifPresent((parentComment) -> {
-				if(!parentComment.getChildComments().isEmpty()){
+				if (!parentComment.getChildComments().isEmpty()) {
 					parentComment.deleteParentCommentSoftlyWithContent();
 					return;
 				}
@@ -88,13 +93,13 @@ public class ParentCommentService {
 	}
 
 	// 자식 댓글이 없고 삭제된 부모 댓글이면 삭제
-	public void deleteIfParentCommentIsDeletedAndChildrenIsEmpty(ParentComment parentComment){
+	public void deleteIfParentCommentIsDeletedAndChildrenIsEmpty(ParentComment parentComment) {
 		// 부모 댓글이 삭제되지 않은 상태면 return
 		if (!parentComment.getIsDeleted()) {
 			return;
 		}
 		// 자식 댓글이 존재하면 return
-		if(!parentComment.getChildComments().isEmpty()){
+		if (!parentComment.getChildComments().isEmpty()) {
 			return;
 		}
 

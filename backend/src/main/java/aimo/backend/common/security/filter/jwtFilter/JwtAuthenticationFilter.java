@@ -4,6 +4,8 @@ import static aimo.backend.common.exception.ErrorCode.*;
 
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.properties.SecurityProperties;
+import aimo.backend.domains.member.model.IncreasePoint;
+import aimo.backend.domains.member.service.MemberPointService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,6 +29,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private final JwtTokenProvider jwtTokenProvider;
 	private final SecurityProperties securityProperties;
 	private final AntPathMatcher pathMatcher;
+	private final MemberPointService memberPointService;
 
 	@Override
 	protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
@@ -79,7 +82,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		}
 
 		checkLogoutToken(accessToken);
+
 		log.info("access 토큰 인증 성공");
+
+		// 출석 포인트 증가
+		memberPointService.checkAndIncreaseMemberPoint(jwtTokenProvider.extractMemberId(accessToken).get(), IncreasePoint.ATTENDANCE);
+
 		Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
 		saveAuthentication(authentication);
 		filterChain.doFilter(request, response);

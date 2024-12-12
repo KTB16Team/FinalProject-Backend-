@@ -12,11 +12,11 @@ import aimo.backend.common.dto.DataResponse;
 import aimo.backend.common.util.memberLoader.MemberLoader;
 import aimo.backend.domains.like.dto.parameter.LikeChildCommentParameter;
 import aimo.backend.domains.like.dto.parameter.LikeParentCommentParameter;
+import aimo.backend.domains.like.dto.parameter.LikePostParameter;
 import aimo.backend.domains.like.model.LikeType;
 import aimo.backend.domains.like.service.ChildCommentLikeService;
 import aimo.backend.domains.like.service.ParentCommentLikeService;
 import aimo.backend.domains.like.service.PostLikeService;
-import aimo.backend.domains.like.dto.parameter.LikePostParameter;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -27,7 +27,6 @@ public class LikeController {
 	private final PostLikeService postLikeService;
 	private final ChildCommentLikeService childCommentLikeService;
 	private final ParentCommentLikeService parentCommentLikeService;
-
 
 	@PostMapping("/comments/child/{childCommentId}/likes")
 	public ResponseEntity<DataResponse<Void>> likeChildComment(
@@ -60,7 +59,6 @@ public class LikeController {
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(DataResponse.created());
 	}
-
 
 	@PostMapping("/{postId}/likes")
 	public ResponseEntity<DataResponse<Void>> likePost(

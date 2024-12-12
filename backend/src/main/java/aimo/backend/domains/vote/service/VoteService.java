@@ -2,13 +2,14 @@ package aimo.backend.domains.vote.service;
 
 import static aimo.backend.common.exception.ErrorCode.*;
 
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.domains.member.entity.Member;
+import aimo.backend.domains.member.model.IncreasePoint;
 import aimo.backend.domains.member.repository.MemberRepository;
+import aimo.backend.domains.member.service.MemberPointService;
 import aimo.backend.domains.post.entity.Post;
 import aimo.backend.domains.post.repository.PostRepository;
 import aimo.backend.domains.vote.dto.SaveVotePostParameter;
@@ -25,7 +26,7 @@ public class VoteService {
 	private final VoteRepository voteRepository;
 	private final MemberRepository memberRepository;
 	private final PostRepository postRepository;
-	private final ApplicationEventPublisher eventPublisher;
+	private final MemberPointService memberPointService;
 
 	// 투표하기
 	@Transactional(rollbackFor = ApiException.class)
@@ -44,6 +45,9 @@ public class VoteService {
 				() -> {
 					Vote newVote = Vote.from(post, member, side);
 					voteRepository.save(newVote);
+
+					// 포인트 증가
+					memberPointService.checkAndIncreaseMemberPoint(member.getId(), IncreasePoint.VOTE);
 				}
 			);
 	}
