@@ -20,6 +20,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import aimo.backend.common.properties.SecurityProperties;
 import aimo.backend.common.security.oAuth.OAuth2LoginFailureHandler;
+import aimo.backend.domains.member.service.MemberPointService;
 import aimo.backend.domains.member.service.MemberService;
 import aimo.backend.common.security.filter.exceptionHandlingFilter.ExceptionHandlingFilter;
 import aimo.backend.common.security.filter.jwtFilter.JwtAuthenticationFilter;
@@ -35,7 +36,7 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfig {
 
 	private final MemberService memberService;
-
+	private final MemberPointService memberPointService;
 	private final UserDetailsService userDetailsService;
 	private final JwtTokenProvider jwtTokenProvider;
 	private final CustomOAuth2UserService customOAuth2UserService;
@@ -112,7 +113,7 @@ public class SecurityConfig {
 
 	@Bean
 	public JwtAuthenticationFilter jwtAuthenticationFilter() {
-		return new JwtAuthenticationFilter(jwtTokenProvider, securityProperties, pathMatcher);
+		return new JwtAuthenticationFilter(jwtTokenProvider, securityProperties, pathMatcher, memberPointService);
 	}
 
 	@Bean

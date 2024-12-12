@@ -17,7 +17,9 @@ import aimo.backend.domains.comment.repository.ChildCommentRepository;
 import aimo.backend.domains.comment.repository.ParentCommentRepository;
 import aimo.backend.domains.like.repository.PostLikeRepository;
 import aimo.backend.domains.member.entity.Member;
+import aimo.backend.domains.member.model.IncreasePoint;
 import aimo.backend.domains.member.repository.MemberRepository;
+import aimo.backend.domains.member.service.MemberPointService;
 import aimo.backend.domains.post.dto.parameter.DeletePostParameter;
 import aimo.backend.domains.post.dto.parameter.FindPostAndCommentsByIdParameter;
 import aimo.backend.domains.post.dto.parameter.FindPostByPostTypeParameter;
@@ -48,6 +50,7 @@ public class PostService {
 	private final ChildCommentRepository childCommentRepository;
 	private final PostLikeRepository postLikeRepository;
 	private final VoteRepository voteRepository;
+	private final MemberPointService memberPointService;
 
 	// 글 저장
 	@Transactional
@@ -57,7 +60,12 @@ public class PostService {
 
 		privatePostService.publishPrivatePost(savePostParameter.privatePostId());
 		Post post = Post.of(savePostParameter, member);
-		return postRepository.save(post).getId();
+		post = postRepository.save(post);
+
+		// 포인트 증가
+		memberPointService.checkAndIncreaseMemberPoint(member.getId(), IncreasePoint.POST);
+
+		return post.getId();
 	}
 
 	// 글 조회, dto로 응답
