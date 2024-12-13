@@ -20,7 +20,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "audio_records")
+@Table(name = "file_records")
 @Getter
 @NoArgsConstructor(access = PROTECTED)
 public class FileRecord extends BaseEntity {
@@ -33,7 +33,7 @@ public class FileRecord extends BaseEntity {
 	@Column(nullable = false)
 	private String filename;
 
-	@Column(nullable = false)
+	@Column(nullable = false, length = 1000)
 	private String url;
 
 	@Column(nullable = false)
