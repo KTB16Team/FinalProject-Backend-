@@ -56,11 +56,11 @@ public class PrivatePost extends BaseEntity {
 	private String judgement;
 
 	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "audio_record_id", referencedColumnName = "audio_record_id")
+	@JoinColumn(name = "file_record_id")
 	private FileRecord fileRecord;
 
 	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@JoinColumn(name = "text_record_id", referencedColumnName = "text_record_id")
+	@JoinColumn(name = "text_record_id")
 	private TextRecord textRecord;
 
 

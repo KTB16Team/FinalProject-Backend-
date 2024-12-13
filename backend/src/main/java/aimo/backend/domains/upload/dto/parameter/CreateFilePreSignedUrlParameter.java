@@ -8,9 +8,9 @@ public record CreateFilePreSignedUrlParameter(
 	String extension,
 	PreSignedUrlPrefix prefix
 ) {
-	public static CreateFilePreSignedUrlParameter from(CreatePreSignedUrlRequest request) {
-		String extension = request.filename().substring(request.filename().lastIndexOf(".") + 1);
+	public static CreateFilePreSignedUrlParameter of(String filename, PreSignedUrlPrefix prefix) {
+		String extension = filename.substring(filename.lastIndexOf(".") + 1);
 
-		return new CreateFilePreSignedUrlParameter(request.filename(), extension, request.prefix());
+		return new CreateFilePreSignedUrlParameter(filename, extension, prefix);
 	}
 }

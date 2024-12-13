@@ -46,7 +46,7 @@ public class FileRecord extends BaseEntity {
 	@Enumerated(EnumType.STRING)
 	private PreSignedUrlPrefix prefix;
 
-	@OneToOne(mappedBy = "audioRecord")
+	@OneToOne(mappedBy = "fileRecord")
 	private PrivatePost privatePost;
 
 	@Builder
@@ -64,6 +64,7 @@ public class FileRecord extends BaseEntity {
 			.extension(parameter.extension())
 			.url(parameter.url())
 			.size(parameter.size())
+			.prefix(parameter.prefix())
 			.build();
 	}
 }

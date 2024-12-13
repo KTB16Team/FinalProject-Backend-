@@ -12,6 +12,7 @@ public record SaveFileMetaDataRequest(
 	String filename,
 	@NotNull(message = "파일 확장자가 필요합니다.")
 	String extension,
+	@NotNull(message = "prefix가 필요합니다.")
 	PreSignedUrlPrefix prefix
 ) {
 

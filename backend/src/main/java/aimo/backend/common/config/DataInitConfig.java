@@ -32,7 +32,6 @@ import aimo.backend.domains.privatePost.model.OriginType;
 import aimo.backend.domains.privatePost.repository.PrivatePostRepository;
 import aimo.backend.domains.privatePost.repository.TextRecordRepository;
 
-@Configuration
 public class DataInitConfig {
 
 	private final PasswordEncoder passwordEncoder;
@@ -71,7 +70,7 @@ public class DataInitConfig {
 
 		List<TextRecord> textRecords = new ArrayList<>();
 
-		for(int i=1; i<=10; i++){
+		for(int i=1; i<=200000; i++){
 			TextRecord textRecord = TextRecord.builder()
 				.content("This is a text record " + i)
 				.build();
@@ -80,7 +79,7 @@ public class DataInitConfig {
 
 		// PrivatePosts 생성
 		List<PrivatePost> privatePosts = new ArrayList<>();
-		for (int i = 1; i <= 10; i++) {
+		for (int i = 1; i <= 200000; i++) {
 			Member member = members.get(i % 3);
 			PrivatePost privatePost =
 				PrivatePost.builder()
@@ -91,28 +90,30 @@ public class DataInitConfig {
 					.summaryAi("Summary AI " + i)
 					.judgement("Judgement " + i)
 					.originType(OriginType.TEXT)
-					.textRecord(textRecords.get(i-1))
+					.textRecord(textRecords.get(i - 1))
 					.faultRatePlaintiff(50)
 					.faultRateDefendant(50)
 					.published(true)
 					.build();
 
-			privatePosts.add(privatePostRepo.save(privatePost));
+			privatePosts.add(privatePost);
 		}
+		privatePostRepo.saveAll(privatePosts);
 
 		// Posts 생성
 		List<Post> posts = new ArrayList<>();
-		for (int i = 1; i <= 10; i++) {
+		for (int i = 1; i <= 200000; i++) {
 			Member member = members.get(i % 3);
 			PrivatePost privatePost = privatePosts.get(i - 1);
 			SavePostParameter parameter = new SavePostParameter(member.getId(), privatePost.getId(), "Public Post Title " + i, "Plaintiff Stance " + i, "Defendant Stance " + i, "Summary AI " + i, "Judgement " + i, 50, 50, OriginType.TEXT, Category.COMMON);
 			Post post = Post.of(parameter, member);
-			posts.add(postRepo.save(post));
+			posts.add(post);
 		}
+		postRepo.saveAll(posts);
 
 		// ParentComments 생성
 		List<ParentComment> parentComments = new ArrayList<>();
-		for (int i = 1; i <= 10; i++) {
+		for (int i = 1; i <= 200000; i++) {
 			Member member = members.get(i % 3);
 			Post post = posts.get(i - 1);
 			ParentComment parentComment =
@@ -122,11 +123,13 @@ public class DataInitConfig {
 					.member(member)
 					.post(post)
 					.build();
-			parentComments.add(parentCommentRepo.save(parentComment));
+			parentComments.add(parentComment);
 		}
+		parentCommentRepo.saveAll(parentComments);
 
 		// ChildComments 생성
-		for (int i = 1; i <= 10; i++) {
+		List<ChildComment> childComments = new ArrayList<>();
+		for (int i = 1; i <= 200000; i++) {
 			ParentComment parentComment = parentComments.get(i - 1);
 			Member member = members.get(i % 3);
 			ChildComment childComment =
@@ -139,5 +142,6 @@ public class DataInitConfig {
 					.build();
 			childCommentRepo.save(childComment);
 		}
+		childCommentRepo.saveAll(childComments);
 	}
 }
