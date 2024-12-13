@@ -2,22 +2,24 @@ package aimo.backend.domains.privatePost.service;
 
 import static aimo.backend.common.exception.ErrorCode.*;
 
+import org.springframework.amqp.AmqpException;
 import org.springframework.data.domain.Page;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.exception.ErrorCode;
-import aimo.backend.common.properties.AiServerProperties;
-import aimo.backend.common.service.ExternalApiService;
+import aimo.backend.common.messageQueue.MessageQueueService;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.member.repository.MemberRepository;
 import aimo.backend.domains.privatePost.dto.parameter.DeletePrivatePostParameter;
 import aimo.backend.domains.privatePost.dto.parameter.FindPrivatePostParameter;
 import aimo.backend.domains.privatePost.dto.parameter.FindPrivatePostPreviewParameter;
-import aimo.backend.domains.privatePost.dto.parameter.JudgementParameter;
 import aimo.backend.domains.privatePost.dto.parameter.JudgementToAiParameter;
+import aimo.backend.domains.privatePost.dto.parameter.UpdatePostContentParameter;
+import aimo.backend.domains.privatePost.dto.request.UpdateContentToPrivatePostRequest;
 import aimo.backend.domains.privatePost.dto.response.JudgementResponse;
 import aimo.backend.domains.privatePost.dto.response.PrivatePostPreviewResponse;
 import aimo.backend.domains.privatePost.dto.response.PrivatePostResponse;
@@ -37,34 +39,52 @@ public class PrivatePostService {
 
 	private final PrivatePostRepository privatePostRepository;
 	private final MemberRepository memberRepository;
-	private final AiServerProperties aiServerProperties;
-	private final ExternalApiService externalApiService;
+	private final MessageQueueService messageQueueService;
 
-	@Transactional
-	public Long serveTextRecordToAi(JudgementToAiParameter parameter) {
-		Long memberId = parameter.memberId();
-		Member member = memberRepository.findById(memberId)
+	// mq에 판단 요청
+	@Async
+	@Transactional(rollbackFor = {ApiException.class, AmqpException.class})
+	public void uploadTextRecordAndRequestJudgement(JudgementToAiParameter parameter) {
+		Member member = memberRepository.findById(parameter.memberId())
 			.orElseThrow(() -> ApiException.from(ErrorCode.MEMBER_NOT_FOUND));
 
-		JudgementResponse judgementResponse = serveContentToAi(parameter, member);
-		JudgementParameter judgementParameter = JudgementParameter.from(memberId, judgementResponse);
+		// db에 저장
 		TextRecord textRecord = TextRecord.of(parameter.content());
-		PrivatePost privatePost = PrivatePost.from(judgementParameter, member, textRecord);
+		PrivatePost privatePost = PrivatePost.createWithoutContent(member, textRecord, parameter.originType());
+		privatePostRepository.save(privatePost);
 
-		return privatePostRepository.save(privatePost).getId();
+		// mq에 요청
+		SummaryAndJudgementRequest request = SummaryAndJudgementRequest.from(
+			privatePost.getId(),
+			parameter.content(),
+			member);
+		messageQueueService.send(request);
 	}
 
-	// AI 서버에 판단 요청
-	public JudgementResponse serveContentToAi(JudgementToAiParameter parameter, Member member) {
-		String url = aiServerProperties.getDomainUrl() + aiServerProperties.getJudgementApi();
+	// AI로부터 받은 콜백 응답을 기존에 저장했던 PrivatePost에 업데이트
+	@Transactional
+	public void updateContentToPrivatePost(UpdateContentToPrivatePostRequest request) {
+		Long privatePostId = request.id();
+		Integer faultRatePlaintiff = request.faultRate().intValue();
+		Integer faultRateDefendant = calculateFaultRateDefendant(request.faultRate());
 
-		SummaryAndJudgementRequest summaryAndJudgementRequest =
-			SummaryAndJudgementRequest.from(parameter, member);
+		UpdatePostContentParameter parameter = new UpdatePostContentParameter(
+			request.stancePlaintiff(),
+			request.stanceDefendant(),
+			request.title(),
+			request.summaryAi(),
+			request.judgement(),
+			faultRatePlaintiff,
+			faultRateDefendant
+		);
 
-		return externalApiService
-			.post(url, summaryAndJudgementRequest, JudgementFromAiResponse.class)
-			.map(judgementFromAi -> mapToJudgementResponse(judgementFromAi, parameter))
-			.block();
+		PrivatePost privatePost = privatePostRepository.findById(privatePostId)
+			.orElseThrow(() -> ApiException.from(ErrorCode.PRIVATE_POST_NOT_FOUND));
+		privatePost.updateContent(parameter);
+	}
+
+	private Integer calculateFaultRateDefendant(Float faultRate) {
+		return 100 - faultRate.intValue();
 	}
 
 	private JudgementResponse mapToJudgementResponse(JudgementFromAiResponse judgementFromAi, JudgementToAiParameter parameter) {

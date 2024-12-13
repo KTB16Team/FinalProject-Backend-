@@ -23,20 +23,20 @@ import aimo.backend.domains.privatePost.dto.parameter.FindPrivatePostParameter;
 import aimo.backend.domains.privatePost.dto.parameter.FindPrivatePostPreviewParameter;
 import aimo.backend.domains.privatePost.dto.parameter.SpeechToTextParameter;
 import aimo.backend.domains.privatePost.dto.parameter.JudgementToAiParameter;
+import aimo.backend.domains.privatePost.dto.request.UpdateContentToPrivatePostRequest;
 import aimo.backend.domains.privatePost.dto.response.PrivatePostPreviewResponse;
 import aimo.backend.domains.privatePost.dto.response.PrivatePostResponse;
 import aimo.backend.domains.privatePost.dto.request.SaveAudioSuccessRequest;
 import aimo.backend.domains.privatePost.dto.response.SaveAudioSuccessResponse;
 import aimo.backend.domains.privatePost.dto.request.SpeechToTextRequest;
-import aimo.backend.domains.privatePost.dto.response.SavePrivatePostResponse;
 import aimo.backend.domains.privatePost.dto.response.SpeechToTextResponse;
 
-import aimo.backend.domains.privatePost.dto.request.TextRecordRequest;
+import aimo.backend.domains.privatePost.dto.request.UploadTextRecordAndRequestJudgementRequest;
 import aimo.backend.domains.privatePost.model.OriginType;
 import aimo.backend.domains.privatePost.service.AudioRecordService;
 import aimo.backend.domains.privatePost.service.PrivatePostService;
 
-import aimo.backend.domains.privatePost.service.SaveAudioSuccessParameter;
+import aimo.backend.domains.privatePost.dto.parameter.SaveAudioSuccessParameter;
 import aimo.backend.infrastructure.s3.S3Service;
 import aimo.backend.infrastructure.s3.dto.request.CreatePresignedUrlRequest;
 import aimo.backend.infrastructure.s3.dto.response.CreatePresignedUrlResponse;
@@ -54,22 +54,30 @@ public class PrivatePostController {
 	private final PrivatePostService privatePostService;
 	private final S3Service s3Service;
 
-	// 대화록 업로드 + 판결
 	@PostMapping("/judgement/text")
-	public ResponseEntity<DataResponse<SavePrivatePostResponse>> uploadTextRecordAndJudgement(
-		@Valid @RequestBody TextRecordRequest textRecordRequest
+	public ResponseEntity<DataResponse<Void>> uploadTextRecordAndJudgement(
+		@Valid @RequestBody UploadTextRecordAndRequestJudgementRequest request
 	) {
 		Long memberId = MemberLoader.getMemberId();
 
 		JudgementToAiParameter judgementToAiParameter = JudgementToAiParameter.of(
 			memberId,
-			textRecordRequest.content(),
+			request.content(),
 			OriginType.TEXT);
 
-		Long privatePostId = privatePostService.serveTextRecordToAi(judgementToAiParameter);
+		privatePostService.uploadTextRecordAndRequestJudgement(judgementToAiParameter);
 
-		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(DataResponse.created(SavePrivatePostResponse.of(privatePostId)));
+		return ResponseEntity.ok(DataResponse.ok());
+	}
+
+	// AI로부터의 판결문 요청 콜백
+	@PostMapping("/judgement/callback")
+	public ResponseEntity<DataResponse<Void>> updateContentToPrivatePost(
+		@Valid @RequestBody UpdateContentToPrivatePostRequest request
+	) {
+		privatePostService.updateContentToPrivatePost(request);
+
+		return ResponseEntity.ok(DataResponse.ok());
 	}
 
 	// @PostMapping("/chat")

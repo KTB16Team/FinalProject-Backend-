@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.properties.AiServerProperties;
 import aimo.backend.common.util.webclient.ReactiveHttpService;
+import aimo.backend.domains.privatePost.dto.parameter.SaveAudioSuccessParameter;
 import aimo.backend.domains.privatePost.dto.parameter.SpeechToTextParameter;
 import aimo.backend.domains.privatePost.dto.response.SaveAudioSuccessResponse;
 import aimo.backend.domains.privatePost.dto.response.SpeechToTextResponse;

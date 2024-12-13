@@ -1,13 +1,12 @@
 package aimo.backend.domains.privatePost.dto.parameter;
 
-import aimo.backend.domains.privatePost.dto.request.TextRecordRequest;
-import aimo.backend.domains.privatePost.model.OriginType;
+import aimo.backend.domains.privatePost.dto.request.UploadTextRecordAndRequestJudgementRequest;
 
 public record TextRecordParameter(
 	String content
 ) {
 
-	public static TextRecordParameter from(TextRecordRequest request) {
+	public static TextRecordParameter from(UploadTextRecordAndRequestJudgementRequest request) {
 		return new TextRecordParameter(request.content());
 	}
 }
