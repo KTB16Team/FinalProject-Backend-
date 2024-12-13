@@ -4,7 +4,7 @@ import static jakarta.persistence.GenerationType.*;
 import static lombok.AccessLevel.*;
 
 import aimo.backend.common.entity.BaseEntity;
-import aimo.backend.domains.privatePost.dto.parameter.SaveAudioSuccessParameter;
+import aimo.backend.domains.upload.dto.parameter.SaveAudioMetaDataParameter;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -49,7 +49,7 @@ public class AudioRecord extends BaseEntity {
 		this.extension = extension;
 	}
 
-	public static AudioRecord from(SaveAudioSuccessParameter parameter) {
+	public static AudioRecord from(SaveAudioMetaDataParameter parameter) {
 		return AudioRecord.builder()
 			.filename(parameter.filename())
 			.extension(parameter.extension())

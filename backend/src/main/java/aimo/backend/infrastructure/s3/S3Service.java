@@ -11,8 +11,7 @@ import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 
 import aimo.backend.common.properties.S3Properties;
 import aimo.backend.infrastructure.s3.dto.parameter.CreateResourceUrlParameter;
-import aimo.backend.infrastructure.s3.dto.request.CreatePresignedUrlRequest;
-import aimo.backend.infrastructure.s3.dto.response.CreatePresignedUrlResponse;
+import aimo.backend.infrastructure.s3.dto.response.CreatePreSignedUrlResponse;
 import aimo.backend.infrastructure.s3.model.PresignedUrlPrefix;
 import lombok.RequiredArgsConstructor;
 
@@ -23,19 +22,18 @@ public class S3Service {
 	private final AmazonS3 amazonS3Client;
 	private final S3Properties s3Properties;
 
-	public CreatePresignedUrlResponse createAudioPreSignedUrl(CreatePresignedUrlRequest request) {
-		String path = createPath(PresignedUrlPrefix.AUDIO.getValue(), request.filename());
-		String url = createGeneratePresignedUrlRequest(path);
-		return new CreatePresignedUrlResponse(url, request.filename());
+	// PreSignedUrl 생성
+	public CreatePreSignedUrlResponse createPreSignedUrl(
+		String filename,
+		PresignedUrlPrefix prefix
+	) {
+		String path = createPath(prefix, filename);
+		String url = createGeneratePreSignedUrlRequest(path);
+		return new CreatePreSignedUrlResponse(url, filename);
 	}
 
-	public CreatePresignedUrlResponse createProfilePresignedUrl(CreatePresignedUrlRequest request) {
-		String path = createPath(PresignedUrlPrefix.IMAGE.getValue(), request.filename());
-		String url = createGeneratePresignedUrlRequest(path);
-		return new CreatePresignedUrlResponse(url, request.filename());
-	}
-
-	private String createGeneratePresignedUrlRequest(String path) {
+	// s3를 통해 PreSignedUrl 생성
+	private String createGeneratePreSignedUrlRequest(String path) {
 		GeneratePresignedUrlRequest generatePresignedUrlRequest = new GeneratePresignedUrlRequest(
 			s3Properties.getBucketName(), path)
 			.withMethod(HttpMethod.PUT)
@@ -43,11 +41,14 @@ public class S3Service {
 		return amazonS3Client.generatePresignedUrl(generatePresignedUrlRequest).toString();
 	}
 
+	// 파일 URL 생성
 	public String getResourceUrl(CreateResourceUrlParameter createResourceUrlParameter) {
-		String key = createResourceUrlParameter.prefix() + "/" + createResourceUrlParameter.filename() + "." + createResourceUrlParameter.extension();
+		String key = createResourceUrlParameter.prefix() + "/" + createResourceUrlParameter.filename() + "."
+			+ createResourceUrlParameter.extension();
 		return amazonS3Client.getUrl(s3Properties.getBucketName(), key).toString();
 	}
 
+	// PreSignedUrl 만료 시간 설정
 	private Date getPreSignedUrlExpiration() {
 		Date expiration = new Date();
 		long expTimeMillis = expiration.getTime();
@@ -65,13 +66,8 @@ public class S3Service {
 		return UUID.randomUUID().toString();
 	}
 
-	/**
-	 * 파일의 전체 경로를 생성
-	 *
-	 * @param prefix 디렉토리 경로
-	 * @return 파일의 전체 경로
-	 */
-	private String createPath(String prefix, String fileName) {
-		return String.format("%s/%s", prefix, fileName);
+	// 파일 형식 및 이름으로 저장
+	private String createPath(PresignedUrlPrefix prefix, String fileName) {
+		return String.format("%s/%s", prefix.getValue(), fileName);
 	}
 }

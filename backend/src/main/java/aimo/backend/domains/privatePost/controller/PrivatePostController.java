@@ -16,30 +16,22 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import aimo.backend.common.dto.DataResponse;
-
 import aimo.backend.common.util.memberLoader.MemberLoader;
 import aimo.backend.domains.privatePost.dto.parameter.DeletePrivatePostParameter;
 import aimo.backend.domains.privatePost.dto.parameter.FindPrivatePostParameter;
 import aimo.backend.domains.privatePost.dto.parameter.FindPrivatePostPreviewParameter;
-import aimo.backend.domains.privatePost.dto.parameter.SpeechToTextParameter;
 import aimo.backend.domains.privatePost.dto.parameter.JudgementToAiParameter;
 import aimo.backend.domains.privatePost.dto.request.UpdateContentToPrivatePostRequest;
+import aimo.backend.domains.privatePost.dto.request.UploadTextRecordAndRequestJudgementRequest;
 import aimo.backend.domains.privatePost.dto.response.PrivatePostPreviewResponse;
 import aimo.backend.domains.privatePost.dto.response.PrivatePostResponse;
-import aimo.backend.domains.privatePost.dto.request.SaveAudioSuccessRequest;
-import aimo.backend.domains.privatePost.dto.response.SaveAudioSuccessResponse;
-import aimo.backend.domains.privatePost.dto.request.SpeechToTextRequest;
 import aimo.backend.domains.privatePost.dto.response.SpeechToTextResponse;
-
-import aimo.backend.domains.privatePost.dto.request.UploadTextRecordAndRequestJudgementRequest;
 import aimo.backend.domains.privatePost.model.OriginType;
-import aimo.backend.domains.privatePost.service.AudioRecordService;
 import aimo.backend.domains.privatePost.service.PrivatePostService;
-
-import aimo.backend.domains.privatePost.dto.parameter.SaveAudioSuccessParameter;
+import aimo.backend.domains.upload.dto.parameter.SpeechToTextParameter;
+import aimo.backend.domains.upload.dto.request.SpeechToTextRequest;
+import aimo.backend.domains.upload.service.AudioRecordService;
 import aimo.backend.infrastructure.s3.S3Service;
-import aimo.backend.infrastructure.s3.dto.request.CreatePresignedUrlRequest;
-import aimo.backend.infrastructure.s3.dto.response.CreatePresignedUrlResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -98,26 +90,6 @@ public class PrivatePostController {
 
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(DataResponse.created(audioRecordService.speechToText(parameter)));
-	}
-
-	@GetMapping("/audio/presigned/{filename}")
-	public ResponseEntity<DataResponse<CreatePresignedUrlResponse>> getPresignedUrlTo(
-		@Valid @PathVariable("filename") String filename
-	) {
-		CreatePresignedUrlRequest createPresignedUrlRequest = CreatePresignedUrlRequest.of(filename);
-
-		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(DataResponse.created(s3Service.createAudioPreSignedUrl(createPresignedUrlRequest)));
-	}
-
-	@PostMapping("/audio/success")
-	public ResponseEntity<DataResponse<SaveAudioSuccessResponse>> saveAudioRecord(
-		@Valid @RequestBody SaveAudioSuccessRequest saveAudioSuccessRequest
-	) {
-		SaveAudioSuccessParameter parameter = SaveAudioSuccessParameter.from(saveAudioSuccessRequest);
-
-		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(DataResponse.created(audioRecordService.save(parameter)));
 	}
 
 	// 개인글 조회

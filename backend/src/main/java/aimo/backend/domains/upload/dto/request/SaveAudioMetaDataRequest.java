@@ -1,8 +1,8 @@
-package aimo.backend.domains.privatePost.dto.request;
+package aimo.backend.domains.upload.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 
-public record SaveAudioSuccessRequest(
+public record SaveAudioMetaDataRequest(
 	@NotNull(message = "URL이 필요합니다.")
 	String url,
 	@NotNull(message = "파일 사이즈가 필요합니다.")
@@ -13,7 +13,7 @@ public record SaveAudioSuccessRequest(
 	String extension
 ) {
 
-	public static SaveAudioSuccessRequest of(String url, Long size, String filename, String extension) {
-		return new SaveAudioSuccessRequest(url, size, filename, extension);
+	public static SaveAudioMetaDataRequest of(String url, Long size, String filename, String extension) {
+		return new SaveAudioMetaDataRequest(url, size, filename, extension);
 	}
 }

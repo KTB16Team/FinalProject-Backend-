@@ -7,7 +7,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum PresignedUrlPrefix {
 
-	IMAGE("image"), AUDIO("audio"),
+	IMAGE("image"),
+	AUDIO("audio"),
+	PROFILE("profile"),
 	;
 	private final String value;
 }

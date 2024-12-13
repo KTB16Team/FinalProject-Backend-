@@ -13,30 +13,29 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import aimo.backend.common.dto.DataResponse;
+import aimo.backend.common.security.filter.jwtFilter.JwtTokenProvider;
 import aimo.backend.common.util.memberLoader.MemberLoader;
-import aimo.backend.domains.member.dto.parameter.DeleteProfileImageParameter;
-import aimo.backend.domains.member.dto.parameter.SignUpParameter;
-import aimo.backend.domains.member.dto.parameter.UpdateNicknameParameter;
 import aimo.backend.domains.member.dto.parameter.DeleteMemberParameter;
+import aimo.backend.domains.member.dto.parameter.DeleteProfileImageParameter;
 import aimo.backend.domains.member.dto.parameter.FindMyInfoParameter;
 import aimo.backend.domains.member.dto.parameter.SaveFileMetaDataParameter;
+import aimo.backend.domains.member.dto.parameter.SignUpParameter;
+import aimo.backend.domains.member.dto.parameter.UpdateNicknameParameter;
 import aimo.backend.domains.member.dto.parameter.UpdatePasswordParameter;
 import aimo.backend.domains.member.dto.request.CheckNicknameExistsRequest;
 import aimo.backend.domains.member.dto.request.DeleteMemberRequest;
 import aimo.backend.domains.member.dto.request.LogoutRequest;
-import aimo.backend.domains.member.dto.response.FindMyInfoResponse;
-import aimo.backend.domains.member.dto.response.NicknameExistsResponse;
 import aimo.backend.domains.member.dto.request.SendTemporaryPasswordRequest;
-import aimo.backend.common.dto.DataResponse;
-import aimo.backend.common.security.filter.jwtFilter.JwtTokenProvider;
 import aimo.backend.domains.member.dto.request.UpdateNicknameRequest;
 import aimo.backend.domains.member.dto.request.UpdatePasswordRequest;
-import aimo.backend.infrastructure.s3.S3Service;
-import aimo.backend.infrastructure.s3.dto.request.CreatePresignedUrlRequest;
-import aimo.backend.infrastructure.s3.dto.response.CreatePresignedUrlResponse;
-import aimo.backend.infrastructure.s3.dto.request.SaveFileMetaDataRequest;
-
+import aimo.backend.domains.member.dto.response.FindMyInfoResponse;
+import aimo.backend.domains.member.dto.response.NicknameExistsResponse;
 import aimo.backend.domains.member.service.MemberService;
+import aimo.backend.infrastructure.s3.S3Service;
+import aimo.backend.infrastructure.s3.dto.request.SaveFileMetaDataRequest;
+import aimo.backend.infrastructure.s3.dto.response.CreatePreSignedUrlResponse;
+import aimo.backend.infrastructure.s3.model.PresignedUrlPrefix;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -82,13 +81,11 @@ public class MemberController {
 	}
 
 	@GetMapping("/profile/presigned/{filename}")
-	public ResponseEntity<DataResponse<CreatePresignedUrlResponse>> createProfileImagePreSignedUrl(
+	public ResponseEntity<DataResponse<CreatePreSignedUrlResponse>> createProfileImagePreSignedUrl(
 		@PathVariable("filename") String filename
 	) {
-		CreatePresignedUrlRequest createPresignedUrlRequest = CreatePresignedUrlRequest.of(filename);
-
 		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(DataResponse.created(s3Service.createProfilePresignedUrl(createPresignedUrlRequest)));
+			.body(DataResponse.created(s3Service.createPreSignedUrl(filename, PresignedUrlPrefix.IMAGE)));
 	}
 
 	@PostMapping("/profile/success")
