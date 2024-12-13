@@ -49,6 +49,8 @@ public enum ErrorCode {
 	PRIVATE_POST_READ_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "대화록 조회 권한이 없습니다.", "PRIVATEPOST-008"),
 	PRIVATE_POST_ALREADY_PUBLISHED(HttpStatus.BAD_REQUEST, "이미 공개된 대화록입니다.", "PRIVATEPOST-009"),
 	PRIVATE_POST_ALREADY_UNPUBLISHED(HttpStatus.BAD_REQUEST, "이미 비공개된 대화록입니다.", "PRIVATEPOST-010"),
+	PRIVATE_POST_PROGRESS(HttpStatus.BAD_REQUEST, "AI 분석 중인 대화록입니다.", "PRIVATEPOST-011"),
+	PRIVATE_POST_FAIL(HttpStatus.BAD_REQUEST, "AI 분석 실패한 대화록입니다.", "PRIVATEPOST-012"),
 
 	//Post
 	POST_NOT_FOUND(HttpStatus.NOT_FOUND, "해당하는 게시글을 찾을 수 없습니다.", "POST-001"),
@@ -75,6 +77,7 @@ public enum ErrorCode {
 	//AI
 	AI_BAD_GATEWAY(HttpStatus.BAD_GATEWAY, "AI 서버와의 통신에 실패하였습니다.", "AI-001"),
 	AI_SEVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "AI 서버 내부에서 에러가 발생하였습니다.", "AI-002"),
+	INVALID_ACCESS_KEY(HttpStatus.UNAUTHORIZED, "접근 키가 일치하지 않습니다.", "AI-003"),
 
 	// FILE
 	INVALID_PREFIX(HttpStatus.BAD_REQUEST, "잘못된 파일 경로입니다.", "FILE-000"),
@@ -89,6 +92,7 @@ public enum ErrorCode {
 	// CHAT
 	CHAT_RECORD_NOT_FOUND(HttpStatus.NOT_FOUND, "해당하는 채팅 레코드를 찾을 수 없습니다.", "CHAT-001"),
 	;
+
 	private final HttpStatus httpStatus;
 	private final String message;
 	private final String code;

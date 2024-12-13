@@ -3,11 +3,11 @@ package aimo.backend.domains.privatePost.entity;
 import static lombok.AccessLevel.*;
 
 import aimo.backend.common.entity.BaseEntity;
-import aimo.backend.domains.privatePost.dto.parameter.JudgementParameter;
+import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.privatePost.dto.parameter.UpdatePostContentParameter;
 import aimo.backend.domains.privatePost.model.ContentLength;
 import aimo.backend.domains.privatePost.model.OriginType;
-import aimo.backend.domains.member.entity.Member;
+import aimo.backend.domains.privatePost.model.PrivatePostStatus;
 import aimo.backend.domains.upload.entity.FileRecord;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -63,7 +63,6 @@ public class PrivatePost extends BaseEntity {
 	@JoinColumn(name = "text_record_id")
 	private TextRecord textRecord;
 
-
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private OriginType originType;
@@ -74,6 +73,10 @@ public class PrivatePost extends BaseEntity {
 
 	@Column(nullable = false)
 	private Boolean published;
+
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
+	private PrivatePostStatus privatePostStatus;
 
 	@Builder
 	private PrivatePost(
@@ -88,7 +91,9 @@ public class PrivatePost extends BaseEntity {
 		OriginType originType,
 		Integer faultRatePlaintiff,
 		Integer faultRateDefendant,
-		Boolean published) {
+		Boolean published,
+		PrivatePostStatus privatePostStatus
+	) {
 
 		this.title = title;
 		this.member = member;
@@ -102,30 +107,23 @@ public class PrivatePost extends BaseEntity {
 		this.faultRatePlaintiff = faultRatePlaintiff;
 		this.faultRateDefendant = faultRateDefendant;
 		this.published = published;
-	}
-
-	public static PrivatePost from(JudgementParameter parameter, Member member, TextRecord textRecord) {
-		return PrivatePost.builder()
-			.title(parameter.title())
-			.member(member)
-			.stancePlaintiff(parameter.stancePlaintiff())
-			.stanceDefendant(parameter.stanceDefendant())
-			.summaryAi(parameter.summary())
-			.judgement(parameter.judgement())
-			.originType(parameter.originType())
-			.faultRatePlaintiff(parameter.faultRatePlaintiff())
-			.faultRateDefendant(parameter.faultRateDefendant())
-			.textRecord(textRecord)
-			.published(false)
-			.build();
+		this.privatePostStatus = privatePostStatus;
 	}
 
 	public static PrivatePost createWithoutContent(Member member, TextRecord textRecord, OriginType originType) {
 		return PrivatePost.builder()
 			.member(member)
+			.stanceDefendant("")
+			.stancePlaintiff("")
+			.title("AI가 처리중입니다.")
+			.summaryAi("AI가 처리중입니다.")
+			.faultRateDefendant(0)
+			.faultRatePlaintiff(0)
+			.judgement("")
 			.textRecord(textRecord)
 			.originType(originType)
 			.published(false)
+			.privatePostStatus(PrivatePostStatus.PROGRESS)
 			.build();
 	}
 
@@ -139,8 +137,6 @@ public class PrivatePost extends BaseEntity {
 		this.faultRateDefendant = parameter.faultRateDefendant();
 	}
 
-
-
 	public void publish() {
 		this.published = true;
 	}
@@ -152,5 +148,9 @@ public class PrivatePost extends BaseEntity {
 	public String getPreview() {
 		return summaryAi.length() > ContentLength.PREVIEW_LENGTH.getValue() ?
 			summaryAi.substring(0, ContentLength.PREVIEW_LENGTH.getValue()) + "..." : summaryAi;
+	}
+
+	public void updateStatus(PrivatePostStatus privatePostStatus) {
+		this.privatePostStatus = privatePostStatus;
 	}
 }

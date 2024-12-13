@@ -2,16 +2,19 @@ package aimo.backend.domains.privatePost.service;
 
 import static aimo.backend.common.exception.ErrorCode.*;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 import org.springframework.amqp.AmqpException;
 import org.springframework.data.domain.Page;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.exception.ErrorCode;
 import aimo.backend.common.messageQueue.MessageQueueService;
+import aimo.backend.common.properties.AiServerProperties;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.member.repository.MemberRepository;
 import aimo.backend.domains.privatePost.dto.parameter.DeletePrivatePostParameter;
@@ -19,14 +22,13 @@ import aimo.backend.domains.privatePost.dto.parameter.FindPrivatePostParameter;
 import aimo.backend.domains.privatePost.dto.parameter.FindPrivatePostPreviewParameter;
 import aimo.backend.domains.privatePost.dto.parameter.JudgementToAiParameter;
 import aimo.backend.domains.privatePost.dto.parameter.UpdatePostContentParameter;
+import aimo.backend.domains.privatePost.dto.request.SummaryAndJudgementRequest;
 import aimo.backend.domains.privatePost.dto.request.UpdateContentToPrivatePostRequest;
-import aimo.backend.domains.privatePost.dto.response.JudgementResponse;
 import aimo.backend.domains.privatePost.dto.response.PrivatePostPreviewResponse;
 import aimo.backend.domains.privatePost.dto.response.PrivatePostResponse;
-import aimo.backend.domains.privatePost.dto.request.SummaryAndJudgementRequest;
-import aimo.backend.domains.privatePost.dto.response.JudgementFromAiResponse;
 import aimo.backend.domains.privatePost.entity.PrivatePost;
 import aimo.backend.domains.privatePost.entity.TextRecord;
+import aimo.backend.domains.privatePost.model.PrivatePostStatus;
 import aimo.backend.domains.privatePost.repository.PrivatePostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +42,7 @@ public class PrivatePostService {
 	private final PrivatePostRepository privatePostRepository;
 	private final MemberRepository memberRepository;
 	private final MessageQueueService messageQueueService;
+	private final AiServerProperties aiServerProperties;
 
 	// mq에 판단 요청
 	@Async
@@ -64,7 +67,20 @@ public class PrivatePostService {
 	// AI로부터 받은 콜백 응답을 기존에 저장했던 PrivatePost에 업데이트
 	@Transactional
 	public void updateContentToPrivatePost(UpdateContentToPrivatePostRequest request) {
+		// 키 확인
+		validateKey(request.accessKey());
+
 		Long privatePostId = request.id();
+		PrivatePost privatePost = privatePostRepository.findById(privatePostId)
+			.orElseThrow(() -> ApiException.from(ErrorCode.PRIVATE_POST_NOT_FOUND));
+
+		// 실패시
+		if (!request.status()) {
+			privatePost.updateStatus(PrivatePostStatus.FAIL);
+			return;
+		}
+
+		// 성공시
 		Integer faultRatePlaintiff = request.faultRate().intValue();
 		Integer faultRateDefendant = calculateFaultRateDefendant(request.faultRate());
 
@@ -78,19 +94,20 @@ public class PrivatePostService {
 			faultRateDefendant
 		);
 
-		PrivatePost privatePost = privatePostRepository.findById(privatePostId)
-			.orElseThrow(() -> ApiException.from(ErrorCode.PRIVATE_POST_NOT_FOUND));
 		privatePost.updateContent(parameter);
+		privatePost.updateStatus(PrivatePostStatus.SUCCESS);
 	}
 
+	// 키 확인
+	private void validateKey(String key) {
+		if (!aiServerProperties.getAccessKey().equals(key)) {
+			throw ApiException.from(ErrorCode.INVALID_ACCESS_KEY);
+		}
+	}
+
+	// 과실 비율 계산
 	private Integer calculateFaultRateDefendant(Float faultRate) {
 		return 100 - faultRate.intValue();
-	}
-
-	private JudgementResponse mapToJudgementResponse(JudgementFromAiResponse judgementFromAi, JudgementToAiParameter parameter) {
-		int faultRateDefendant = judgementFromAi.faultRate().intValue(),
-			faultRatePlaintiff = 100 - faultRateDefendant;
-		return JudgementResponse.from(judgementFromAi, faultRatePlaintiff, faultRateDefendant, parameter);
 	}
 
 	// 개인글 삭제
@@ -104,7 +121,7 @@ public class PrivatePostService {
 		PrivatePost privatePost = privatePostRepository.findById(privatePostId)
 			.orElseThrow(() -> ApiException.from(ErrorCode.PRIVATE_POST_NOT_FOUND));
 
-		if(!validationPrivatePost(memberId, privatePost)) {
+		if (!validationPrivatePost(memberId, privatePost)) {
 			throw ApiException.from(PRIVATE_POST_DELETE_UNAUTHORIZED);
 		}
 
@@ -114,13 +131,39 @@ public class PrivatePostService {
 
 	// 개인글 단일 조회
 	public PrivatePostResponse findPrivatePostResponseBy(FindPrivatePostParameter parameter) {
-		PrivatePost privatePost = privatePostRepository.findById(parameter.privatePostId())
+		PrivatePost privatePost = privatePostRepository.findByMember_IdAndId(
+				parameter.memberId(),
+				parameter.privatePostId())
 			.orElseThrow(() -> ApiException.from(ErrorCode.PRIVATE_POST_NOT_FOUND));
 
-		if (!validationPrivatePost(parameter.memberId(), privatePost))
-			throw ApiException.from(PRIVATE_POST_READ_UNAUTHORIZED);
+		// 상태 확인 및 에러시 처리
+		validatePrivatePostStatus(privatePost);
 
 		return PrivatePostResponse.from(privatePost);
+	}
+	// 개인글 상태에 따른 에러 리턴 및 실패시 개인글 삭제
+	@Transactional(rollbackFor = ApiException.class)
+	public void validatePrivatePostStatus(PrivatePost privatePost) {
+
+		// 분석 10분이 지난 경우 삭제하고 에러 반환
+		LocalDateTime createdAt = privatePost.getCreatedAt();
+		LocalDateTime now = LocalDateTime.now();
+		Duration duration = Duration.between(createdAt, now);
+		if (duration.toMinutes() > 10) {
+			privatePostRepository.delete(privatePost);
+			throw ApiException.from(PRIVATE_POST_FAIL);
+		}
+
+		// 아직 분석중인 경우
+		if (privatePost.getPrivatePostStatus() == PrivatePostStatus.PROGRESS) {
+			throw ApiException.from(PRIVATE_POST_PROGRESS);
+		}
+
+		// 분석 실패한 경우
+		if (privatePost.getPrivatePostStatus() == PrivatePostStatus.FAIL) {
+			privatePostRepository.delete(privatePost);
+			throw ApiException.from(PRIVATE_POST_FAIL);
+		}
 	}
 
 	// 개인글 목록 조회
@@ -134,18 +177,18 @@ public class PrivatePostService {
 		PrivatePost privatePost = privatePostRepository.findById(privatePostId)
 			.orElseThrow(() -> ApiException.from(PRIVATE_POST_NOT_FOUND));
 
-		if(privatePost.getPublished())
+		if (privatePost.getPublished())
 			throw ApiException.from(PRIVATE_POST_ALREADY_PUBLISHED);
 
 		privatePost.publish();
 	}
 
 	// 개인글 비공개 처리
-	public void unpublishPrivatePost(Long privatePostId){
+	public void unpublishPrivatePost(Long privatePostId) {
 		PrivatePost privatePost = privatePostRepository.findById(privatePostId)
 			.orElseThrow(() -> ApiException.from(PRIVATE_POST_NOT_FOUND));
 
-		if(!privatePost.getPublished()) {
+		if (!privatePost.getPublished()) {
 			throw ApiException.from(PRIVATE_POST_ALREADY_UNPUBLISHED);
 		}
 
@@ -156,6 +199,5 @@ public class PrivatePostService {
 	private boolean validationPrivatePost(Long memberId, PrivatePost privatePost) {
 		return privatePost.getMember().getId().equals(memberId);
 	}
-
 
 }
