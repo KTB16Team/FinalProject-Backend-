@@ -1,4 +1,4 @@
-package aimo.backend.domains.privatePost.service;
+package aimo.backend.domains.upload.service;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
