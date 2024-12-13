@@ -7,25 +7,24 @@ import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.exception.ErrorCode;
 import aimo.backend.common.properties.AiServerProperties;
 import aimo.backend.common.util.webclient.ReactiveHttpService;
-import aimo.backend.domains.upload.dto.parameter.CreateAudioPreSignedUrlParameter;
-import aimo.backend.domains.upload.dto.parameter.SaveAudioMetaDataParameter;
+import aimo.backend.domains.upload.dto.parameter.CreateFilePreSignedUrlParameter;
+import aimo.backend.domains.upload.dto.parameter.SaveFileMetaDataParameter;
 import aimo.backend.domains.upload.dto.parameter.SpeechToTextParameter;
-import aimo.backend.domains.upload.dto.response.SaveAudioMetaDataResponse;
+import aimo.backend.domains.upload.dto.response.SaveFileMetaDataResponse;
 import aimo.backend.domains.privatePost.dto.response.SpeechToTextResponse;
-import aimo.backend.domains.privatePost.entity.AudioRecord;
-import aimo.backend.domains.privatePost.repository.AudioRecordRepository;
+import aimo.backend.domains.upload.entity.FileRecord;
+import aimo.backend.domains.upload.repository.FileRepository;
 
 import aimo.backend.infrastructure.s3.S3Service;
 import aimo.backend.infrastructure.s3.dto.response.CreatePreSignedUrlResponse;
-import aimo.backend.infrastructure.s3.model.PresignedUrlPrefix;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class AudioRecordService {
+public class FileService {
 
-	private final AudioRecordRepository audioRecordRepository;
+	private final FileRepository fileRepository;
 	private final ReactiveHttpService reactiveHttpService;
 	private final AiServerProperties aiServerProperties;
 	private final S3Service s3Service;
@@ -38,28 +37,21 @@ public class AudioRecordService {
 
 	// 음성 파일 메타데이터 저장
 	@Transactional(rollbackFor = ApiException.class)
-	public SaveAudioMetaDataResponse save(SaveAudioMetaDataParameter parameter) {
-		AudioRecord audioRecord = audioRecordRepository.save(AudioRecord.from(parameter));
-		return SaveAudioMetaDataResponse.from(audioRecord);
+	public SaveFileMetaDataResponse save(SaveFileMetaDataParameter parameter) {
+		FileRecord fileRecord = fileRepository.save(FileRecord.from(parameter));
+		return SaveFileMetaDataResponse.from(fileRecord);
 	}
 
-	public CreatePreSignedUrlResponse createAudioPreSignedUrl(CreateAudioPreSignedUrlParameter parameter) {
-		if (!isAudioFile(parameter.extension())) {
+	public CreatePreSignedUrlResponse createFilePreSignedUrl(CreateFilePreSignedUrlParameter parameter) {
+		// Prefix 타입과 extention 일치하는 지 확인
+		if (!parameter.prefix().isValidExtension(parameter.extension())) {
 			throw ApiException.from(ErrorCode.INVALID_FILE_EXTENSION);
 		}
 
 		return s3Service.createPreSignedUrl(
 			parameter.filename(),
-			PresignedUrlPrefix.AUDIO
+			parameter.prefix()
 		);
 	}
 
-	private boolean isAudioFile(String extension) {
-		return extension.equals("mp3")
-			|| extension.equals("wav")
-			|| extension.equals("ogg")
-			|| extension.equals("acc")
-			|| extension.equals("flac")
-			|| extension.equals("m4a");
-	}
 }

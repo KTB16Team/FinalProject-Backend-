@@ -31,7 +31,7 @@ import aimo.backend.domains.member.repository.ProfileImageRepository;
 import aimo.backend.domains.post.entity.Post;
 import aimo.backend.infrastructure.s3.S3Service;
 import aimo.backend.infrastructure.s3.dto.parameter.CreateResourceUrlParameter;
-import aimo.backend.infrastructure.s3.model.PresignedUrlPrefix;
+import aimo.backend.infrastructure.s3.model.PreSignedUrlPrefix;
 import aimo.backend.infrastructure.smtp.MailService;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
@@ -114,7 +114,7 @@ public class MemberService {
 			deleteProfileImage(deleteProfileImageParameter);
 		
 		CreateResourceUrlParameter createResourceUrlParameter =
-			CreateResourceUrlParameter.from(PresignedUrlPrefix.IMAGE, parameter);
+			CreateResourceUrlParameter.from(PreSignedUrlPrefix.IMAGE, parameter);
 		String url = s3Service.getResourceUrl(createResourceUrlParameter);
 		ProfileImage profileImage = ProfileImage.of(parameter, member, url);
 

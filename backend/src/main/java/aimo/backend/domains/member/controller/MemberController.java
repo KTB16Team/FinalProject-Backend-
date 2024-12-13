@@ -35,7 +35,7 @@ import aimo.backend.domains.member.service.MemberService;
 import aimo.backend.infrastructure.s3.S3Service;
 import aimo.backend.infrastructure.s3.dto.request.SaveFileMetaDataRequest;
 import aimo.backend.infrastructure.s3.dto.response.CreatePreSignedUrlResponse;
-import aimo.backend.infrastructure.s3.model.PresignedUrlPrefix;
+import aimo.backend.infrastructure.s3.model.PreSignedUrlPrefix;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -85,7 +85,7 @@ public class MemberController {
 		@PathVariable("filename") String filename
 	) {
 		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(DataResponse.created(s3Service.createPreSignedUrl(filename, PresignedUrlPrefix.IMAGE)));
+			.body(DataResponse.created(s3Service.createPreSignedUrl(filename, PreSignedUrlPrefix.IMAGE)));
 	}
 
 	@PostMapping("/profile/success")

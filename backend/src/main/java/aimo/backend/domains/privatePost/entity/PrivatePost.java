@@ -8,6 +8,7 @@ import aimo.backend.domains.privatePost.dto.parameter.UpdatePostContentParameter
 import aimo.backend.domains.privatePost.model.ContentLength;
 import aimo.backend.domains.privatePost.model.OriginType;
 import aimo.backend.domains.member.entity.Member;
+import aimo.backend.domains.upload.entity.FileRecord;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -56,15 +57,11 @@ public class PrivatePost extends BaseEntity {
 
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "audio_record_id", referencedColumnName = "audio_record_id")
-	private AudioRecord audioRecord;
+	private FileRecord fileRecord;
 
 	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "text_record_id", referencedColumnName = "text_record_id")
 	private TextRecord textRecord;
-
-	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "chat_record_id", referencedColumnName = "chat_record_id")
-	private ChatRecord chatRecord;
 
 
 	@Enumerated(EnumType.STRING)
@@ -86,9 +83,8 @@ public class PrivatePost extends BaseEntity {
 		String stanceDefendant,
 		String summaryAi,
 		String judgement,
-		AudioRecord audioRecord,
+		FileRecord fileRecord,
 		TextRecord textRecord,
-		ChatRecord chatRecord,
 		OriginType originType,
 		Integer faultRatePlaintiff,
 		Integer faultRateDefendant,
@@ -100,9 +96,8 @@ public class PrivatePost extends BaseEntity {
 		this.stanceDefendant = stanceDefendant;
 		this.summaryAi = summaryAi;
 		this.judgement = judgement;
-		this.audioRecord = audioRecord;
+		this.fileRecord = fileRecord;
 		this.textRecord = textRecord;
-		this.chatRecord = chatRecord;
 		this.originType = originType;
 		this.faultRatePlaintiff = faultRatePlaintiff;
 		this.faultRateDefendant = faultRateDefendant;

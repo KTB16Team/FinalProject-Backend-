@@ -30,8 +30,7 @@ import aimo.backend.domains.privatePost.model.OriginType;
 import aimo.backend.domains.privatePost.service.PrivatePostService;
 import aimo.backend.domains.upload.dto.parameter.SpeechToTextParameter;
 import aimo.backend.domains.upload.dto.request.SpeechToTextRequest;
-import aimo.backend.domains.upload.service.AudioRecordService;
-import aimo.backend.infrastructure.s3.S3Service;
+import aimo.backend.domains.upload.service.FileService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,9 +41,8 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class PrivatePostController {
 
-	private final AudioRecordService audioRecordService;
+	private final FileService fileService;
 	private final PrivatePostService privatePostService;
-	private final S3Service s3Service;
 
 	@PostMapping("/judgement/text")
 	public ResponseEntity<DataResponse<Void>> uploadTextRecordAndJudgement(
@@ -89,7 +87,7 @@ public class PrivatePostController {
 		SpeechToTextParameter parameter = SpeechToTextParameter.from(speechToTextRequest);
 
 		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(DataResponse.created(audioRecordService.speechToText(parameter)));
+			.body(DataResponse.created(fileService.speechToText(parameter)));
 	}
 
 	// 개인글 조회

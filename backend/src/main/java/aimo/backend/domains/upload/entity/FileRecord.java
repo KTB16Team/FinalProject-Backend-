@@ -1,12 +1,16 @@
-package aimo.backend.domains.privatePost.entity;
+package aimo.backend.domains.upload.entity;
 
 import static jakarta.persistence.GenerationType.*;
 import static lombok.AccessLevel.*;
 
 import aimo.backend.common.entity.BaseEntity;
-import aimo.backend.domains.upload.dto.parameter.SaveAudioMetaDataParameter;
+import aimo.backend.domains.privatePost.entity.PrivatePost;
+import aimo.backend.domains.upload.dto.parameter.SaveFileMetaDataParameter;
+import aimo.backend.infrastructure.s3.model.PreSignedUrlPrefix;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
@@ -19,38 +23,43 @@ import lombok.NoArgsConstructor;
 @Table(name = "audio_records")
 @Getter
 @NoArgsConstructor(access = PROTECTED)
-public class AudioRecord extends BaseEntity {
+public class FileRecord extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
-	@Column(name = "audio_record_id")
+	@Column(name = "file_record_id")
 	private Long id;
 
-	@Column(nullable = false, name = "file_name")
+	@Column(nullable = false)
 	private String filename;
 
-	@Column(nullable = false, name = "url")
+	@Column(nullable = false)
 	private String url;
 
-	@Column(nullable = false, name = "size")
+	@Column(nullable = false)
 	private Long size;
 
-	@Column(nullable = false, name = "extension")
+	@Column(nullable = false)
 	private String extension;
+
+	@Column(nullable = false)
+	@Enumerated(EnumType.STRING)
+	private PreSignedUrlPrefix prefix;
 
 	@OneToOne(mappedBy = "audioRecord")
 	private PrivatePost privatePost;
 
 	@Builder
-	private AudioRecord(String filename, String extension, String url, Long size) {
+	private FileRecord(String filename, String extension, String url, Long size, PreSignedUrlPrefix prefix) {
 		this.filename = filename;
 		this.url = url;
 		this.size = size;
 		this.extension = extension;
+		this.prefix = prefix;
 	}
 
-	public static AudioRecord from(SaveAudioMetaDataParameter parameter) {
-		return AudioRecord.builder()
+	public static FileRecord from(SaveFileMetaDataParameter parameter) {
+		return FileRecord.builder()
 			.filename(parameter.filename())
 			.extension(parameter.extension())
 			.url(parameter.url())

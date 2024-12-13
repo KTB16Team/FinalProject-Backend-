@@ -12,7 +12,7 @@ import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import aimo.backend.common.properties.S3Properties;
 import aimo.backend.infrastructure.s3.dto.parameter.CreateResourceUrlParameter;
 import aimo.backend.infrastructure.s3.dto.response.CreatePreSignedUrlResponse;
-import aimo.backend.infrastructure.s3.model.PresignedUrlPrefix;
+import aimo.backend.infrastructure.s3.model.PreSignedUrlPrefix;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -25,7 +25,7 @@ public class S3Service {
 	// PreSignedUrl 생성
 	public CreatePreSignedUrlResponse createPreSignedUrl(
 		String filename,
-		PresignedUrlPrefix prefix
+		PreSignedUrlPrefix prefix
 	) {
 		String path = createPath(prefix, filename);
 		String url = createGeneratePreSignedUrlRequest(path);
@@ -67,7 +67,7 @@ public class S3Service {
 	}
 
 	// 파일 형식 및 이름으로 저장
-	private String createPath(PresignedUrlPrefix prefix, String fileName) {
+	private String createPath(PreSignedUrlPrefix prefix, String fileName) {
 		return String.format("%s/%s", prefix.getValue(), fileName);
 	}
 }

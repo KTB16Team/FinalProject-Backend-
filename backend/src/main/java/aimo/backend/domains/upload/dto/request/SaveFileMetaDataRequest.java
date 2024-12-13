@@ -1,8 +1,9 @@
 package aimo.backend.domains.upload.dto.request;
 
+import aimo.backend.infrastructure.s3.model.PreSignedUrlPrefix;
 import jakarta.validation.constraints.NotNull;
 
-public record SaveAudioMetaDataRequest(
+public record SaveFileMetaDataRequest(
 	@NotNull(message = "URL이 필요합니다.")
 	String url,
 	@NotNull(message = "파일 사이즈가 필요합니다.")
@@ -10,10 +11,17 @@ public record SaveAudioMetaDataRequest(
 	@NotNull(message = "파일 이름이 필요합니다.")
 	String filename,
 	@NotNull(message = "파일 확장자가 필요합니다.")
-	String extension
+	String extension,
+	PreSignedUrlPrefix prefix
 ) {
 
-	public static SaveAudioMetaDataRequest of(String url, Long size, String filename, String extension) {
-		return new SaveAudioMetaDataRequest(url, size, filename, extension);
+	public static SaveFileMetaDataRequest of(
+		String url,
+		Long size,
+		String filename,
+		String extension,
+		PreSignedUrlPrefix prefix
+	) {
+		return new SaveFileMetaDataRequest(url, size, filename, extension, prefix);
 	}
 }
