@@ -72,7 +72,7 @@ public class DataInitConfig {
 
 		List<TextRecord> textRecords = new ArrayList<>();
 
-		for(int i=1; i<=200000; i++){
+		for(int i=1; i<=10000; i++){
 			TextRecord textRecord = TextRecord.builder()
 				.content("This is a text record " + i)
 				.build();
@@ -81,7 +81,7 @@ public class DataInitConfig {
 
 		// PrivatePosts 생성
 		List<PrivatePost> privatePosts = new ArrayList<>();
-		for (int i = 1; i <= 200000; i++) {
+		for (int i = 1; i <= 10000; i++) {
 			Member member = members.get(i % 3);
 			PrivatePost privatePost =
 				PrivatePost.builder()
@@ -105,7 +105,7 @@ public class DataInitConfig {
 
 		// Posts 생성
 		List<Post> posts = new ArrayList<>();
-		for (int i = 1; i <= 200000; i++) {
+		for (int i = 1; i <= 10000; i++) {
 			Member member = members.get(i % 3);
 			PrivatePost privatePost = privatePosts.get(i - 1);
 			SavePostParameter parameter = new SavePostParameter(member.getId(), privatePost.getId(), "Public Post Title " + i, "Plaintiff Stance " + i, "Defendant Stance " + i, "Summary AI " + i, "Judgement " + i, 50, 50, OriginType.TEXT, Category.COMMON);
@@ -116,7 +116,7 @@ public class DataInitConfig {
 
 		// ParentComments 생성
 		List<ParentComment> parentComments = new ArrayList<>();
-		for (int i = 1; i <= 200000; i++) {
+		for (int i = 1; i <= 10000; i++) {
 			Member member = members.get(i % 3);
 			Post post = posts.get(i - 1);
 			ParentComment parentComment =
@@ -132,7 +132,7 @@ public class DataInitConfig {
 
 		// ChildComments 생성
 		List<ChildComment> childComments = new ArrayList<>();
-		for (int i = 1; i <= 200000; i++) {
+		for (int i = 1; i <= 10000; i++) {
 			ParentComment parentComment = parentComments.get(i - 1);
 			Member member = members.get(i % 3);
 			ChildComment childComment =
