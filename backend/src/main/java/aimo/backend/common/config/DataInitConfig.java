@@ -29,9 +29,11 @@ import aimo.backend.domains.post.repository.PostRepository;
 import aimo.backend.domains.privatePost.entity.PrivatePost;
 import aimo.backend.domains.privatePost.entity.TextRecord;
 import aimo.backend.domains.privatePost.model.OriginType;
+import aimo.backend.domains.privatePost.model.PrivatePostStatus;
 import aimo.backend.domains.privatePost.repository.PrivatePostRepository;
 import aimo.backend.domains.privatePost.repository.TextRecordRepository;
 
+@Configuration
 public class DataInitConfig {
 
 	private final PasswordEncoder passwordEncoder;
@@ -94,6 +96,7 @@ public class DataInitConfig {
 					.faultRatePlaintiff(50)
 					.faultRateDefendant(50)
 					.published(true)
+					.privatePostStatus(PrivatePostStatus.SUCCESS)
 					.build();
 
 			privatePosts.add(privatePost);
