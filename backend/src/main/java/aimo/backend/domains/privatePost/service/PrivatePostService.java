@@ -9,6 +9,7 @@ import org.springframework.amqp.AmqpException;
 import org.springframework.data.domain.Page;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import aimo.backend.common.dto.PageResponse;
@@ -131,6 +132,8 @@ public class PrivatePostService {
 	}
 
 	// 개인글 단일 조회
+	// 에러 반환시 롤백하면 안된다.
+	@Transactional(noRollbackFor = ApiException.class)
 	public PrivatePostResponse findPrivatePostResponseBy(FindPrivatePostParameter parameter) {
 		PrivatePost privatePost = privatePostRepository.findByMember_IdAndId(
 				parameter.memberId(),
@@ -144,14 +147,12 @@ public class PrivatePostService {
 	}
 
 	// 개인글 상태에 따른 에러 리턴 및 실패시 개인글 삭제
-	@Transactional(rollbackFor = ApiException.class)
 	public void validatePrivatePostStatus(PrivatePost privatePost) {
-
 		// 분석 10분이 지난 경우 삭제하고 에러 반환
 		LocalDateTime createdAt = privatePost.getCreatedAt();
 		LocalDateTime now = LocalDateTime.now();
 		Duration duration = Duration.between(createdAt, now);
-		if (duration.toMinutes() > 10) {
+		if (duration.toMinutes() > 10 &&  privatePost.getPrivatePostStatus() == PrivatePostStatus.PROGRESS) {
 			privatePostRepository.delete(privatePost);
 			throw ApiException.from(PRIVATE_POST_FAIL);
 		}
