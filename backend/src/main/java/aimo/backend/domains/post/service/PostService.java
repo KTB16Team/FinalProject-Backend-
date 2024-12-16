@@ -4,6 +4,7 @@ import static aimo.backend.common.exception.ErrorCode.*;
 
 import java.util.List;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import aimo.backend.common.dto.PageResponse;
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.comment.repository.ChildCommentRepository;
@@ -96,7 +98,13 @@ public class PostService {
 	}
 
 	// PostType으로 글 조회
-	public Page<FindPostsByPostTypeResponse> findPostDtosByPostType(FindPostByPostTypeParameter parameter) {
+	// Popular Post는 캐시 적용
+	@Cacheable(
+		cacheNames = "shortTermCache",
+		key = "'popular-posts:page:' + #parameter.page() + ':size:' + #parameter.size() + ':postType:' + #parameter.postType()",
+		condition = "#parameter.postType() == T(aimo.backend.domains.post.model.PostType).POPULAR"
+	)
+	public PageResponse<FindPostsByPostTypeResponse> findPostDtosByPostType(FindPostByPostTypeParameter parameter) {
 		PostType postType = parameter.postType();
 
 		Pageable pageable = PageRequest.of(
@@ -105,7 +113,8 @@ public class PostService {
 			Sort.by(Sort.Direction.DESC, "id"));
 
 		// 각 PostType의 execute 메서드를 호출해 로직 실행
-		return postType.findPosts(this, parameter, pageable);
+		Page<FindPostsByPostTypeResponse> posts = postType.findPosts(this, parameter, pageable);
+		return PageResponse.from(posts);
 	}
 
 	// 내가 쓴 글 조회
@@ -118,6 +127,7 @@ public class PostService {
 
 	// 인기 글 조회
 	public Page<FindPostsByPostTypeResponse> findPopularPosts(Pageable pageable) {
+		log.info("find popular posts");
 		return postRepository
 			.findAllByOrderByPostViewsCountDesc(pageable)
 			.map(FindPostsByPostTypeResponse::from);
