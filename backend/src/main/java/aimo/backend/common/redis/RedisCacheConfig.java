@@ -11,6 +11,8 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 @Configuration
 @EnableCaching // Spring Boot의 캐싱 설정을 활성화
 public class RedisCacheConfig {
@@ -19,14 +21,12 @@ public class RedisCacheConfig {
 	@Bean
 	public RedisCacheConfiguration redisCacheConfiguration() {
 		return RedisCacheConfiguration.defaultCacheConfig()
-			.entryTtl(Duration.ofSeconds(60))
-			.disableCachingNullValues()
-			.serializeKeysWith(
-				RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer())
-			)
-			.serializeValuesWith(
-				RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer())
-			);
+			.entryTtl(Duration.ofMinutes(1)) // TTL 설정
+			.disableCachingNullValues() // null 값 캐싱 방지
+			.serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
+			.serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(
+				new GenericJackson2JsonRedisSerializer(new ObjectMapper()) // Custom ObjectMapper 사용
+			));
 	}
 
 	// 커스텀 캐시 전략
@@ -36,7 +36,9 @@ public class RedisCacheConfig {
 			.withCacheConfiguration("shortTermCache",
 				RedisCacheConfiguration.defaultCacheConfig()
 					.entryTtl(Duration.ofMinutes(1)) // cache1에 TTL 1분
-					.serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
-					.serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer())));
+					.serializeKeysWith(
+						RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
+					.serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(
+						new GenericJackson2JsonRedisSerializer())));
 	}
 }

@@ -1,6 +1,5 @@
 package aimo.backend.domains.privatePost.controller;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -16,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import aimo.backend.common.dto.DataResponse;
+import aimo.backend.common.dto.PageResponse;
 import aimo.backend.common.util.memberLoader.MemberLoader;
 import aimo.backend.domains.privatePost.dto.parameter.DeletePrivatePostParameter;
 import aimo.backend.domains.privatePost.dto.parameter.FindPrivatePostParameter;
@@ -104,7 +104,7 @@ public class PrivatePostController {
 	}
 
 	@GetMapping
-	public ResponseEntity<DataResponse<Page<PrivatePostPreviewResponse>>> findPrivatePostPage(
+	public ResponseEntity<DataResponse<PageResponse<PrivatePostPreviewResponse>>> findPrivatePostPage(
 		@Valid @RequestParam(defaultValue = "0") Integer page,
 		@Valid @RequestParam(defaultValue = "10") Integer size
 	) {

@@ -11,6 +11,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import aimo.backend.common.dto.PageResponse;
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.exception.ErrorCode;
 import aimo.backend.common.messageQueue.MessageQueueService;
@@ -141,6 +142,7 @@ public class PrivatePostService {
 
 		return PrivatePostResponse.from(privatePost);
 	}
+
 	// 개인글 상태에 따른 에러 리턴 및 실패시 개인글 삭제
 	@Transactional(rollbackFor = ApiException.class)
 	public void validatePrivatePostStatus(PrivatePost privatePost) {
@@ -167,9 +169,13 @@ public class PrivatePostService {
 	}
 
 	// 개인글 목록 조회
-	public Page<PrivatePostPreviewResponse> findPrivatePostPreviewsBy(FindPrivatePostPreviewParameter parameter) {
-		return privatePostRepository.findByMemberId(parameter.memberId(), parameter.pageable())
+	public PageResponse<PrivatePostPreviewResponse> findPrivatePostPreviewsBy(
+		FindPrivatePostPreviewParameter parameter) {
+		Page<PrivatePostPreviewResponse> privatePosts = privatePostRepository.findByMemberId(parameter.memberId(),
+				parameter.pageable())
 			.map(PrivatePostPreviewResponse::from);
+
+		return PageResponse.from(privatePosts);
 	}
 
 	// 개인글 공개 처리

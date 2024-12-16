@@ -1,6 +1,5 @@
 package aimo.backend.domains.post.controller;
 
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -13,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import aimo.backend.common.dto.DataResponse;
+import aimo.backend.common.dto.PageResponse;
 import aimo.backend.common.util.memberLoader.MemberLoader;
 import aimo.backend.domains.post.dto.parameter.DeletePostParameter;
 import aimo.backend.domains.post.dto.parameter.FindPostAndCommentsByIdParameter;
@@ -51,7 +51,7 @@ public class PostController {
 	}
 
 	@GetMapping
-	public ResponseEntity<DataResponse<Page<FindPostsByPostTypeResponse>>> findPostsByPostType(
+	public ResponseEntity<DataResponse<PageResponse<FindPostsByPostTypeResponse>>> findPostsByPostType(
 		@RequestParam("type") @NotNull PostType postType,
 		@RequestParam("page") @NotNull Integer page,
 		@RequestParam("size") @NotNull Integer size
@@ -60,7 +60,8 @@ public class PostController {
 
 		FindPostByPostTypeParameter parameter = FindPostByPostTypeParameter.of(memberId, postType, page, size);
 
-		return ResponseEntity.ok(DataResponse.from(postService.findPostDtosByPostType(parameter)));
+		PageResponse<FindPostsByPostTypeResponse> responses = postService.findPostDtosByPostType(parameter);
+		return ResponseEntity.ok(DataResponse.from(responses));
 	}
 
 	@GetMapping("/{postId}")
