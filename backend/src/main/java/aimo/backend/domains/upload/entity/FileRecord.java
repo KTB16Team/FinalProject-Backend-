@@ -33,11 +33,8 @@ public class FileRecord extends BaseEntity {
 	@Column(nullable = false)
 	private String filename;
 
-	@Column(nullable = false, length = 1000)
-	private String url;
-
-	@Column(nullable = false)
-	private Long size;
+	@Column(name = "file_key", nullable = false, length = 1000)
+	private String key;
 
 	@Column(nullable = false)
 	private String extension;
@@ -50,20 +47,18 @@ public class FileRecord extends BaseEntity {
 	private PrivatePost privatePost;
 
 	@Builder
-	private FileRecord(String filename, String extension, String url, Long size, PreSignedUrlPrefix prefix) {
+	private FileRecord(String filename, String extension, String key, PreSignedUrlPrefix prefix) {
 		this.filename = filename;
-		this.url = url;
-		this.size = size;
+		this.key = key;
 		this.extension = extension;
 		this.prefix = prefix;
 	}
 
-	public static FileRecord from(SaveFileMetaDataParameter parameter) {
+	public static FileRecord of(SaveFileMetaDataParameter parameter, String key) {
 		return FileRecord.builder()
 			.filename(parameter.filename())
 			.extension(parameter.extension())
-			.url(parameter.url())
-			.size(parameter.size())
+			.key(key)
 			.prefix(parameter.prefix())
 			.build();
 	}

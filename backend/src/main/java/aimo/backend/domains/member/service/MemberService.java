@@ -112,10 +112,13 @@ public class MemberService {
 
 		if (member.getProfileImage() != null)
 			deleteProfileImage(deleteProfileImageParameter);
-		
-		CreateResourceUrlParameter createResourceUrlParameter =
-			CreateResourceUrlParameter.from(PreSignedUrlPrefix.IMAGE, parameter);
-		String url = s3Service.getResourceUrl(createResourceUrlParameter);
+
+		// url 상상
+		String url = s3Service.getResourceUrl(
+			PreSignedUrlPrefix.IMAGE.getValue(),
+			parameter.filename(),
+			parameter.extension());
+
 		ProfileImage profileImage = ProfileImage.of(parameter, member, url);
 
 		profileImageRepository.save(profileImage);

@@ -13,7 +13,6 @@ import aimo.backend.common.dto.DataResponse;
 import aimo.backend.domains.upload.dto.parameter.CreateFilePreSignedUrlParameter;
 import aimo.backend.domains.upload.dto.parameter.SaveFileMetaDataParameter;
 import aimo.backend.domains.upload.dto.request.SaveFileMetaDataRequest;
-import aimo.backend.domains.upload.dto.response.SaveFileMetaDataResponse;
 import aimo.backend.domains.upload.service.FileService;
 import aimo.backend.infrastructure.s3.dto.response.CreatePreSignedUrlResponse;
 import aimo.backend.infrastructure.s3.model.PreSignedUrlPrefix;
@@ -28,22 +27,23 @@ public class FileController {
 	private final FileService fileService;
 
 	@PostMapping
-	public ResponseEntity<DataResponse<SaveFileMetaDataResponse>> saveFileMetaData(
+	public ResponseEntity<DataResponse<Void>> saveFileMetaData(
 		@Valid @RequestBody SaveFileMetaDataRequest request
 	) {
-		System.out.println(request.prefix());
 		SaveFileMetaDataParameter parameter = SaveFileMetaDataParameter.from(request);
+		fileService.save(parameter);
 
 		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(DataResponse.created(fileService.save(parameter)));
+			.body(DataResponse.created());
 	}
 
 	@GetMapping("/presigned")
 	public ResponseEntity<DataResponse<CreatePreSignedUrlResponse>> createFilePreSignedUrl(
 		@RequestParam("filename") String filename,
-		@RequestParam("prefix") PreSignedUrlPrefix prefix
+		@RequestParam("prefix") PreSignedUrlPrefix prefix,
+		@RequestParam("extension") String extension
 	) {
-		CreateFilePreSignedUrlParameter parameter = CreateFilePreSignedUrlParameter.of(filename, prefix);
+		CreateFilePreSignedUrlParameter parameter = CreateFilePreSignedUrlParameter.of(filename, extension, prefix);
 
 		CreatePreSignedUrlResponse response = fileService.createFilePreSignedUrl(parameter);
 

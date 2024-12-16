@@ -10,7 +10,6 @@ import aimo.backend.common.util.webclient.ReactiveHttpService;
 import aimo.backend.domains.upload.dto.parameter.CreateFilePreSignedUrlParameter;
 import aimo.backend.domains.upload.dto.parameter.SaveFileMetaDataParameter;
 import aimo.backend.domains.upload.dto.parameter.SpeechToTextParameter;
-import aimo.backend.domains.upload.dto.response.SaveFileMetaDataResponse;
 import aimo.backend.domains.privatePost.dto.response.SpeechToTextResponse;
 import aimo.backend.domains.upload.entity.FileRecord;
 import aimo.backend.domains.upload.repository.FileRepository;
@@ -37,13 +36,16 @@ public class FileService {
 
 	// 음성 파일 메타데이터 저장
 	@Transactional(rollbackFor = ApiException.class)
-	public SaveFileMetaDataResponse save(SaveFileMetaDataParameter parameter) {
-		FileRecord fileRecord = fileRepository.save(FileRecord.from(parameter));
-		return SaveFileMetaDataResponse.from(fileRecord);
+	public void save(SaveFileMetaDataParameter parameter) {
+		// url 생성
+		String url = s3Service.getUrl(parameter.key());
+
+		fileRepository.save(FileRecord.of(parameter, url));
 	}
 
 	public CreatePreSignedUrlResponse createFilePreSignedUrl(CreateFilePreSignedUrlParameter parameter) {
 		// Prefix 타입과 extention 일치하는 지 확인
+
 		if (!parameter.prefix().isValidExtension(parameter.extension())) {
 			throw ApiException.from(ErrorCode.INVALID_FILE_EXTENSION);
 		}
