@@ -13,7 +13,9 @@ import aimo.backend.domains.member.entity.Member;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
@@ -33,8 +35,8 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 		String accessToken = jwtTokenProvider.createAccessToken(member.getId());
 		String refreshToken = jwtTokenProvider.createRefreshToken(member.getId());
 
-		// jwtTokenProvider.sendAccessAndRefreshToken(response, accessToken, refreshToken);
-		// jwtTokenProvider.saveOrUpdateRefreshToken(member.getId(), refreshToken);
+		// RefreshToken 저장
+		jwtTokenProvider.saveOrUpdateRefreshToken(member.getId(), refreshToken);
 
 		// React의 Redirect URI로 리다이렉트
 		String redirectUrl = String.format(
