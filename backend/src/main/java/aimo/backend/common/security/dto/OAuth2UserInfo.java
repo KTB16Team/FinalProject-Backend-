@@ -42,7 +42,7 @@ public class OAuth2UserInfo {
 	}
 
 	public Member toEntity() {
-		return Member.createOAuthMember(email, name, MemberRole.GUEST, provider, providerId);
+		return Member.createOAuthMember(email, name, MemberRole.USER, provider, providerId);
 	}
 
 }
