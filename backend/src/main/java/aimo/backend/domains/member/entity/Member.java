@@ -18,6 +18,7 @@ import aimo.backend.domains.member.model.Provider;
 import aimo.backend.common.entity.BaseEntity;
 import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.post.entity.Post;
+import aimo.backend.domains.upload.entity.ProfileImage;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

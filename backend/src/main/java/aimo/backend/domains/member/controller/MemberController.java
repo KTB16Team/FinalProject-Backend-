@@ -3,7 +3,6 @@ package aimo.backend.domains.member.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,9 +16,7 @@ import aimo.backend.common.dto.DataResponse;
 import aimo.backend.common.security.filter.jwtFilter.JwtTokenProvider;
 import aimo.backend.common.util.memberLoader.MemberLoader;
 import aimo.backend.domains.member.dto.parameter.DeleteMemberParameter;
-import aimo.backend.domains.member.dto.parameter.DeleteProfileImageParameter;
 import aimo.backend.domains.member.dto.parameter.FindMyInfoParameter;
-import aimo.backend.domains.member.dto.parameter.SaveFileMetaDataParameter;
 import aimo.backend.domains.member.dto.parameter.SignUpParameter;
 import aimo.backend.domains.member.dto.parameter.UpdateNicknameParameter;
 import aimo.backend.domains.member.dto.parameter.UpdatePasswordParameter;
@@ -32,10 +29,6 @@ import aimo.backend.domains.member.dto.request.UpdatePasswordRequest;
 import aimo.backend.domains.member.dto.response.FindMyInfoResponse;
 import aimo.backend.domains.member.dto.response.NicknameExistsResponse;
 import aimo.backend.domains.member.service.MemberService;
-import aimo.backend.infrastructure.s3.S3Service;
-import aimo.backend.infrastructure.s3.dto.request.SaveFileMetaDataRequest;
-import aimo.backend.infrastructure.s3.dto.response.CreatePreSignedUrlResponse;
-import aimo.backend.infrastructure.s3.model.PreSignedUrlPrefix;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -50,8 +43,8 @@ public class MemberController {
 
 	private final MemberService memberService;
 	private final JwtTokenProvider jwtTokenProvider;
-	private final S3Service s3Service;
 
+	// 로그아웃
 	@PostMapping("/logout")
 	public ResponseEntity<DataResponse<Void>> logoutMember(HttpServletRequest request) {
 		String accessToken = jwtTokenProvider.extractAccessToken(request)
@@ -62,6 +55,7 @@ public class MemberController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
 
+	// 회원가입
 	@PostMapping("/signup")
 	public ResponseEntity<DataResponse<Void>> signupMember(@RequestBody @Valid SignUpParameter parameter) {
 		memberService.signUp(parameter);
@@ -69,6 +63,7 @@ public class MemberController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
 
+	// 회원탈퇴
 	@PostMapping
 	public ResponseEntity<DataResponse<Void>> deleteMember(@RequestBody @Valid DeleteMemberRequest request) {
 		Long memberId = MemberLoader.getMemberId();
@@ -78,38 +73,6 @@ public class MemberController {
 		memberService.deleteMember(parameter);
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
-	}
-
-	@GetMapping("/profile/presigned/{filename}")
-	public ResponseEntity<DataResponse<CreatePreSignedUrlResponse>> createProfileImagePreSignedUrl(
-		@PathVariable("filename") String filename
-	) {
-		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(DataResponse.created(s3Service.createPreSignedUrl(filename, PreSignedUrlPrefix.IMAGE)));
-	}
-
-	@PostMapping("/profile/success")
-	public ResponseEntity<DataResponse<Void>> saveProfileImageMetaData(
-		@RequestBody @Valid SaveFileMetaDataRequest request
-	) {
-		Long memberId = MemberLoader.getMemberId();
-
-		SaveFileMetaDataParameter parameter = SaveFileMetaDataParameter.of(memberId, request);
-
-		memberService.saveProfileImageMetaData(parameter);
-
-		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
-	}
-
-	@DeleteMapping("/profile")
-	public ResponseEntity<DataResponse<Void>> deleteProfileImage() {
-		Long memberId = MemberLoader.getMemberId();
-
-		DeleteProfileImageParameter parameter = DeleteProfileImageParameter.from(memberId);
-
-		memberService.deleteProfileImage(parameter);
-
-		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(DataResponse.noContent());
 	}
 
 	@PostMapping(value = "/login", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
@@ -155,6 +118,7 @@ public class MemberController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
 
+	// 닉네임 중복 확인
 	@GetMapping("/nickname/{nickname}/exists")
 	public ResponseEntity<DataResponse<NicknameExistsResponse>> checkNicknameExists(
 		@PathVariable("nickname") String nickname
@@ -166,6 +130,7 @@ public class MemberController {
 		return ResponseEntity.status(HttpStatus.OK).body(DataResponse.from(exist));
 	}
 
+	// 닉네임 수정
 	@PutMapping("/nickname")
 	public ResponseEntity<DataResponse<Void>> updateNickname(
 		@RequestBody @Valid UpdateNicknameRequest updateNicknameRequest

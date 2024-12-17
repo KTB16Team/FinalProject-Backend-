@@ -14,9 +14,8 @@ import aimo.backend.domains.comment.entity.ChildComment;
 import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.member.dto.parameter.DeleteMemberContentsParameter;
 import aimo.backend.domains.member.dto.parameter.DeleteMemberParameter;
-import aimo.backend.domains.member.dto.parameter.DeleteProfileImageParameter;
+
 import aimo.backend.domains.member.dto.parameter.FindMyInfoParameter;
-import aimo.backend.domains.member.dto.parameter.SaveFileMetaDataParameter;
 import aimo.backend.domains.member.dto.parameter.SignUpParameter;
 import aimo.backend.domains.member.dto.parameter.UpdateNicknameParameter;
 import aimo.backend.domains.member.dto.parameter.UpdatePasswordParameter;
@@ -25,13 +24,10 @@ import aimo.backend.domains.member.dto.request.LogoutRequest;
 import aimo.backend.domains.member.dto.request.SendTemporaryPasswordRequest;
 import aimo.backend.domains.member.dto.response.FindMyInfoResponse;
 import aimo.backend.domains.member.entity.Member;
-import aimo.backend.domains.member.entity.ProfileImage;
 import aimo.backend.domains.member.repository.MemberRepository;
-import aimo.backend.domains.member.repository.ProfileImageRepository;
+import aimo.backend.domains.upload.repository.ProfileImageRepository;
 import aimo.backend.domains.post.entity.Post;
 import aimo.backend.infrastructure.s3.S3Service;
-import aimo.backend.infrastructure.s3.dto.parameter.CreateResourceUrlParameter;
-import aimo.backend.infrastructure.s3.model.PreSignedUrlPrefix;
 import aimo.backend.infrastructure.smtp.MailService;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
@@ -103,37 +99,6 @@ public class MemberService {
 			.forEach(ChildComment::deleteChildCommentSoftly);
 	}
 
-	// 프로필 이미지 메타데이터 저장
-	@Transactional(rollbackFor = ApiException.class)
-	public void saveProfileImageMetaData(SaveFileMetaDataParameter parameter) {
-		Long memberId = parameter.memberId();
-		Member member = findMemberById(memberId);
-		DeleteProfileImageParameter deleteProfileImageParameter = new DeleteProfileImageParameter(memberId);
-
-		if (member.getProfileImage() != null)
-			deleteProfileImage(deleteProfileImageParameter);
-
-		// url 상상
-		String url = s3Service.getResourceUrl(
-			PreSignedUrlPrefix.IMAGE.getValue(),
-			parameter.filename(),
-			parameter.extension());
-
-		ProfileImage profileImage = ProfileImage.of(parameter, member, url);
-
-		profileImageRepository.save(profileImage);
-		member.updateProfileImage(profileImage);
-	}
-
-	// 프로필 이미지 삭제
-	@Transactional(rollbackFor = ApiException.class)
-	public void deleteProfileImage(DeleteProfileImageParameter parameter) {
-		Member member = findMemberById(parameter.memberId());
-		ProfileImage profileImage = member.getProfileImage();
-		profileImageRepository.delete(profileImage);
-		member.updateProfileImage(null);
-	}
-
 	// 비밀번호 변경
 	@Transactional(rollbackFor = ApiException.class)
 	public void updatePassword(UpdatePasswordParameter parameter) {
@@ -149,6 +114,12 @@ public class MemberService {
 	public void updateNickname(UpdateNicknameParameter parameter) {
 		Member member = findMemberById(parameter.memberId());
 
+		// 닉네임이 같으면 변경하지 않음
+		if (member.getNickname().equals(parameter.newNickname())) {
+			return;
+		}
+
+		// 닉네임 중복 검사
 		validateDuplicateNickname(parameter.newNickname());
 
 		member.updateNickname(parameter.newNickname());

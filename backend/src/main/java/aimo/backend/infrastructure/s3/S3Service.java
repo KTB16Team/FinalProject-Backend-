@@ -50,11 +50,9 @@ public class S3Service {
 
 	// s3를 통해 PreSignedUrl 생성 요청
 	private GeneratePresignedUrlRequest createGeneratePreSignedUrlRequest(String key) {
-		GeneratePresignedUrlRequest generatePresignedUrlRequest =
-			new GeneratePresignedUrlRequest(s3Properties.getBucketName(), key)
-				.withMethod(HttpMethod.PUT)
-				.withExpiration(getPreSignedUrlExpiration());
-		return generatePresignedUrlRequest;
+		return new GeneratePresignedUrlRequest(s3Properties.getBucketName(), key)
+			.withMethod(HttpMethod.PUT)
+			.withExpiration(getPreSignedUrlExpiration());
 	}
 
 	// PreSignedUrl 만료 시간 설정
@@ -66,17 +64,9 @@ public class S3Service {
 		return expiration;
 	}
 
-	// 파일 URL 생성
-	public String getResourceUrl(String prefix, String filename, String extension) {
-		String key = prefix + "/" + filename + "." + extension;
-
-		return amazonS3Client.getUrl(s3Properties.getBucketName(), key).toString();
-	}
-
-
 	// 파일 삭제
-	public void deleteFile(String path) {
-		amazonS3Client.deleteObject(s3Properties.getBucketName(), path);
+	public void deleteFile(String key) {
+		amazonS3Client.deleteObject(s3Properties.getBucketName(), key);
 	}
 
 }

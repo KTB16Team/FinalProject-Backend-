@@ -1,9 +1,10 @@
-package aimo.backend.domains.member.entity;
+package aimo.backend.domains.upload.entity;
 
 import static lombok.AccessLevel.*;
 
 import aimo.backend.common.entity.BaseEntity;
-import aimo.backend.domains.member.dto.parameter.SaveFileMetaDataParameter;
+import aimo.backend.domains.member.entity.Member;
+import aimo.backend.domains.upload.dto.parameter.SaveProfileImageMetaDataParameter;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -29,8 +30,8 @@ public class ProfileImage extends BaseEntity {
 	@Column
 	private String url;
 
-	@Column(nullable = false)
-	private Long size;
+	@Column(name = "profile_image_key", nullable = false, length = 1000)
+	private String key;
 
 	@Column(nullable = false)
 	private String filename;
@@ -42,18 +43,18 @@ public class ProfileImage extends BaseEntity {
 	private Member member;
 
 	@Builder
-	protected ProfileImage(String url, Long size, String filename, String extension, Member member) {
+	protected ProfileImage(String url, String key, String filename, String extension, Member member) {
 		this.url = url;
-		this.size = size;
+		this.key = key;
 		this.filename = filename;
 		this.extension = extension;
 		this.member = member;
 	}
 
-	public static ProfileImage of(SaveFileMetaDataParameter parameter, Member member, String url) {
+	public static ProfileImage of(SaveProfileImageMetaDataParameter parameter, Member member, String url) {
 		return ProfileImage.builder()
 			.url(url)
-			.size(parameter.size())
+			.key(parameter.key())
 			.filename(parameter.filename())
 			.extension(parameter.extension())
 			.member(member)
