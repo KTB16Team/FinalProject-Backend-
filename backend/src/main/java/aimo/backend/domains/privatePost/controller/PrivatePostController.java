@@ -20,16 +20,19 @@ import aimo.backend.common.util.memberLoader.MemberLoader;
 import aimo.backend.domains.privatePost.dto.parameter.DeletePrivatePostParameter;
 import aimo.backend.domains.privatePost.dto.parameter.FindPrivatePostParameter;
 import aimo.backend.domains.privatePost.dto.parameter.FindPrivatePostPreviewParameter;
+import aimo.backend.domains.privatePost.dto.parameter.ImageToTextParameter;
 import aimo.backend.domains.privatePost.dto.parameter.JudgementToAiParameter;
+import aimo.backend.domains.privatePost.dto.request.ImageToTextRequest;
 import aimo.backend.domains.privatePost.dto.request.UpdateContentToPrivatePostRequest;
 import aimo.backend.domains.privatePost.dto.request.UploadTextRecordAndRequestJudgementRequest;
+import aimo.backend.domains.privatePost.dto.response.ImageToTextResponse;
 import aimo.backend.domains.privatePost.dto.response.PrivatePostPreviewResponse;
 import aimo.backend.domains.privatePost.dto.response.PrivatePostResponse;
 import aimo.backend.domains.privatePost.dto.response.SpeechToTextResponse;
 import aimo.backend.domains.privatePost.model.OriginType;
 import aimo.backend.domains.privatePost.service.PrivatePostService;
-import aimo.backend.domains.upload.dto.parameter.SpeechToTextParameter;
-import aimo.backend.domains.upload.dto.request.SpeechToTextRequest;
+import aimo.backend.domains.privatePost.dto.parameter.SpeechToTextParameter;
+import aimo.backend.domains.privatePost.dto.request.SpeechToTextRequest;
 import aimo.backend.domains.upload.service.FileService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -82,12 +85,22 @@ public class PrivatePostController {
 
 	@PostMapping("/speech-to-text")
 	public ResponseEntity<DataResponse<SpeechToTextResponse>> speechToText(
-		@Valid @RequestBody SpeechToTextRequest speechToTextRequest
+		@Valid @RequestBody SpeechToTextRequest request
 	) {
-		SpeechToTextParameter parameter = SpeechToTextParameter.from(speechToTextRequest);
+		SpeechToTextParameter parameter = SpeechToTextParameter.from(request);
 
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(DataResponse.created(fileService.speechToText(parameter)));
+	}
+
+	@PostMapping("/image-to-text")
+	public ResponseEntity<DataResponse<ImageToTextResponse>> ImageToText(
+		@Valid @RequestBody ImageToTextRequest request
+	) {
+		ImageToTextParameter parameter = ImageToTextParameter.from(request.url());
+
+		return ResponseEntity.status(HttpStatus.CREATED)
+			.body(DataResponse.created(fileService.imageToText(parameter)));
 	}
 
 	// 개인글 조회

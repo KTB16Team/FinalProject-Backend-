@@ -9,11 +9,13 @@ import aimo.backend.common.properties.AiServerProperties;
 import aimo.backend.common.util.webclient.ReactiveHttpService;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.member.repository.MemberRepository;
+import aimo.backend.domains.privatePost.dto.parameter.ImageToTextParameter;
+import aimo.backend.domains.privatePost.dto.response.ImageToTextResponse;
 import aimo.backend.domains.privatePost.dto.response.SpeechToTextResponse;
 import aimo.backend.domains.upload.dto.parameter.CreateFilePreSignedUrlParameter;
 import aimo.backend.domains.upload.dto.parameter.SaveFileMetaDataParameter;
 import aimo.backend.domains.upload.dto.parameter.SaveProfileImageMetaDataParameter;
-import aimo.backend.domains.upload.dto.parameter.SpeechToTextParameter;
+import aimo.backend.domains.privatePost.dto.parameter.SpeechToTextParameter;
 import aimo.backend.domains.upload.dto.response.FindProfileImageUrlResponse;
 import aimo.backend.domains.upload.entity.FileRecord;
 import aimo.backend.domains.upload.entity.ProfileImage;
@@ -39,6 +41,12 @@ public class FileService {
 	public SpeechToTextResponse speechToText(SpeechToTextParameter speechToTextParameter) {
 		String url = aiServerProperties.getDomainUrl() + aiServerProperties.getSpeechToTextApi();
 		return reactiveHttpService.<SpeechToTextParameter, SpeechToTextResponse>post(url, speechToTextParameter).block();
+	}
+
+	// AI서버에 이미지 파일을 텍스트로 변환 요청
+	public ImageToTextResponse imageToText(ImageToTextParameter parameter) {
+		String url = aiServerProperties.getDomainUrl() + aiServerProperties.getImageToTextApi();
+		return reactiveHttpService.<ImageToTextParameter, ImageToTextResponse>post(url, parameter).block();
 	}
 
 	// 음성 파일 메타데이터 저장
