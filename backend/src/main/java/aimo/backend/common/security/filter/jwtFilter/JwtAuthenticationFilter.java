@@ -35,12 +35,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
 		String path = request.getRequestURI();
 
-		boolean result = Arrays.stream(securityProperties.getPermitUrls())
+		return Arrays.stream(securityProperties.getPermitUrls())
 			.anyMatch(permitUrl -> pathMatcher.match(permitUrl, path));
-
-		log.info("JwtAuthenticationFilter.shouldNotFilter({}) : {}", path, result);
-
-		return result;
 	}
 
 	@Override
