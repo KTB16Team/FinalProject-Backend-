@@ -12,7 +12,6 @@ public enum ErrorCode {
 	BAD_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 요청입니다.", "COMMON-001"),
 	INVALID_PARAMETER(HttpStatus.BAD_REQUEST, "요청 파라미터가 잘못 되었습니다.", "COMMON-002"),
 	INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부에서 에러가 발생하였습니다.", "COMMON-003"),
-	EMAIL_BAD_GATEWAY(HttpStatus.BAD_GATEWAY, "이메일 전송에 실패하였습니다.", "COMMON-004"),
 	NULL_POINTER(HttpStatus.INTERNAL_SERVER_ERROR, "Null 포인터 Exception이 발생하였습니다.", "COMMON-005"),
 	ILLEGAL_ARGUMENT(HttpStatus.BAD_REQUEST, "IllegalArgument Exception이 발생하였습니다.", "COMMON-006"),
 	IO_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "Stream 변환 과정에서 에러가 발생하였습니다.", "COMMON-007"),
@@ -30,7 +29,6 @@ public enum ErrorCode {
 	//Member
 	INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호가 잘못 되었습니다.", "MEMBER-001"),
 	MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당하는 회원을 찾을 수 없습니다.", "MEMBER-002"),
-	EMAIL_DUPLICATE(HttpStatus.CONFLICT, "이미 가입된 이메일입니다.", "MEMBER-003"),
 	MEMBER_NAME_DUPLICATE(HttpStatus.CONFLICT, "이미 가입된 닉네임입니다.", "MEMBER-004"),
 	MEMBER_NAME_UPDATE_FAIL(HttpStatus.BAD_REQUEST, "닉네임 변경에 실패하였습니다.", "MEMBER-005"),
 	PROFILE_IMAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당하는 프로필 이미지를 찾을 수 없습니다.", "MEMBER-006"),
@@ -91,6 +89,13 @@ public enum ErrorCode {
 
 	// CHAT
 	CHAT_RECORD_NOT_FOUND(HttpStatus.NOT_FOUND, "해당하는 채팅 레코드를 찾을 수 없습니다.", "CHAT-001"),
+
+	// EMAIL
+	UNAUTHENTICATED_EMAIL(HttpStatus.UNAUTHORIZED, "이메일 인증이 필요합니다." , "EMAIL-001"),
+	EMAIL_BAD_GATEWAY(HttpStatus.BAD_GATEWAY, "이메일 전송에 실패하였습니다.", "EMAIL-002"),
+	EMAIL_CODE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 이메일 코드를 찾을 수 없습니다.", "EMAIL-003"),
+	EMAIL_DUPLICATE(HttpStatus.CONFLICT, "이미 가입된 이메일입니다.", "EMAIL-004"),
+	INVALID_EMAIL_CODE(HttpStatus.BAD_REQUEST, "유효하지 않은 이메일 코드입니다.", "EMAIL-005"),
 	;
 
 	private final HttpStatus httpStatus;

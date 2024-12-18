@@ -3,6 +3,7 @@ package aimo.backend.domains.member.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,13 +24,17 @@ import aimo.backend.domains.member.dto.parameter.UpdatePasswordParameter;
 import aimo.backend.domains.member.dto.request.CheckNicknameExistsRequest;
 import aimo.backend.domains.member.dto.request.DeleteMemberRequest;
 import aimo.backend.domains.member.dto.request.LogoutRequest;
-import aimo.backend.domains.member.dto.request.SendTemporaryPasswordRequest;
+import aimo.backend.domains.member.dto.request.SendNewPasswordRequest;
+import aimo.backend.domains.member.dto.request.SignUpRequest;
 import aimo.backend.domains.member.dto.request.UpdateNicknameRequest;
 import aimo.backend.domains.member.dto.request.UpdatePasswordRequest;
 import aimo.backend.domains.member.dto.response.FindMyInfoResponse;
 import aimo.backend.domains.member.dto.response.NicknameExistsResponse;
 import aimo.backend.domains.member.service.MemberService;
-import jakarta.mail.MessagingException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -57,7 +62,9 @@ public class MemberController {
 
 	// 회원가입
 	@PostMapping("/signup")
-	public ResponseEntity<DataResponse<Void>> signupMember(@RequestBody @Valid SignUpParameter parameter) {
+	public ResponseEntity<DataResponse<Void>> signupMember(@RequestBody @Valid SignUpRequest request) {
+		SignUpParameter parameter = SignUpParameter.from(request);
+
 		memberService.signUp(parameter);
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
@@ -108,14 +115,35 @@ public class MemberController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
 	}
 
-	// 비밀번호 재발급(임시 비밀번호를 이메일로 전송)
-	@PostMapping("/password/temp")
-	public ResponseEntity<DataResponse<Void>> sendTemporaryPassword(
-		@Valid @RequestBody SendTemporaryPasswordRequest sendTemporaryPasswordRequest
-	) throws MessagingException {
-		memberService.updateTemporaryPasswordAndSendMail(sendTemporaryPasswordRequest);
+	@PostMapping("/password-reissue")
+	@Operation(
+		summary = "비밀번호 재발급",
+		description = """
+			인증 요청을 한 email이 없으면 401
+			code가 일치하면 true, 일치하지 않으면 false를 반환한다.""",
+		responses = {
+			@ApiResponse(
+				responseCode = "200",
+				description = "성공"
+			),
+			@ApiResponse(
+				responseCode = "400",
+				description = "유효하지 않은 이메일 코드입니다.",
+				content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+			),
+			@ApiResponse(
+				responseCode = "401",
+				description = "이메일 인증을 시도해주세요.",
+				content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+			)
+		}
+	)
+	public ResponseEntity<DataResponse<Void>> sendNewPassword(
+		@RequestBody @Valid SendNewPasswordRequest request
+	) {
+		memberService.validateCodeAndSendNewPassword(request);
 
-		return ResponseEntity.status(HttpStatus.CREATED).body(DataResponse.created());
+		return ResponseEntity.ok(DataResponse.ok());
 	}
 
 	// 닉네임 중복 확인
