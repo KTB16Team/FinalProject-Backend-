@@ -13,6 +13,8 @@ import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Size;
 
 public record SignUpRequest(
+	@NotNull(message = "code가 비었습니다.")
+	Integer code,
 	@NotBlank(message = "nickname이 빈 문자열입니다.")
 	String nickname,
 	@Email(message = "email 형식이 아닙니다.")

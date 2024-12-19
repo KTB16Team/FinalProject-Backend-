@@ -5,9 +5,9 @@ import org.springframework.context.annotation.Configuration;
 
 import aimo.backend.common.properties.AiServerProperties;
 import aimo.backend.common.properties.CorsProperties;
+import aimo.backend.common.properties.EmailProperties;
 import aimo.backend.common.properties.FrontProperties;
 import aimo.backend.common.properties.JwtProperties;
-import aimo.backend.common.properties.MailProperties;
 import aimo.backend.common.properties.RabbitMqProperties;
 import aimo.backend.common.properties.RedisProperties;
 import aimo.backend.common.properties.S3Properties;
@@ -20,10 +20,10 @@ import aimo.backend.common.properties.SecurityProperties;
 	CorsProperties.class,
 	AiServerProperties.class,
 	S3Properties.class,
-	MailProperties.class,
 	FrontProperties.class,
 	RedisProperties.class,
-	RabbitMqProperties.class
+	RabbitMqProperties.class,
+	EmailProperties.class
 })
 public class PropertiesConfig {
 }
