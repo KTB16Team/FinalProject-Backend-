@@ -22,7 +22,10 @@ import aimo.backend.domains.privatePost.dto.parameter.FindPrivatePostParameter;
 import aimo.backend.domains.privatePost.dto.parameter.FindPrivatePostPreviewParameter;
 import aimo.backend.domains.privatePost.dto.parameter.ImageToTextParameter;
 import aimo.backend.domains.privatePost.dto.parameter.JudgementToAiParameter;
+import aimo.backend.domains.privatePost.dto.parameter.SpeechToTextParameter;
+import aimo.backend.domains.privatePost.dto.parameter.UpdateContentToPrivatePostParameter;
 import aimo.backend.domains.privatePost.dto.request.ImageToTextRequest;
+import aimo.backend.domains.privatePost.dto.request.SpeechToTextRequest;
 import aimo.backend.domains.privatePost.dto.request.UpdateContentToPrivatePostRequest;
 import aimo.backend.domains.privatePost.dto.request.UploadTextRecordAndRequestJudgementRequest;
 import aimo.backend.domains.privatePost.dto.response.ImageToTextResponse;
@@ -31,8 +34,6 @@ import aimo.backend.domains.privatePost.dto.response.PrivatePostResponse;
 import aimo.backend.domains.privatePost.dto.response.SpeechToTextResponse;
 import aimo.backend.domains.privatePost.model.OriginType;
 import aimo.backend.domains.privatePost.service.PrivatePostService;
-import aimo.backend.domains.privatePost.dto.parameter.SpeechToTextParameter;
-import aimo.backend.domains.privatePost.dto.request.SpeechToTextRequest;
 import aimo.backend.domains.upload.service.FileService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -68,7 +69,10 @@ public class PrivatePostController {
 	public ResponseEntity<DataResponse<Void>> updateContentToPrivatePost(
 		@Valid @RequestBody UpdateContentToPrivatePostRequest request
 	) {
-		privatePostService.updateContentToPrivatePost(request);
+		Long memberId = MemberLoader.getMemberId();
+
+		UpdateContentToPrivatePostParameter parameter = UpdateContentToPrivatePostParameter.from(request, memberId);
+		privatePostService.updateContentToPrivatePost(parameter);
 
 		return ResponseEntity.ok(DataResponse.ok());
 	}

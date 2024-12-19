@@ -8,6 +8,7 @@ import aimo.backend.common.exception.ErrorCode;
 import aimo.backend.domains.member.dto.response.FindMemberPointResponse;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.member.entity.MemberAttemptCount;
+import aimo.backend.domains.member.model.DecreasePoint;
 import aimo.backend.domains.member.model.IncreasePoint;
 import aimo.backend.domains.member.repository.MemberAttemptCountRepository;
 import aimo.backend.domains.member.repository.MemberRepository;
@@ -41,5 +42,12 @@ public class MemberPointService {
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> ApiException.from(ErrorCode.MEMBER_NOT_FOUND));
 		return new FindMemberPointResponse(member.getPoint());
+	}
+
+	@Transactional
+	public void decreaseMemberPoint(Long memberId, DecreasePoint point) {
+		Member member = memberRepository.findById(memberId)
+			.orElseThrow(() -> ApiException.from(ErrorCode.MEMBER_NOT_FOUND));
+		member.decreasePoint(point.getPoint());
 	}
 }
