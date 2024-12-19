@@ -110,9 +110,10 @@ jobs:
             echo "Deregistering instance $INSTANCE_ID from target group $TARGET_GROUP_ARN"
             aws elbv2 deregister-targets --target-group-arn "$TARGET_GROUP_ARN" --targets Id="$INSTANCE_ID"
 
-            # 기존 애플리케이션 종료
-            if screen -list | grep -q "\bbe\b"; then screen -S be -X quit; fi
-
+            # 기존 애플리케이션 종료 - 모든 screen 세션 종료
+            screen -ls | grep -o '[0-9]*\.[^ ]*' | xargs -n 1 -I {} screen -S {} -X quit
+  
+  
             # S3에서 새로운 JAR 파일 다운로드
             echo "Downloading JAR file from S3"
             aws s3 cp s3://$S3_BUCKET_NAME/backend-server.jar /home/ubuntu/backend-server.jar
@@ -161,8 +162,8 @@ jobs:
             echo "Deregistering instance $INSTANCE_ID from target group $TARGET_GROUP_ARN"
             aws elbv2 deregister-targets --target-group-arn "$TARGET_GROUP_ARN" --targets Id="$INSTANCE_ID"
 
-            # 기존 애플리케이션 종료
-            if screen -list | grep -q "\bbe\b"; then screen -S be -X quit; fi
+            # 기존 애플리케이션 종료 - 모든 screen 세션 종료
+            screen -ls | grep -o '[0-9]*\.[^ ]*' | xargs -n 1 -I {} screen -S {} -X quit
 
             # S3에서 새로운 JAR 파일 다운로드
             echo "Downloading JAR file from S3"
