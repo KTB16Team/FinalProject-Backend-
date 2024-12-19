@@ -17,6 +17,7 @@ import aimo.backend.domains.upload.dto.parameter.SaveFileMetaDataParameter;
 import aimo.backend.domains.upload.dto.parameter.SaveProfileImageMetaDataParameter;
 import aimo.backend.domains.privatePost.dto.parameter.SpeechToTextParameter;
 import aimo.backend.domains.upload.dto.response.FindProfileImageUrlResponse;
+import aimo.backend.domains.upload.dto.response.SaveFileMetaDataResponse;
 import aimo.backend.domains.upload.entity.FileRecord;
 import aimo.backend.domains.upload.entity.ProfileImage;
 import aimo.backend.domains.upload.repository.FileRepository;
@@ -51,11 +52,13 @@ public class FileService {
 
 	// 음성 파일 메타데이터 저장
 	@Transactional(rollbackFor = ApiException.class)
-	public void saveFileMetaData(SaveFileMetaDataParameter parameter) {
+	public SaveFileMetaDataResponse saveFileMetaData(SaveFileMetaDataParameter parameter) {
 		// url 생성
 		String url = s3Service.getUrl(parameter.key());
 
 		fileRepository.save(FileRecord.of(parameter, url));
+
+		return new SaveFileMetaDataResponse(url);
 	}
 
 	// 파일 업로드 전 사전 서명된 URL 생성

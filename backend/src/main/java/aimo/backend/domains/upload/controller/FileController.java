@@ -18,6 +18,7 @@ import aimo.backend.domains.upload.dto.parameter.SaveProfileImageMetaDataParamet
 import aimo.backend.domains.upload.dto.request.SaveFileMetaDataRequest;
 import aimo.backend.domains.upload.dto.request.SaveProfileImageMetaDataRequest;
 import aimo.backend.domains.upload.dto.response.FindProfileImageUrlResponse;
+import aimo.backend.domains.upload.dto.response.SaveFileMetaDataResponse;
 import aimo.backend.domains.upload.service.FileService;
 import aimo.backend.infrastructure.s3.dto.response.CreatePreSignedUrlResponse;
 import aimo.backend.infrastructure.s3.model.PreSignedUrlPrefix;
@@ -34,14 +35,14 @@ public class FileController {
 	private final FileService fileService;
 
 	@PostMapping
-	public ResponseEntity<DataResponse<Void>> saveFileMetaData(
+	public ResponseEntity<DataResponse<SaveFileMetaDataResponse>> saveFileMetaData(
 		@Valid @RequestBody SaveFileMetaDataRequest request
 	) {
 		SaveFileMetaDataParameter parameter = SaveFileMetaDataParameter.from(request);
-		fileService.saveFileMetaData(parameter);
+		SaveFileMetaDataResponse response = fileService.saveFileMetaData(parameter);
 
 		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(DataResponse.created());
+			.body(DataResponse.from(response));
 	}
 
 	// 파일 업로드 전 사전 서명된 URL 생성
@@ -51,8 +52,6 @@ public class FileController {
 		@RequestParam("prefix") PreSignedUrlPrefix prefix,
 		@RequestParam("extension") String extension
 	) {
-		log.info("filename: {}, prefix: {}, extension: {}", filename, prefix, extension);
-
 		CreateFilePreSignedUrlParameter parameter = CreateFilePreSignedUrlParameter.of(filename, extension, prefix);
 
 		CreatePreSignedUrlResponse response = fileService.createFilePreSignedUrl(parameter);
