@@ -9,7 +9,6 @@ import org.springframework.amqp.AmqpException;
 import org.springframework.data.domain.Page;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import aimo.backend.common.dto.PageResponse;
@@ -18,14 +17,16 @@ import aimo.backend.common.exception.ErrorCode;
 import aimo.backend.common.messageQueue.MessageQueueService;
 import aimo.backend.common.properties.AiServerProperties;
 import aimo.backend.domains.member.entity.Member;
+import aimo.backend.domains.member.model.DecreasePoint;
 import aimo.backend.domains.member.repository.MemberRepository;
+import aimo.backend.domains.member.service.MemberPointService;
 import aimo.backend.domains.privatePost.dto.parameter.DeletePrivatePostParameter;
 import aimo.backend.domains.privatePost.dto.parameter.FindPrivatePostParameter;
 import aimo.backend.domains.privatePost.dto.parameter.FindPrivatePostPreviewParameter;
 import aimo.backend.domains.privatePost.dto.parameter.JudgementToAiParameter;
+import aimo.backend.domains.privatePost.dto.parameter.UpdateContentToPrivatePostParameter;
 import aimo.backend.domains.privatePost.dto.parameter.UpdatePostContentParameter;
 import aimo.backend.domains.privatePost.dto.request.SummaryAndJudgementRequest;
-import aimo.backend.domains.privatePost.dto.request.UpdateContentToPrivatePostRequest;
 import aimo.backend.domains.privatePost.dto.response.PrivatePostPreviewResponse;
 import aimo.backend.domains.privatePost.dto.response.PrivatePostResponse;
 import aimo.backend.domains.privatePost.entity.PrivatePost;
@@ -45,6 +46,7 @@ public class PrivatePostService {
 	private final MemberRepository memberRepository;
 	private final MessageQueueService messageQueueService;
 	private final AiServerProperties aiServerProperties;
+	private final MemberPointService memberPointService;
 
 	// mq에 판단 요청
 	@Async
@@ -68,36 +70,39 @@ public class PrivatePostService {
 
 	// AI로부터 받은 콜백 응답을 기존에 저장했던 PrivatePost에 업데이트
 	@Transactional
-	public void updateContentToPrivatePost(UpdateContentToPrivatePostRequest request) {
+	public void updateContentToPrivatePost(UpdateContentToPrivatePostParameter parameter) {
 		// 키 확인
-		validateKey(request.accessKey());
+		validateKey(parameter.accessKey());
 
-		Long privatePostId = request.id();
+		Long privatePostId = parameter.id();
 		PrivatePost privatePost = privatePostRepository.findById(privatePostId)
 			.orElseThrow(() -> ApiException.from(ErrorCode.PRIVATE_POST_NOT_FOUND));
 
 		// 실패시
-		if (!request.status()) {
+		if (!parameter.status()) {
 			privatePost.updateStatus(PrivatePostStatus.FAIL);
 			return;
 		}
 
 		// 성공시
-		Integer faultRatePlaintiff = request.faultRate().intValue();
-		Integer faultRateDefendant = calculateFaultRateDefendant(request.faultRate());
+		Integer faultRatePlaintiff = parameter.faultRate().intValue();
+		Integer faultRateDefendant = calculateFaultRateDefendant(parameter.faultRate());
 
-		UpdatePostContentParameter parameter = new UpdatePostContentParameter(
-			request.stancePlaintiff(),
-			request.stanceDefendant(),
-			request.title(),
-			request.summaryAi(),
-			request.judgement(),
+		UpdatePostContentParameter updatePostContentParameter = new UpdatePostContentParameter(
+			parameter.stancePlaintiff(),
+			parameter.stanceDefendant(),
+			parameter.title(),
+			parameter.summaryAi(),
+			parameter.judgement(),
 			faultRatePlaintiff,
 			faultRateDefendant
 		);
 
-		privatePost.updateContent(parameter);
+		privatePost.updateContent(updatePostContentParameter);
 		privatePost.updateStatus(PrivatePostStatus.SUCCESS);
+
+		// 포인트 감소
+		memberPointService.decreaseMemberPoint(privatePost.getMember().getId(), DecreasePoint.AI_REQUEST);
 	}
 
 	// 키 확인
@@ -152,7 +157,7 @@ public class PrivatePostService {
 		LocalDateTime createdAt = privatePost.getCreatedAt();
 		LocalDateTime now = LocalDateTime.now();
 		Duration duration = Duration.between(createdAt, now);
-		if (duration.toMinutes() > 10 &&  privatePost.getPrivatePostStatus() == PrivatePostStatus.PROGRESS) {
+		if (duration.toMinutes() > 10 && privatePost.getPrivatePostStatus() == PrivatePostStatus.PROGRESS) {
 			privatePostRepository.delete(privatePost);
 			throw ApiException.from(PRIVATE_POST_FAIL);
 		}
@@ -206,5 +211,6 @@ public class PrivatePostService {
 	private boolean validationPrivatePost(Long memberId, PrivatePost privatePost) {
 		return privatePost.getMember().getId().equals(memberId);
 	}
+
 
 }
