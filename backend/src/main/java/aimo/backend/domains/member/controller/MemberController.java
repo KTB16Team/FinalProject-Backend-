@@ -5,7 +5,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,7 +20,6 @@ import aimo.backend.domains.member.dto.parameter.FindMyInfoParameter;
 import aimo.backend.domains.member.dto.parameter.SignUpParameter;
 import aimo.backend.domains.member.dto.parameter.UpdateNicknameParameter;
 import aimo.backend.domains.member.dto.parameter.UpdatePasswordParameter;
-import aimo.backend.domains.member.dto.request.CheckNicknameExistsRequest;
 import aimo.backend.domains.member.dto.request.DeleteMemberRequest;
 import aimo.backend.domains.member.dto.request.LogoutRequest;
 import aimo.backend.domains.member.dto.request.SendNewPasswordRequest;
@@ -29,7 +27,6 @@ import aimo.backend.domains.member.dto.request.SignUpRequest;
 import aimo.backend.domains.member.dto.request.UpdateNicknameRequest;
 import aimo.backend.domains.member.dto.request.UpdatePasswordRequest;
 import aimo.backend.domains.member.dto.response.FindMyInfoResponse;
-import aimo.backend.domains.member.dto.response.NicknameExistsResponse;
 import aimo.backend.domains.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -144,18 +141,6 @@ public class MemberController {
 		memberService.validateCodeAndSendNewPassword(request);
 
 		return ResponseEntity.ok(DataResponse.ok());
-	}
-
-	// 닉네임 중복 확인
-	@GetMapping("/nickname/{nickname}/exists")
-	public ResponseEntity<DataResponse<NicknameExistsResponse>> checkNicknameExists(
-		@PathVariable("nickname") String nickname
-	) {
-		CheckNicknameExistsRequest request = CheckNicknameExistsRequest.from(nickname);
-
-		NicknameExistsResponse exist = NicknameExistsResponse.from(memberService.isNicknameExists(request));
-
-		return ResponseEntity.status(HttpStatus.OK).body(DataResponse.from(exist));
 	}
 
 	// 닉네임 수정

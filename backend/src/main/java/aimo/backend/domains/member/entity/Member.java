@@ -9,15 +9,15 @@ import java.util.List;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.hibernate.annotations.ColumnDefault;
 
+import aimo.backend.common.entity.BaseEntity;
 import aimo.backend.domains.comment.entity.ChildComment;
+import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.member.dto.parameter.SignUpParameter;
-import aimo.backend.domains.privatePost.entity.PrivatePost;
 import aimo.backend.domains.member.model.Gender;
 import aimo.backend.domains.member.model.MemberRole;
 import aimo.backend.domains.member.model.Provider;
-import aimo.backend.common.entity.BaseEntity;
-import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.post.entity.Post;
+import aimo.backend.domains.privatePost.entity.PrivatePost;
 import aimo.backend.domains.upload.entity.ProfileImage;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -47,7 +47,7 @@ public class Member extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(nullable = false, unique = true)
+	@Column(nullable = false)
 	private String nickname;
 
 	@Column(nullable = false)
