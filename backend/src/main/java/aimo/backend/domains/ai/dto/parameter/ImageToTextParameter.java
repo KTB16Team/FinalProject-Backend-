@@ -1,4 +1,4 @@
-package aimo.backend.domains.privatePost.dto.parameter;
+package aimo.backend.domains.ai.dto.parameter;
 
 public record ImageToTextParameter(String url) {
 

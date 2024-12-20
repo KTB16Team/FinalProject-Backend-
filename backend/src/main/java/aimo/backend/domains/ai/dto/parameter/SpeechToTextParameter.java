@@ -1,6 +1,6 @@
-package aimo.backend.domains.privatePost.dto.parameter;
+package aimo.backend.domains.ai.dto.parameter;
 
-import aimo.backend.domains.privatePost.dto.request.SpeechToTextRequest;
+import aimo.backend.domains.ai.dto.request.SpeechToTextRequest;
 
 public record SpeechToTextParameter(String url) {
 

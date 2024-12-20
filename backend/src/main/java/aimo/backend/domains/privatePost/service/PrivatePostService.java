@@ -5,16 +5,13 @@ import static aimo.backend.common.exception.ErrorCode.*;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-import org.springframework.amqp.AmqpException;
 import org.springframework.data.domain.Page;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import aimo.backend.common.dto.PageResponse;
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.exception.ErrorCode;
-import aimo.backend.common.messageQueue.MessageQueueService;
 import aimo.backend.common.properties.AiServerProperties;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.member.model.DecreasePoint;
@@ -23,14 +20,11 @@ import aimo.backend.domains.member.service.MemberPointService;
 import aimo.backend.domains.privatePost.dto.parameter.DeletePrivatePostParameter;
 import aimo.backend.domains.privatePost.dto.parameter.FindPrivatePostParameter;
 import aimo.backend.domains.privatePost.dto.parameter.FindPrivatePostPreviewParameter;
-import aimo.backend.domains.privatePost.dto.parameter.JudgementToAiParameter;
 import aimo.backend.domains.privatePost.dto.parameter.UpdateContentToPrivatePostParameter;
 import aimo.backend.domains.privatePost.dto.parameter.UpdatePostContentParameter;
-import aimo.backend.domains.privatePost.dto.request.SummaryAndJudgementRequest;
 import aimo.backend.domains.privatePost.dto.response.PrivatePostPreviewResponse;
 import aimo.backend.domains.privatePost.dto.response.PrivatePostResponse;
 import aimo.backend.domains.privatePost.entity.PrivatePost;
-import aimo.backend.domains.privatePost.entity.TextRecord;
 import aimo.backend.domains.privatePost.model.PrivatePostStatus;
 import aimo.backend.domains.privatePost.repository.PrivatePostRepository;
 import lombok.RequiredArgsConstructor;
@@ -44,29 +38,8 @@ public class PrivatePostService {
 
 	private final PrivatePostRepository privatePostRepository;
 	private final MemberRepository memberRepository;
-	private final MessageQueueService messageQueueService;
 	private final AiServerProperties aiServerProperties;
 	private final MemberPointService memberPointService;
-
-	// mq에 판단 요청
-	@Async
-	@Transactional(rollbackFor = {ApiException.class, AmqpException.class})
-	public void uploadTextRecordAndRequestJudgement(JudgementToAiParameter parameter) {
-		Member member = memberRepository.findById(parameter.memberId())
-			.orElseThrow(() -> ApiException.from(ErrorCode.MEMBER_NOT_FOUND));
-
-		// db에 저장
-		TextRecord textRecord = TextRecord.of(parameter.content());
-		PrivatePost privatePost = PrivatePost.createWithoutContent(member, textRecord, parameter.originType());
-		privatePostRepository.save(privatePost);
-
-		// mq에 요청
-		SummaryAndJudgementRequest request = SummaryAndJudgementRequest.from(
-			privatePost.getId(),
-			parameter.content(),
-			member);
-		messageQueueService.send(request);
-	}
 
 	// AI로부터 받은 콜백 응답을 기존에 저장했던 PrivatePost에 업데이트
 	@Transactional
@@ -211,6 +184,5 @@ public class PrivatePostService {
 	private boolean validationPrivatePost(Long memberId, PrivatePost privatePost) {
 		return privatePost.getMember().getId().equals(memberId);
 	}
-
 
 }
