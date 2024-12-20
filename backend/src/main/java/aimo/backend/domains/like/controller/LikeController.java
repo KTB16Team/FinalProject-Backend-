@@ -60,7 +60,7 @@ public class LikeController {
 			.body(DataResponse.created());
 	}
 
-	@PostMapping("/{postId}/likes")
+	@PostMapping("/posts/{postId}/likes")
 	public ResponseEntity<DataResponse<Void>> likePost(
 		@PathVariable Long postId,
 		@RequestParam("likeType") LikeType likeType
