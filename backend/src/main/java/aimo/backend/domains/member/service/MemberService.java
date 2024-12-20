@@ -20,7 +20,6 @@ import aimo.backend.domains.member.dto.parameter.FindMyInfoParameter;
 import aimo.backend.domains.member.dto.parameter.SignUpParameter;
 import aimo.backend.domains.member.dto.parameter.UpdateNicknameParameter;
 import aimo.backend.domains.member.dto.parameter.UpdatePasswordParameter;
-import aimo.backend.domains.member.dto.request.CheckNicknameExistsRequest;
 import aimo.backend.domains.member.dto.request.LogoutRequest;
 import aimo.backend.domains.member.dto.request.SendNewPasswordRequest;
 import aimo.backend.domains.member.dto.response.FindMyInfoResponse;
@@ -51,7 +50,6 @@ public class MemberService {
 	@Transactional(rollbackFor = ApiException.class)
 	public void signUp(SignUpParameter parameter) {
 		validateDuplicateEmail(parameter.email());
-		validateDuplicateNickname(parameter.nickname());
 
 		// 인증 토큰 확인
 		emailService.verifyEmailCode(
@@ -119,9 +117,6 @@ public class MemberService {
 			return;
 		}
 
-		// 닉네임 중복 검사
-		validateDuplicateNickname(parameter.newNickname());
-
 		member.updateNickname(parameter.newNickname());
 	}
 
@@ -134,11 +129,6 @@ public class MemberService {
 	private Member findMemberById(Long memberId) {
 		return memberRepository.findById(memberId)
 			.orElseThrow(() -> ApiException.from(ErrorCode.MEMBER_NOT_FOUND));
-	}
-
-	// 닉네임 중복 검사
-	public boolean isNicknameExists(CheckNicknameExistsRequest request) {
-		return memberRepository.existsByNickname(request.nickname());
 	}
 
 	// 비밀번호 확인
@@ -154,12 +144,6 @@ public class MemberService {
 	private void validateDuplicateEmail(String email) {
 		if (memberRepository.existsByEmailAndProvider(email, Provider.AIMO))
 			throw ApiException.from(ErrorCode.EMAIL_DUPLICATE);
-	}
-
-	// 닉네임 중복 검사
-	private void validateDuplicateNickname(String nickname) {
-		if (memberRepository.existsByNickname(nickname))
-			throw ApiException.from(ErrorCode.MEMBER_NAME_DUPLICATE);
 	}
 
 	// 비밀번호 재발급

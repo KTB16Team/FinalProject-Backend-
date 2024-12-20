@@ -35,7 +35,7 @@ public class OAuth2UserInfo {
 
 		return OAuth2UserInfo.builder()
 			.provider(Provider.KAKAO)
-			.email(kakaoOAuth2Response.email())
+			.email(Provider.KAKAO + " - " +kakaoOAuth2Response.email())
 			.name(kakaoOAuth2Response.nickname())
 			.providerId(kakaoOAuth2Response.id())
 			.build();
