@@ -1,10 +1,11 @@
 package aimo.backend.domains.privatePost.dto.response;
 
-public record SpeechToTextResponse(
-	String record
+public record
+SpeechToTextResponse(
+	String script
 ) {
 
-	public static SpeechToTextResponse of(String record) {
-		return new SpeechToTextResponse(record);
+	public static SpeechToTextResponse of(String script) {
+		return new SpeechToTextResponse(script);
 	}
 }

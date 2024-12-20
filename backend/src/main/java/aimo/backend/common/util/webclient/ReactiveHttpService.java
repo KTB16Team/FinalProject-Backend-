@@ -7,7 +7,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.exception.ErrorCode;
-import aimo.backend.domains.privatePost.dto.response.SpeechToTextResponse;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
