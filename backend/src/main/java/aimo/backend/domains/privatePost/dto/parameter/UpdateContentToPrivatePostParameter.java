@@ -4,7 +4,6 @@ import aimo.backend.domains.privatePost.dto.request.UpdateContentToPrivatePostRe
 import jakarta.validation.constraints.NotNull;
 
 public record UpdateContentToPrivatePostParameter(
-	Long memberId,
 	String accessKey,
 	Boolean status,
 	Long id,
@@ -15,9 +14,8 @@ public record UpdateContentToPrivatePostParameter(
 	String judgement,
 	Float faultRate
 ) {
-	public static UpdateContentToPrivatePostParameter from(UpdateContentToPrivatePostRequest request, Long memberId) {
+	public static UpdateContentToPrivatePostParameter from(UpdateContentToPrivatePostRequest request) {
 		return new UpdateContentToPrivatePostParameter(
-			memberId,
 			request.accessKey(),
 			request.status(),
 			request.id(),

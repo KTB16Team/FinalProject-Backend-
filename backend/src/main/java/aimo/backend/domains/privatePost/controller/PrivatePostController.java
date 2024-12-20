@@ -69,9 +69,7 @@ public class PrivatePostController {
 	public ResponseEntity<DataResponse<Void>> updateContentToPrivatePost(
 		@Valid @RequestBody UpdateContentToPrivatePostRequest request
 	) {
-		Long memberId = MemberLoader.getMemberId();
-
-		UpdateContentToPrivatePostParameter parameter = UpdateContentToPrivatePostParameter.from(request, memberId);
+		UpdateContentToPrivatePostParameter parameter = UpdateContentToPrivatePostParameter.from(request);
 		privatePostService.updateContentToPrivatePost(parameter);
 
 		return ResponseEntity.ok(DataResponse.ok());
