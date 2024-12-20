@@ -41,13 +41,13 @@ public class FileService {
 	// AI서버에 음성 파일을 텍스트로 변환 요청
 	public SpeechToTextResponse speechToText(SpeechToTextParameter speechToTextParameter) {
 		String url = aiServerProperties.getDomainUrl() + aiServerProperties.getSpeechToTextApi();
-		return reactiveHttpService.<SpeechToTextParameter, SpeechToTextResponse>post(url, speechToTextParameter).block();
+		return reactiveHttpService.post(url, speechToTextParameter, SpeechToTextResponse.class).block();
 	}
 
 	// AI서버에 이미지 파일을 텍스트로 변환 요청
 	public ImageToTextResponse imageToText(ImageToTextParameter parameter) {
 		String url = aiServerProperties.getDomainUrl() + aiServerProperties.getImageToTextApi();
-		return reactiveHttpService.<ImageToTextParameter, ImageToTextResponse>post(url, parameter).block();
+		return reactiveHttpService.post(url, parameter, ImageToTextResponse.class).block();
 	}
 
 	// 음성 파일 메타데이터 저장
