@@ -1,6 +1,5 @@
 package aimo.backend.domains.ai.controller;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,13 +11,13 @@ import aimo.backend.common.util.memberLoader.MemberLoader;
 import aimo.backend.domains.ai.dto.parameter.ImageToTextParameter;
 import aimo.backend.domains.ai.dto.parameter.JudgementToAiParameter;
 import aimo.backend.domains.ai.dto.parameter.SpeechToTextParameter;
+import aimo.backend.domains.ai.dto.request.ImageToTextCallbackRequest;
 import aimo.backend.domains.ai.dto.request.ImageToTextRequest;
+import aimo.backend.domains.ai.dto.request.SpeechToTextCallbackRequest;
 import aimo.backend.domains.ai.dto.request.SpeechToTextRequest;
-import aimo.backend.domains.ai.dto.response.ImageToTextResponse;
-import aimo.backend.domains.ai.dto.response.SpeechToTextResponse;
+import aimo.backend.domains.ai.dto.request.UpdateContentToPrivatePostRequest;
 import aimo.backend.domains.ai.service.AIService;
 import aimo.backend.domains.privatePost.dto.parameter.UpdateContentToPrivatePostParameter;
-import aimo.backend.domains.privatePost.dto.request.UpdateContentToPrivatePostRequest;
 import aimo.backend.domains.privatePost.dto.request.UploadTextRecordAndRequestJudgementRequest;
 import aimo.backend.domains.privatePost.model.OriginType;
 import aimo.backend.domains.privatePost.service.PrivatePostService;
@@ -34,23 +33,45 @@ public class AIController {
 	private final PrivatePostService privatePostService;
 
 	@PostMapping("/private-posts/speech-to-text")
-	public ResponseEntity<DataResponse<SpeechToTextResponse>> speechToText(
+	public ResponseEntity<DataResponse<Void>> speechToText(
 		@Valid @RequestBody SpeechToTextRequest request
 	) {
-		SpeechToTextParameter parameter = SpeechToTextParameter.from(request);
+		SpeechToTextParameter parameter = SpeechToTextParameter.of(request.url(), MemberLoader.getMemberId());
+		aiService.speechToText(parameter);
 
-		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(DataResponse.created(aiService.speechToText(parameter)));
+		return ResponseEntity.ok(DataResponse.ok());
+	}
+
+	// AI로부터의 음성인식 콜백
+	@PostMapping("/private-posts/speech-to-text/callback")
+	public ResponseEntity<DataResponse<Void>> speechToTextCallback(
+		@Valid @RequestBody SpeechToTextCallbackRequest request
+	) {
+		JudgementToAiParameter parameter = JudgementToAiParameter.of(request.id(), request.script(), OriginType.VOICE);
+		aiService.uploadTextRecordAndRequestJudgement(parameter);
+
+		return ResponseEntity.ok(DataResponse.ok());
 	}
 
 	@PostMapping("/private-posts/image-to-text")
-	public ResponseEntity<DataResponse<ImageToTextResponse>> ImageToText(
+	public ResponseEntity<DataResponse<Void>> ImageToText(
 		@Valid @RequestBody ImageToTextRequest request
 	) {
-		ImageToTextParameter parameter = ImageToTextParameter.from(request.url());
+		ImageToTextParameter parameter = ImageToTextParameter.from(request.url(), MemberLoader.getMemberId());
+		aiService.imageToText(parameter);
 
-		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(DataResponse.created(aiService.imageToText(parameter)));
+		return ResponseEntity.ok(DataResponse.ok());
+	}
+
+	@PostMapping("/private-posts/image-to-text/callback")
+	public ResponseEntity<DataResponse<Void>> imageToTextCallback(
+		@Valid @RequestBody ImageToTextCallbackRequest request
+	) {
+		JudgementToAiParameter parameter = JudgementToAiParameter.of(request.id(), request.script(), OriginType.IMAGE);
+
+		aiService.uploadTextRecordAndRequestJudgement(parameter);
+
+		return ResponseEntity.ok(DataResponse.ok());
 	}
 
 	@PostMapping("/private-posts/judgement/text")
@@ -69,6 +90,17 @@ public class AIController {
 		return ResponseEntity.ok(DataResponse.ok());
 	}
 
+	// AI로부터의 판결문 요청 콜백
+	@PostMapping("/private-posts/judgement/callback")
+	public ResponseEntity<DataResponse<Void>> updateContentToPrivatePost(
+		@Valid @RequestBody UpdateContentToPrivatePostRequest request
+	) {
+		UpdateContentToPrivatePostParameter parameter = UpdateContentToPrivatePostParameter.from(request);
+		privatePostService.updateContentToPrivatePost(parameter);
+
+		return ResponseEntity.ok(DataResponse.ok());
+	}
+
 	@PostMapping("/private-posts/analyze-conflict")
 	public ResponseEntity<DataResponse<Void>> uploadImageOrSoundRecordAndJudgement(
 		@Valid @RequestBody UploadTextRecordAndRequestJudgementRequest request
@@ -81,17 +113,6 @@ public class AIController {
 			OriginType.TEXT);
 
 		aiService.uploadImageOrSoundRecordAndJudgement(judgementToAiParameter);
-
-		return ResponseEntity.ok(DataResponse.ok());
-	}
-
-	// AI로부터의 판결문 요청 콜백
-	@PostMapping("/private-posts/judgement/callback")
-	public ResponseEntity<DataResponse<Void>> updateContentToPrivatePost(
-		@Valid @RequestBody UpdateContentToPrivatePostRequest request
-	) {
-		UpdateContentToPrivatePostParameter parameter = UpdateContentToPrivatePostParameter.from(request);
-		privatePostService.updateContentToPrivatePost(parameter);
 
 		return ResponseEntity.ok(DataResponse.ok());
 	}

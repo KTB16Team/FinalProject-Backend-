@@ -8,16 +8,12 @@ import org.springframework.transaction.annotation.Transactional;
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.exception.ErrorCode;
 import aimo.backend.common.messageQueue.MessageQueueService;
-import aimo.backend.common.properties.AiServerProperties;
-import aimo.backend.common.util.webclient.ReactiveHttpService;
+import aimo.backend.domains.ai.dto.parameter.ImageToTextParameter;
+import aimo.backend.domains.ai.dto.parameter.JudgementToAiParameter;
+import aimo.backend.domains.ai.dto.parameter.SpeechToTextParameter;
+import aimo.backend.domains.ai.dto.request.SummaryAndJudgementRequest;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.member.repository.MemberRepository;
-import aimo.backend.domains.ai.dto.parameter.JudgementToAiParameter;
-import aimo.backend.domains.ai.dto.request.SummaryAndJudgementRequest;
-import aimo.backend.domains.ai.dto.parameter.ImageToTextParameter;
-import aimo.backend.domains.ai.dto.parameter.SpeechToTextParameter;
-import aimo.backend.domains.ai.dto.response.ImageToTextResponse;
-import aimo.backend.domains.ai.dto.response.SpeechToTextResponse;
 import aimo.backend.domains.privatePost.entity.PrivatePost;
 import aimo.backend.domains.privatePost.entity.TextRecord;
 import aimo.backend.domains.privatePost.repository.PrivatePostRepository;
@@ -29,8 +25,6 @@ public class AIService {
 
 	private final MessageQueueService messageQueueService;
 	private final MemberRepository memberRepository;
-	private final ReactiveHttpService reactiveHttpService;
-	private final AiServerProperties aiServerProperties;
 	private final PrivatePostRepository privatePostRepository;
 
 	// mq에 텍스트 판단 요청
@@ -50,7 +44,7 @@ public class AIService {
 			privatePost.getId(),
 			parameter.content(),
 			member);
-		messageQueueService.send(request);
+		messageQueueService.judgement(request);
 	}
 
 	// mq에 image or sound 판단 요청
@@ -70,18 +64,16 @@ public class AIService {
 			privatePost.getId(),
 			parameter.content(),
 			member);
-		messageQueueService.send(request);
+		messageQueueService.judgement(request);
 	}
-	
+
 	// AI서버에 음성 파일을 텍스트로 변환 요청
-	public SpeechToTextResponse speechToText(SpeechToTextParameter speechToTextParameter) {
-		String url = aiServerProperties.getDomainUrl() + aiServerProperties.getSpeechToTextApi();
-		return reactiveHttpService.post(url, speechToTextParameter, SpeechToTextResponse.class).block();
+	public void speechToText(SpeechToTextParameter speechToTextParameter) {
+		messageQueueService.speechToText(speechToTextParameter);
 	}
 
 	// AI서버에 이미지 파일을 텍스트로 변환 요청
-	public ImageToTextResponse imageToText(ImageToTextParameter parameter) {
-		String url = aiServerProperties.getDomainUrl() + aiServerProperties.getImageToTextApi();
-		return reactiveHttpService.post(url, parameter, ImageToTextResponse.class).block();
+	public void imageToText(ImageToTextParameter parameter) {
+		messageQueueService.imageToText(parameter);
 	}
 }

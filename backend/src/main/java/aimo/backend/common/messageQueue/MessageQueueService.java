@@ -10,10 +10,22 @@ import lombok.RequiredArgsConstructor;
 public class MessageQueueService {
 
 	private final RabbitTemplate rabbitTemplate;
-	private final String DIRECT_EXCHANGE_NAME = "aiProcessingExchange"; // 추후 변경
-	private final String DIRECT_QUEUE_ROUTING_KEY = "ai.processing.key"; // 추후 변경
+	private final String JUDGEMENT_EXCHANGE_NAME = "aiProcessingExchange";
+	private final String JUDGEMENT_QUEUE_ROUTING_KEY = "ai.processing.key";
+	private final String IMAGE_TO_TEXT_EXCHANGE_NAME = "aiOCRExchange";
+	private final String IMAGE_TO_TEXT_QUEUE_ROUTING_KEY = "ai.ocr.key";
+	private final String SPEECH_TO_TEXT_EXCHANGE_NAME = "aiSTTExchange";
+	private final String SPEECH_TO_TEXT_QUEUE_ROUTING_KEY = "ai.stt.key";
 
-	public void send(Object data) {
-		rabbitTemplate.convertAndSend(DIRECT_EXCHANGE_NAME,DIRECT_QUEUE_ROUTING_KEY,data);
+	public void judgement(Object data) {
+		rabbitTemplate.convertAndSend(JUDGEMENT_EXCHANGE_NAME, JUDGEMENT_QUEUE_ROUTING_KEY,data);
+	}
+
+	public void imageToText(Object data) {
+		rabbitTemplate.convertAndSend(IMAGE_TO_TEXT_EXCHANGE_NAME, IMAGE_TO_TEXT_QUEUE_ROUTING_KEY, data);
+	}
+
+	public void speechToText(Object data) {
+		rabbitTemplate.convertAndSend(SPEECH_TO_TEXT_EXCHANGE_NAME, SPEECH_TO_TEXT_QUEUE_ROUTING_KEY, data);
 	}
 }
