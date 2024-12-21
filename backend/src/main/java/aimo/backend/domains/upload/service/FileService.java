@@ -5,8 +5,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.exception.ErrorCode;
-import aimo.backend.common.properties.AiServerProperties;
-import aimo.backend.common.util.webclient.ReactiveHttpService;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.member.repository.MemberRepository;
 import aimo.backend.domains.upload.dto.parameter.CreateFilePreSignedUrlParameter;
