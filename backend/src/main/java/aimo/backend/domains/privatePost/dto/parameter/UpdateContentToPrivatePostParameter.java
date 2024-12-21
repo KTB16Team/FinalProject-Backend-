@@ -1,7 +1,6 @@
 package aimo.backend.domains.privatePost.dto.parameter;
 
-import aimo.backend.domains.privatePost.dto.request.UpdateContentToPrivatePostRequest;
-import jakarta.validation.constraints.NotNull;
+import aimo.backend.domains.ai.dto.request.UpdateContentToPrivatePostRequest;
 
 public record UpdateContentToPrivatePostParameter(
 	String accessKey,

@@ -1,6 +1,5 @@
-package aimo.backend.domains.privatePost.dto.request;
+package aimo.backend.domains.ai.dto.request;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record UpdateContentToPrivatePostRequest(
