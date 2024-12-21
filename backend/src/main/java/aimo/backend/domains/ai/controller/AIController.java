@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.RestController;
 import aimo.backend.common.dto.DataResponse;
 import aimo.backend.common.util.memberLoader.MemberLoader;
 import aimo.backend.domains.ai.dto.parameter.ImageToTextParameter;
-import aimo.backend.domains.ai.dto.parameter.JudgementToAiParameter;
+import aimo.backend.domains.ai.dto.parameter.UploadFileRecordAndJudgementParameter;
+import aimo.backend.domains.ai.dto.parameter.UploadTextRecordAndJudgementParameter;
 import aimo.backend.domains.ai.dto.parameter.SpeechToTextParameter;
 import aimo.backend.domains.ai.dto.request.ImageToTextCallbackRequest;
 import aimo.backend.domains.ai.dto.request.ImageToTextRequest;
@@ -47,8 +48,13 @@ public class AIController {
 	public ResponseEntity<DataResponse<Void>> speechToTextCallback(
 		@Valid @RequestBody SpeechToTextCallbackRequest request
 	) {
-		JudgementToAiParameter parameter = JudgementToAiParameter.of(request.id(), request.script(), OriginType.VOICE);
-		aiService.uploadTextRecordAndRequestJudgement(parameter);
+		UploadFileRecordAndJudgementParameter parameter = new UploadFileRecordAndJudgementParameter(
+			request.id(),
+			request.script(),
+			OriginType.VOICE,
+			request.privatePostId());
+
+		aiService.uploadFileRecordAndJudgement(parameter);
 
 		return ResponseEntity.ok(DataResponse.ok());
 	}
@@ -67,9 +73,13 @@ public class AIController {
 	public ResponseEntity<DataResponse<Void>> imageToTextCallback(
 		@Valid @RequestBody ImageToTextCallbackRequest request
 	) {
-		JudgementToAiParameter parameter = JudgementToAiParameter.of(request.id(), request.script(), OriginType.IMAGE);
+		UploadFileRecordAndJudgementParameter parameter = new UploadFileRecordAndJudgementParameter(
+			request.id(),
+			request.script(),
+			OriginType.IMAGE,
+			request.privatePostId());
 
-		aiService.uploadTextRecordAndRequestJudgement(parameter);
+		aiService.uploadFileRecordAndJudgement(parameter);
 
 		return ResponseEntity.ok(DataResponse.ok());
 	}
@@ -80,12 +90,12 @@ public class AIController {
 	) {
 		Long memberId = MemberLoader.getMemberId();
 
-		JudgementToAiParameter judgementToAiParameter = JudgementToAiParameter.of(
+		UploadTextRecordAndJudgementParameter uploadTextRecordAndJudgementParameter = new UploadTextRecordAndJudgementParameter(
 			memberId,
 			request.content(),
 			OriginType.TEXT);
 
-		aiService.uploadTextRecordAndRequestJudgement(judgementToAiParameter);
+		aiService.uploadTextRecordAndJudgement(uploadTextRecordAndJudgementParameter);
 
 		return ResponseEntity.ok(DataResponse.ok());
 	}
@@ -107,12 +117,12 @@ public class AIController {
 	) {
 		Long memberId = MemberLoader.getMemberId();
 
-		JudgementToAiParameter judgementToAiParameter = JudgementToAiParameter.of(
+		UploadTextRecordAndJudgementParameter uploadTextRecordAndJudgementParameter = new UploadTextRecordAndJudgementParameter(
 			memberId,
 			request.content(),
 			OriginType.TEXT);
 
-		aiService.uploadImageOrSoundRecordAndJudgement(judgementToAiParameter);
+		aiService.uploadTextRecordAndJudgement(uploadTextRecordAndJudgementParameter);
 
 		return ResponseEntity.ok(DataResponse.ok());
 	}

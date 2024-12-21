@@ -9,13 +9,17 @@ import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.exception.ErrorCode;
 import aimo.backend.common.messageQueue.MessageQueueService;
 import aimo.backend.domains.ai.dto.parameter.ImageToTextParameter;
-import aimo.backend.domains.ai.dto.parameter.JudgementToAiParameter;
+import aimo.backend.domains.ai.dto.parameter.UploadFileRecordAndJudgementParameter;
+import aimo.backend.domains.ai.dto.parameter.UploadTextRecordAndJudgementParameter;
 import aimo.backend.domains.ai.dto.parameter.SpeechToTextParameter;
+import aimo.backend.domains.ai.dto.request.AiImageToTextRequest;
+import aimo.backend.domains.ai.dto.request.AiSpeechToTextRequest;
 import aimo.backend.domains.ai.dto.request.SummaryAndJudgementRequest;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.member.repository.MemberRepository;
 import aimo.backend.domains.privatePost.entity.PrivatePost;
 import aimo.backend.domains.privatePost.entity.TextRecord;
+import aimo.backend.domains.privatePost.model.OriginType;
 import aimo.backend.domains.privatePost.repository.PrivatePostRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -30,7 +34,7 @@ public class AIService {
 	// mq에 텍스트 판단 요청
 	@Async
 	@Transactional(rollbackFor = {ApiException.class, AmqpException.class})
-	public void uploadTextRecordAndRequestJudgement(JudgementToAiParameter parameter) {
+	public void uploadTextRecordAndJudgement(UploadTextRecordAndJudgementParameter parameter) {
 		Member member = memberRepository.findById(parameter.memberId())
 			.orElseThrow(() -> ApiException.from(ErrorCode.MEMBER_NOT_FOUND));
 
@@ -50,30 +54,56 @@ public class AIService {
 	// mq에 image or sound 판단 요청
 	@Async
 	@Transactional(rollbackFor = {ApiException.class, AmqpException.class})
-	public void uploadImageOrSoundRecordAndJudgement(JudgementToAiParameter parameter) {
+	public void uploadFileRecordAndJudgement(UploadFileRecordAndJudgementParameter parameter) {
 		Member member = memberRepository.findById(parameter.memberId())
 			.orElseThrow(() -> ApiException.from(ErrorCode.MEMBER_NOT_FOUND));
 
 		// db에 저장
-		TextRecord textRecord = TextRecord.of(parameter.content());
-		PrivatePost privatePost = PrivatePost.createWithoutContent(member, textRecord, parameter.originType());
-		privatePostRepository.save(privatePost);
+		PrivatePost privatePost = privatePostRepository.findById(parameter.privatePostId())
+			.orElseThrow(() -> ApiException.from(ErrorCode.PRIVATE_POST_NOT_FOUND));
+		privatePost.getTextRecord().setContent(parameter.content());
 
 		// mq에 요청
 		SummaryAndJudgementRequest request = SummaryAndJudgementRequest.from(
-			privatePost.getId(),
+			parameter.privatePostId(),
 			parameter.content(),
 			member);
 		messageQueueService.judgement(request);
 	}
 
 	// AI서버에 음성 파일을 텍스트로 변환 요청
-	public void speechToText(SpeechToTextParameter speechToTextParameter) {
-		messageQueueService.speechToText(speechToTextParameter);
+	public void speechToText(SpeechToTextParameter parameter) {
+		Member member = memberRepository.findById(parameter.id())
+			.orElseThrow(() -> ApiException.from(ErrorCode.MEMBER_NOT_FOUND));
+
+		// db에 저장
+		TextRecord textRecord = TextRecord.withoutContent();
+		PrivatePost privatePost = PrivatePost.createWithoutContent(member, textRecord, OriginType.VOICE);
+		privatePostRepository.save(privatePost);
+
+		AiSpeechToTextRequest request = new AiSpeechToTextRequest(
+			parameter.url(),
+			parameter.id(),
+			privatePost.getId());
+
+		messageQueueService.speechToText(request);
 	}
 
 	// AI서버에 이미지 파일을 텍스트로 변환 요청
 	public void imageToText(ImageToTextParameter parameter) {
-		messageQueueService.imageToText(parameter);
+		Member member = memberRepository.findById(parameter.id())
+			.orElseThrow(() -> ApiException.from(ErrorCode.MEMBER_NOT_FOUND));
+
+		// db에 저장
+		TextRecord textRecord = TextRecord.withoutContent();
+		PrivatePost privatePost = PrivatePost.createWithoutContent(member, textRecord, OriginType.IMAGE);
+		privatePostRepository.save(privatePost);
+
+		AiImageToTextRequest request = new AiImageToTextRequest(
+			parameter.url(),
+			parameter.id(),
+			privatePost.getId());
+
+		messageQueueService.imageToText(request);
 	}
 }

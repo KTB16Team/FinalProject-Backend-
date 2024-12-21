@@ -13,6 +13,7 @@ import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
@@ -25,6 +26,7 @@ public class TextRecord extends BaseEntity {
 	private Long id;
 
 	@Column(nullable = false, length = 10000)
+	@Setter
 	private String content;
 
 	@OneToOne(mappedBy = "textRecord")
@@ -45,6 +47,12 @@ public class TextRecord extends BaseEntity {
 	public static TextRecord of(String content) {
 		return TextRecord.builder()
 			.content(content)
+			.build();
+	}
+
+	public static TextRecord withoutContent() {
+		return TextRecord.builder()
+			.content("")
 			.build();
 	}
 }
