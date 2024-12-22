@@ -8,7 +8,7 @@ import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.member.model.Gender;
 
 public record SummaryAndJudgementRequest(
-	Long id,
+	Long privatePostId,
 	String content,
 	String nickname,
 	Gender gender,
@@ -17,12 +17,12 @@ public record SummaryAndJudgementRequest(
 ) {
 
 	public static SummaryAndJudgementRequest from(
-		Long id,
+		Long privatePostId,
 		String content,
 		Member member
 	) {
 		return new SummaryAndJudgementRequest(
-			id,
+			privatePostId,
 			content,
 			member.getNickname(),
 			member.getGender(),

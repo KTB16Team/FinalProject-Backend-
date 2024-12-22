@@ -73,7 +73,7 @@ public class AIService {
 
 	// AI서버에 음성 파일을 텍스트로 변환 요청
 	public void speechToText(SpeechToTextParameter parameter) {
-		Member member = memberRepository.findById(parameter.id())
+		Member member = memberRepository.findById(parameter.memberId())
 			.orElseThrow(() -> ApiException.from(ErrorCode.MEMBER_NOT_FOUND));
 
 		// db에 저장
@@ -83,7 +83,7 @@ public class AIService {
 
 		AiSpeechToTextRequest request = new AiSpeechToTextRequest(
 			parameter.url(),
-			parameter.id(),
+			parameter.memberId(),
 			privatePost.getId());
 
 		messageQueueService.speechToText(request);
@@ -91,7 +91,7 @@ public class AIService {
 
 	// AI서버에 이미지 파일을 텍스트로 변환 요청
 	public void imageToText(ImageToTextParameter parameter) {
-		Member member = memberRepository.findById(parameter.id())
+		Member member = memberRepository.findById(parameter.memberId())
 			.orElseThrow(() -> ApiException.from(ErrorCode.MEMBER_NOT_FOUND));
 
 		// db에 저장
@@ -101,7 +101,7 @@ public class AIService {
 
 		AiImageToTextRequest request = new AiImageToTextRequest(
 			parameter.url(),
-			parameter.id(),
+			parameter.memberId(),
 			privatePost.getId());
 
 		messageQueueService.imageToText(request);

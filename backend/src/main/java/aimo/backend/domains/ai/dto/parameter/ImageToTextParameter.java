@@ -1,8 +1,8 @@
 package aimo.backend.domains.ai.dto.parameter;
 
-public record ImageToTextParameter(String url, Long id) {
+public record ImageToTextParameter(String url, Long memberId) {
 
-	public static ImageToTextParameter from(String url, Long id) {
-		return new ImageToTextParameter(url, id);
+	public static ImageToTextParameter from(String url, Long memberId) {
+		return new ImageToTextParameter(url, memberId);
 	}
 }

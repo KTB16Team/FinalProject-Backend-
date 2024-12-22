@@ -47,7 +47,7 @@ public class PrivatePostService {
 		// 키 확인
 		validateKey(parameter.accessKey());
 
-		Long privatePostId = parameter.id();
+		Long privatePostId = parameter.privatePostId();
 		PrivatePost privatePost = privatePostRepository.findById(privatePostId)
 			.orElseThrow(() -> ApiException.from(ErrorCode.PRIVATE_POST_NOT_FOUND));
 

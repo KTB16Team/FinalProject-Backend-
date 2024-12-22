@@ -7,8 +7,8 @@ public record UpdateContentToPrivatePostRequest(
 	String accessKey,
 	@NotNull(message = "status가 필요합니다.")
 	Boolean status,
-	@NotNull(message = "id가 필요합니다.")
-	Long id,
+	@NotNull(message = "privatePostId가 필요합니다.")
+	Long privatePostId,
 	String title,
 	String stancePlaintiff,
 	String stanceDefendant,

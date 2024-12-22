@@ -5,7 +5,7 @@ import aimo.backend.domains.ai.dto.request.UpdateContentToPrivatePostRequest;
 public record UpdateContentToPrivatePostParameter(
 	String accessKey,
 	Boolean status,
-	Long id,
+	Long privatePostId,
 	String title,
 	String stancePlaintiff,
 	String stanceDefendant,
@@ -17,7 +17,7 @@ public record UpdateContentToPrivatePostParameter(
 		return new UpdateContentToPrivatePostParameter(
 			request.accessKey(),
 			request.status(),
-			request.id(),
+			request.privatePostId(),
 			request.title(),
 			request.stancePlaintiff(),
 			request.stanceDefendant(),
