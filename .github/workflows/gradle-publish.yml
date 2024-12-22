@@ -162,8 +162,9 @@ jobs:
             echo "Deregistering instance $INSTANCE_ID from target group $TARGET_GROUP_ARN"
             aws elbv2 deregister-targets --target-group-arn "$TARGET_GROUP_ARN" --targets Id="$INSTANCE_ID"
 
-            # 기존 애플리케이션 종료 - 모든 screen 세션 종료
-            screen -ls | grep -o '[0-9]*\.[^ ]*' | xargs -n 1 -I {} screen -S {} -X quit
+            # 기존 애플리케이션 종료 - backend 스크린 세션 종료
+            echo "Terminating existing 'backend' screen session if it exists"
+            screen -S backend -X quit || echo "No existing 'backend' screen session to terminate"
 
             # S3에서 새로운 JAR 파일 다운로드
             echo "Downloading JAR file from S3"
@@ -171,7 +172,8 @@ jobs:
 
             # 새로운 애플리케이션 실행
             echo "Starting new application instance"
-            screen -dmS be java -jar /home/ubuntu/backend-server.jar
+            screen -dmS backend java -jar /home/ubuntu/backend-server.jar
+
 
             # 애플리케이션 시작 대기
             sleep 30
