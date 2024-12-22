@@ -12,7 +12,7 @@ public record SpeechToTextCallbackRequest(
 	@NotBlank(message = "script가 필요합니다.")
 	String script,
 	@NotNull(message = "id가 필요합니다.")
-	Long id,
+	Long memberId,
 	@NotNull(message = "privatePostId가 필요합니다.")
 	Long privatePostId
 ) {

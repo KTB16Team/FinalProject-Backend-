@@ -49,7 +49,7 @@ public class AIController {
 		@Valid @RequestBody SpeechToTextCallbackRequest request
 	) {
 		UploadFileRecordAndJudgementParameter parameter = new UploadFileRecordAndJudgementParameter(
-			request.id(),
+			request.memberId(),
 			request.script(),
 			OriginType.VOICE,
 			request.privatePostId());
@@ -74,7 +74,7 @@ public class AIController {
 		@Valid @RequestBody ImageToTextCallbackRequest request
 	) {
 		UploadFileRecordAndJudgementParameter parameter = new UploadFileRecordAndJudgementParameter(
-			request.id(),
+			request.memberId(),
 			request.script(),
 			OriginType.IMAGE,
 			request.privatePostId());
