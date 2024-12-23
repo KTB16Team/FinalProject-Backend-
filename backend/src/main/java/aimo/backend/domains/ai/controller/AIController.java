@@ -52,7 +52,8 @@ public class AIController {
 			request.memberId(),
 			request.script(),
 			OriginType.VOICE,
-			request.privatePostId());
+			request.privatePostId(),
+			request.accessKey());
 
 		aiService.uploadFileRecordAndJudgement(parameter);
 
@@ -77,7 +78,8 @@ public class AIController {
 			request.memberId(),
 			request.script(),
 			OriginType.IMAGE,
-			request.privatePostId());
+			request.privatePostId(),
+			request.accessKey());
 
 		aiService.uploadFileRecordAndJudgement(parameter);
 
@@ -106,7 +108,8 @@ public class AIController {
 		@Valid @RequestBody UpdateContentToPrivatePostRequest request
 	) {
 		UpdateContentToPrivatePostParameter parameter = UpdateContentToPrivatePostParameter.from(request);
-		privatePostService.updateContentToPrivatePost(parameter);
+
+		aiService.validateAccessKeyAndUpdateContentToPrivatePost(parameter, request.accessKey());
 
 		return ResponseEntity.ok(DataResponse.ok());
 	}

@@ -44,9 +44,6 @@ public class PrivatePostService {
 	// AI로부터 받은 콜백 응답을 기존에 저장했던 PrivatePost에 업데이트
 	@Transactional
 	public void updateContentToPrivatePost(UpdateContentToPrivatePostParameter parameter) {
-		// 키 확인
-		validateKey(parameter.accessKey());
-
 		Long privatePostId = parameter.privatePostId();
 		PrivatePost privatePost = privatePostRepository.findById(privatePostId)
 			.orElseThrow(() -> ApiException.from(ErrorCode.PRIVATE_POST_NOT_FOUND));
@@ -76,13 +73,6 @@ public class PrivatePostService {
 
 		// 포인트 감소
 		memberPointService.decreaseMemberPoint(privatePost.getMember().getId(), DecreasePoint.AI_REQUEST);
-	}
-
-	// 키 확인
-	private void validateKey(String key) {
-		if (!aiServerProperties.getAccessKey().equals(key)) {
-			throw ApiException.from(ErrorCode.INVALID_ACCESS_KEY);
-		}
 	}
 
 	// 과실 비율 계산

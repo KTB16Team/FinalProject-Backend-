@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.exception.ErrorCode;
 import aimo.backend.common.messageQueue.MessageQueueService;
+import aimo.backend.common.properties.AiServerProperties;
 import aimo.backend.domains.ai.dto.parameter.ImageToTextParameter;
 import aimo.backend.domains.ai.dto.parameter.UploadFileRecordAndJudgementParameter;
 import aimo.backend.domains.ai.dto.parameter.UploadTextRecordAndJudgementParameter;
@@ -17,10 +18,12 @@ import aimo.backend.domains.ai.dto.request.AiSpeechToTextRequest;
 import aimo.backend.domains.ai.dto.request.SummaryAndJudgementRequest;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.member.repository.MemberRepository;
+import aimo.backend.domains.privatePost.dto.parameter.UpdateContentToPrivatePostParameter;
 import aimo.backend.domains.privatePost.entity.PrivatePost;
 import aimo.backend.domains.privatePost.entity.TextRecord;
 import aimo.backend.domains.privatePost.model.OriginType;
 import aimo.backend.domains.privatePost.repository.PrivatePostRepository;
+import aimo.backend.domains.privatePost.service.PrivatePostService;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -30,6 +33,8 @@ public class AIService {
 	private final MessageQueueService messageQueueService;
 	private final MemberRepository memberRepository;
 	private final PrivatePostRepository privatePostRepository;
+	private final AiServerProperties aiServerProperties;
+	private final PrivatePostService privatePostService;
 
 	// mq에 텍스트 판단 요청
 	@Async
@@ -55,6 +60,8 @@ public class AIService {
 	@Async
 	@Transactional(rollbackFor = {ApiException.class, AmqpException.class})
 	public void uploadFileRecordAndJudgement(UploadFileRecordAndJudgementParameter parameter) {
+		validateAccessKey(parameter.accessKey());
+
 		Member member = memberRepository.findById(parameter.memberId())
 			.orElseThrow(() -> ApiException.from(ErrorCode.MEMBER_NOT_FOUND));
 
@@ -105,5 +112,17 @@ public class AIService {
 			privatePost.getId());
 
 		messageQueueService.imageToText(request);
+	}
+
+	public void validateAccessKey(String accessKey) {
+		if (!aiServerProperties.getAccessKey().equals(accessKey)) {
+			throw ApiException.from(ErrorCode.INVALID_ACCESS_KEY);
+		}
+	}
+
+	public void validateAccessKeyAndUpdateContentToPrivatePost(UpdateContentToPrivatePostParameter parameter, String accessKey) {
+		validateAccessKey(accessKey);
+
+		privatePostService.updateContentToPrivatePost(parameter);
 	}
 }

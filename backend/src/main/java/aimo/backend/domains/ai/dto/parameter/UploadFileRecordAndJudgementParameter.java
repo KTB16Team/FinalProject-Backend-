@@ -6,6 +6,7 @@ public record UploadFileRecordAndJudgementParameter(
 	Long memberId,
 	String content,
 	OriginType originType,
-	Long privatePostId
+	Long privatePostId,
+	String accessKey
 ) {
 }
