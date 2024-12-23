@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import aimo.backend.common.dto.PageResponse;
 import aimo.backend.common.exception.ApiException;
 import aimo.backend.common.exception.ErrorCode;
-import aimo.backend.common.properties.AiServerProperties;
 import aimo.backend.domains.member.entity.Member;
 import aimo.backend.domains.member.model.DecreasePoint;
 import aimo.backend.domains.member.repository.MemberRepository;
@@ -38,7 +37,6 @@ public class PrivatePostService {
 
 	private final PrivatePostRepository privatePostRepository;
 	private final MemberRepository memberRepository;
-	private final AiServerProperties aiServerProperties;
 	private final MemberPointService memberPointService;
 
 	// AI로부터 받은 콜백 응답을 기존에 저장했던 PrivatePost에 업데이트
@@ -139,8 +137,9 @@ public class PrivatePostService {
 
 	// 개인글 목록 조회
 	public PageResponse<PrivatePostPreviewResponse> findPrivatePostPreviewsBy(
-		FindPrivatePostPreviewParameter parameter) {
-		Page<PrivatePostPreviewResponse> privatePosts = privatePostRepository.findByMemberId(parameter.memberId(),
+		FindPrivatePostPreviewParameter parameter
+	) {
+		Page<PrivatePostPreviewResponse> privatePosts = privatePostRepository.findAllByMemberId(parameter.memberId(),
 				parameter.pageable())
 			.map(PrivatePostPreviewResponse::from);
 
