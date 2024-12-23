@@ -7,6 +7,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.Builder;
@@ -19,7 +20,11 @@ import lombok.NoArgsConstructor;
 	name = "post_likes",
 	uniqueConstraints = {
 		@UniqueConstraint(columnNames = {"post_id", "member_id"})
-	})
+	},
+	indexes = {
+		@Index(name = "post_likes_idx", columnList = "post_id, member_id")
+	}
+)
 @NoArgsConstructor(access = PROTECTED)
 public class PostLike {
 
