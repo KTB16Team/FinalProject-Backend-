@@ -21,7 +21,6 @@ import aimo.backend.domains.ai.service.AIService;
 import aimo.backend.domains.privatePost.dto.parameter.UpdateContentToPrivatePostParameter;
 import aimo.backend.domains.privatePost.dto.request.UploadTextRecordAndRequestJudgementRequest;
 import aimo.backend.domains.privatePost.model.OriginType;
-import aimo.backend.domains.privatePost.service.PrivatePostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -31,7 +30,6 @@ import lombok.RequiredArgsConstructor;
 public class AIController {
 
 	private final AIService aiService;
-	private final PrivatePostService privatePostService;
 
 	@PostMapping("/private-posts/speech-to-text")
 	public ResponseEntity<DataResponse<Void>> speechToText(

@@ -16,7 +16,13 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(name = "parent_comments")
+@Table(
+	name = "parent_comments",
+	indexes = {
+		@Index(name = "parent_comments_idx_member_id", columnList = "member_id"),
+		@Index(name = "parent_comments_idx_post_id", columnList = "post_id")
+	}
+)
 @NoArgsConstructor(access = PROTECTED)
 public class ParentComment extends BaseEntity {
 
