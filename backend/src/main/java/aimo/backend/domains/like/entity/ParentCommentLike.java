@@ -6,6 +6,7 @@ import aimo.backend.domains.comment.entity.ParentComment;
 import aimo.backend.domains.member.entity.Member;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -20,7 +21,11 @@ import lombok.NoArgsConstructor;
 	name = "parent_comment_likes",
 	uniqueConstraints = {
 		@UniqueConstraint(columnNames = {"parent_comment_id", "member_id"})
-	})
+	},
+	indexes = {
+		@Index(name = "parent_comment_likes_idx", columnList = "parent_comment_id, member_id")
+	}
+)
 @NoArgsConstructor(access = PROTECTED)
 public class ParentCommentLike extends Like {
 

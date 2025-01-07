@@ -19,11 +19,11 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 	Boolean existsByIdAndMember_Id(Long postId, Long memberId);
 
 	@Query("""
-    SELECT DISTINCT p
-    FROM Post p
-    LEFT JOIN ParentComment pc ON pc.post.id = p.id
-    LEFT JOIN ChildComment cc ON cc.post.id = p.id
-    WHERE pc.member.id = :memberId OR cc.member.id = :memberId
-""")
+		    SELECT DISTINCT p
+		    FROM Post p
+		    LEFT JOIN ParentComment pc ON pc.post.id = p.id
+		    LEFT JOIN ChildComment cc ON cc.post.id = p.id
+		    WHERE pc.member.id = :memberId OR cc.member.id = :memberId
+		""")
 	Page<Post> findPostsByCommentsWrittenByMember(@Param("memberId") Long memberId, Pageable pageable);
 }

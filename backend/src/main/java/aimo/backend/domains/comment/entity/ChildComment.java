@@ -17,6 +17,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
@@ -27,7 +28,13 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(name = "child_comments")
+@Table(
+	name = "child_comments",
+	indexes = {
+		@Index(name = "child_comments_idx_member_id", columnList = "member_id"),
+		@Index(name = "child_comments_idx_post_id", columnList = "post_id")
+	}
+)
 @NoArgsConstructor(access = PROTECTED)
 public class ChildComment extends BaseEntity {
 

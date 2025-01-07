@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import aimo.backend.domains.privatePost.entity.PrivatePost;
 
 public interface PrivatePostRepository extends JpaRepository<PrivatePost, Long> {
-	Page<PrivatePost> findByMemberId(Long memberId, Pageable pageable);
+	Page<PrivatePost> findAllByMemberId(Long memberId, Pageable pageable);
 
 	Optional<PrivatePost> findByMember_IdAndId(Long memberId, Long id);
 }

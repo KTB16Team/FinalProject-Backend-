@@ -22,8 +22,6 @@ public record SignUpRequest(
 	@NotBlank(message = "password가 빈 문자열입니다.")
 	@Size(min = 6, message = "비밀번호는 6자 이상이어야 합니다.")
 	String password,
-	@JsonSetter(nulls = Nulls.SKIP)
-	String url,
   	@NotNull(message = "gender가 비었습니다.")
 	Gender gender,
   	@Past(message = "생년월일은 과거 날짜여야 합니다.")
